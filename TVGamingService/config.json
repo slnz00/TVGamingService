@@ -1,0 +1,25 @@
+{
+  "PC": {
+    "SoundDevice": "Headset Earphone",
+    "DisplayModel": "GSM5B38",
+    "DisplayResolution": {
+      "Width": 1920,
+      "Height": 1080
+    }
+  },
+  "TV": {
+    "SoundDevice": "SAMSUNG",
+    "DisplayModel": "SAM0FA0",
+    "DisplayResolution": {
+      "Width": 3840,
+      "Height": 2160
+    }
+  },
+
+  "Playnite": {
+    "Path": "C:\\Users\\Balint\\AppData\\Local\\Playnite\\Playnite.FullscreenApp.exe"
+  },
+  "DS4Windows": {
+    "Path": "C:\\TVGaming\\DS4Windows_v3010\\DS4Windows.exe"
+  }
+}
