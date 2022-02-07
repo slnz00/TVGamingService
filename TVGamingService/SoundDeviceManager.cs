@@ -51,26 +51,28 @@ namespace TVGamingService
 
         private static void SetDefaultSoundDeviceLoop(string targetDeviceName, uint timeout)
         {
-            uint loopCount = timeout / 1000 + 1;
+            uint tries = timeout / 1000 + 1;
 
-            while (loopCount > 0)
+            while (tries > 0)
             {
-                TryToSetDefaultDevice(targetDeviceName);
-                Thread.Sleep(200);
+                lock (threadLock) {
+                    TryToSetDefaultDevice(targetDeviceName);
+                    Thread.Sleep(200);
 
-                string defaultDeviceName = GetDefaultSoundDeviceName();
-                bool failedToRetrieveDefaultDevice = defaultDeviceName == null;
-                bool deviceSuccesfullySet = defaultDeviceName == targetDeviceName;
+                    string defaultDeviceName = GetDefaultSoundDeviceName();
+                    bool failedToRetrieveDefaultDevice = defaultDeviceName == null;
+                    bool deviceSuccesfullySet = defaultDeviceName == targetDeviceName;
 
-                Console.WriteLine($"AudioChange: Current: {defaultDeviceName} Target: {targetDeviceName}");
+                    Console.WriteLine($"AudioChange: Current: {defaultDeviceName} Target: {targetDeviceName}");
 
-                if (failedToRetrieveDefaultDevice || deviceSuccesfullySet)
-                {
-                    break;
+                    if (failedToRetrieveDefaultDevice || deviceSuccesfullySet)
+                    {
+                        break;
+                    }
                 }
 
                 Thread.Sleep(800);
-                loopCount--;
+                tries--;
             }
         }
 

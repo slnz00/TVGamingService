@@ -13,6 +13,8 @@ namespace TVGamingService
         static readonly Config config = Config.LoadFromFile();
 
         static readonly string PLAYNITE_PROCESS_NAME = "Playnite.FullscreenApp";
+        static readonly string EGL_PROCESS_NAME = "EpicGamesLauncher";
+        static readonly string STEAM_PROCESS_NAME = "Steam";
 
         static bool isTvEnvironment = false;
         static Thread playniteWatcherThread = null;
@@ -89,6 +91,13 @@ namespace TVGamingService
             }
         }
 
+        static void ManageGameStores()
+        {
+            if (!isTvEnvironment) {
+                Utils.CloseProcess(STEAM_PROCESS_NAME, true);
+                Utils.CloseProcess(EGL_PROCESS_NAME, true);
+            }
+        }
 
         static void ManageDS4Windows()
         {

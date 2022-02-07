@@ -12,11 +12,11 @@ namespace TVGamingService
             return $"{execDir}/{relativePath}";
         }
 
-        public static void CloseProcess(string processName) {
+        public static void CloseProcess(string processName, bool forceKill = false) {
             Process[] playniteProcesses = Process.GetProcessesByName(processName);
             foreach (Process process in playniteProcesses)
             {
-                if (!process.CloseMainWindow())
+                if (!process.CloseMainWindow() || forceKill)
                 {
                     process.Kill();
                 }
