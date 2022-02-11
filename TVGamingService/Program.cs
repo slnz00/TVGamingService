@@ -39,6 +39,7 @@ namespace TVGamingService
             ManageDesktops();
             ManageDS4Windows();
             ManagePlaynite();
+            ManageGameStores();
         }
 
         static void ManageDesktops()
