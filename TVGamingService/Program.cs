@@ -63,10 +63,9 @@ namespace TVGamingService
             var displays = LegacyDisplayManager.GetDisplays();
             displays[0].Disable();
 
-            var resolution = isTvEnvironment ? config.TV.DisplayResolution : config.PC.DisplayResolution;
+            var env = isTvEnvironment ? config.TV : config.PC;
             displays = LegacyDisplayManager.GetDisplays();
-            displays[1].SetAsPrimary();
-            displays[1].SetResolution(resolution.Width, resolution.Height);
+            displays[1].SetAsPrimary(env.DisplayRefreshRate, env.DisplayResolution.Width, env.DisplayResolution.Height);
 
             LegacyDisplayManager.SaveDisplaySettings();
         }

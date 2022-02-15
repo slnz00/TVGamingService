@@ -21,27 +21,14 @@ namespace TVGamingService
                 GUID = GetGUID();
             }
 
-            public void SetAsPrimary() {
+            public void SetAsPrimary(int rate, short width, short height) {
                 var deviceMode = new DEVMODE();
                 EnumDisplaySettings(AdapterDevice.DeviceName, -1, ref deviceMode);
 
-                ChangeDisplaySettingsEx(
-                   AdapterDevice.DeviceName,
-                   ref deviceMode,
-                   (IntPtr)null,
-                   ChangeDisplaySettingsFlags.CDS_SET_PRIMARY | ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY | ChangeDisplaySettingsFlags.CDS_NORESET,
-                   IntPtr.Zero
-               );
-            }
-
-            public void SetResolution(short width, short height)
-            {
-                var deviceMode = new DEVMODE();
-                EnumDisplaySettings(AdapterDevice.DeviceName, -1, ref deviceMode);
-
+                deviceMode.dmDisplayFrequency = rate;
                 deviceMode.dmPelsWidth = width;
                 deviceMode.dmPelsHeight = height;
-                deviceMode.dmFields = DEVMODEFlags.PelsHeight | DEVMODEFlags.PelsWidth;
+                deviceMode.dmFields = DEVMODEFlags.PelsHeight | DEVMODEFlags.PelsWidth | DEVMODEFlags.DisplayFrequency;
 
                 ChangeDisplaySettingsEx(
                    AdapterDevice.DeviceName,

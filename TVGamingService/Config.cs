@@ -31,6 +31,7 @@ namespace TVGamingService
         public string SoundDevice { get; set; }
         public string DisplayModel { get; set; }
         public DisplayResolutionConfig DisplayResolution { get; set; }
+        public int DisplayRefreshRate { get; set; }
     }
 
     internal class AppConfig

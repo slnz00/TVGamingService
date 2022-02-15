@@ -16,12 +16,41 @@ namespace TVGamingService
             Win = 0x0008
         }
 
+        private class HotkeyData
+        {
+            public static readonly long HOTKEY_TIMEOUT_SECS = 2;
+
+            private Action _handler;
+            private long _lastActivatedAt;
+
+            public bool IsActive
+            {
+                get
+                {
+                    long now = DateTimeOffset.Now.ToUnixTimeSeconds();
+                    return _lastActivatedAt + HOTKEY_TIMEOUT_SECS < now;
+                }
+            }
+
+            public HotkeyData(Action handler) {
+                _handler = handler;
+                _lastActivatedAt = 0;
+            }
+
+            public void TriggerAction()
+            {
+                _lastActivatedAt = DateTimeOffset.Now.ToUnixTimeSeconds();
+                _handler();
+            }
+        }
+
         const int HOTKEY_ID_BASE = 1;
         const int WM_HOTKEY = 0x0312;
 
+
         int hotkeyIdCounter = 0;
 
-        Dictionary<int, Action> hotkeyHandlers = new Dictionary<int, Action>();
+        Dictionary<int, HotkeyData> hotkeys = new Dictionary<int, HotkeyData>();
 
         public HotkeyManager()
         {
@@ -30,7 +59,7 @@ namespace TVGamingService
 
         public void Dispose()
         {
-            foreach (var item in hotkeyHandlers)
+            foreach (var item in hotkeys)
             {
                 UnregisterHotKey(IntPtr.Zero, item.Key);
             }
@@ -41,8 +70,9 @@ namespace TVGamingService
             int hotkeyId = HOTKEY_ID_BASE + hotkeyIdCounter;
 
             bool result = RegisterHotKey(IntPtr.Zero, 1, (int)keyModifiers, key.GetHashCode());
-            if (result) {
-                hotkeyHandlers.Add(hotkeyId, action);
+            if (result)
+            {
+                hotkeys.Add(hotkeyId, new HotkeyData(action));
                 hotkeyIdCounter++;
             }
 
@@ -54,9 +84,10 @@ namespace TVGamingService
             if (msg.message == WM_HOTKEY)
             {
                 int hotkeyId = (int)msg.wParam.ToUInt32();
-                bool actionRegistered = hotkeyHandlers.TryGetValue(hotkeyId, out Action handler);
-                if (actionRegistered) {
-                    handler();
+                bool hotkeyRegistered = hotkeys.TryGetValue(hotkeyId, out HotkeyData hotkey);
+                if (hotkeyRegistered && hotkey.IsActive)
+                {
+                    hotkey.TriggerAction();
                 }
             }
         }

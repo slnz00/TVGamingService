@@ -5,7 +5,8 @@
     "DisplayResolution": {
       "Width": 1920,
       "Height": 1080
-    }
+    },
+    "DisplayRefreshRate": 144
   },
   "TV": {
     "SoundDevice": "SAMSUNG",
@@ -13,7 +14,8 @@
     "DisplayResolution": {
       "Width": 3840,
       "Height": 2160
-    }
+    },
+    "DisplayRefreshRate": 60
   },
 
   "Playnite": {
