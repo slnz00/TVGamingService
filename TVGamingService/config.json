@@ -9,7 +9,7 @@
     "DisplayRefreshRate": 144
   },
   "TV": {
-    "SoundDevice": "SAMSUNG",
+    "SoundDevice": "3 - SAMSUNG",
     "DisplayModel": "SAM0FA0",
     "DisplayResolution": {
       "Width": 3840,
