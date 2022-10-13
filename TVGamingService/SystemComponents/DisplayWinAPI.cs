@@ -1,123 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace TVGamingService
+namespace TVGamingService.SystemComponents
 {
-    class LegacyDisplayManager : DisplayWinAPI
+    class DisplayWinAPI
     {
-        public class Display
-        {
-            public string ModelNumber;
-            public string GUID;
-            public DISPLAY_DEVICE AdapterDevice;
-            public DISPLAY_DEVICE MonitorDevice;
-
-            public Display (DISPLAY_DEVICE adapterDevice, DISPLAY_DEVICE monitorDevice)
-            {
-                AdapterDevice = adapterDevice;
-                MonitorDevice = monitorDevice;
-                ModelNumber = GetModelNumber();
-                GUID = GetGUID();
-            }
-
-            public void SetAsPrimary(int rate, short width, short height) {
-                var deviceMode = new DEVMODE();
-                EnumDisplaySettings(AdapterDevice.DeviceName, -1, ref deviceMode);
-
-                deviceMode.dmDisplayFrequency = rate;
-                deviceMode.dmPelsWidth = width;
-                deviceMode.dmPelsHeight = height;
-                deviceMode.dmFields = DEVMODEFlags.PelsHeight | DEVMODEFlags.PelsWidth | DEVMODEFlags.DisplayFrequency;
-
-                ChangeDisplaySettingsEx(
-                   AdapterDevice.DeviceName,
-                   ref deviceMode,
-                   (IntPtr)null,
-                   ChangeDisplaySettingsFlags.CDS_SET_PRIMARY | ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY | ChangeDisplaySettingsFlags.CDS_NORESET,
-                   IntPtr.Zero
-               );
-            }
-
-            public void Disable()
-            {
-                var deviceMode = new DEVMODE();
-                EnumDisplaySettings(AdapterDevice.DeviceName, -1, ref deviceMode);
-
-                deviceMode.dmPosition.x = 0;
-                deviceMode.dmPosition.y = 0;
-                deviceMode.dmPelsWidth = 0;
-                deviceMode.dmPelsHeight = 0;
-                deviceMode.dmFields = DEVMODEFlags.PelsHeight | DEVMODEFlags.PelsWidth | DEVMODEFlags.Position;
-
-                ChangeDisplaySettingsEx(
-                    AdapterDevice.DeviceName,
-                    ref deviceMode,
-                    (IntPtr)null,
-                    ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY | ChangeDisplaySettingsFlags.CDS_NORESET,
-                    IntPtr.Zero
-                );
-            }
-
-            private string GetModelNumber()
-            {
-                string[] deviceIdParts = MonitorDevice.DeviceID.Split('\\');
-                return deviceIdParts[1];
-            }
-
-            private string GetGUID()
-            {
-                string[] deviceIdParts = MonitorDevice.DeviceID.Split('\\');
-                return deviceIdParts[2].Replace("{", "").Replace("}", "");
-            }
-        }
-
-        public static void SaveDisplaySettings() {
-            ChangeDisplaySettingsEx(null, IntPtr.Zero, (IntPtr)null, ChangeDisplaySettingsFlags.CDS_NONE, (IntPtr)null);
-        }
-
-        public static List<Display> GetDisplays() {
-            List<Display> displays = new List<Display>();
-
-            var adapterDevice = new DISPLAY_DEVICE();
-            adapterDevice.cb = Marshal.SizeOf(adapterDevice);
-
-            var monitorDevice = new DISPLAY_DEVICE();
-            monitorDevice.cb = Marshal.SizeOf(adapterDevice);
-
-            for (uint adapterId = 0; EnumDisplayDevices(null, adapterId, ref adapterDevice, 0); adapterId++)
-            {
-                EnumDisplayDevices(adapterDevice.DeviceName, 0, ref monitorDevice, 0);
-
-                displays.Add(new Display(adapterDevice, monitorDevice));
-
-                monitorDevice = new DISPLAY_DEVICE();
-                monitorDevice.cb = Marshal.SizeOf(adapterDevice);
-                adapterDevice = new DISPLAY_DEVICE();
-                adapterDevice.cb = Marshal.SizeOf(adapterDevice);
-            }
-
-            return displays;
-        }
-    }
-
-
-    class DisplayWinAPI {
         [DllImport("user32.dll")]
-        protected static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
+        public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
 
         [DllImport("user32.dll")]
         // A signature for ChangeDisplaySettingsEx with a DEVMODE struct as the second parameter won't allow you to pass in IntPtr.Zero, so create an overload
-        protected static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, IntPtr lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
+        public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, IntPtr lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
 
         [DllImport("user32.dll")]
-        protected static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
+        public static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
 
         [DllImport("user32.dll")]
-        protected static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+        public static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern long SetDisplayConfig(uint numPathArrayElements, IntPtr pathArray, uint numModeArrayElements, IntPtr modeArray, uint flags);
+        public static extern long SetDisplayConfig(uint numPathArrayElements, IntPtr pathArray, uint numModeArrayElements, IntPtr modeArray, uint flags);
 
         public enum DISP_CHANGE : int
         {
@@ -229,7 +131,8 @@ namespace TVGamingService
         }
 
         [Flags()]
-        public enum DisplayConfigFlags : uint {
+        public enum DisplayConfigFlags : uint
+        {
             SDC_TOPOLOGY_INTERNAL = 0x00000001,
             SDC_TOPOLOGY_CLONE = 0x00000002,
             SDC_TOPOLOGY_EXTEND = 0x00000004,

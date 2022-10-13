@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace TVGamingService
+namespace TVGamingService.SystemComponents
 {
-    internal class MessageLoop
+    internal static class MessageLoop
     {
         private const int WM_CUSTOM_EXIT = 0x0400 + 2000;
-
-        private static List<Action<MSG>> _messageHandlers = new List<Action<MSG>>();
 
         [DllImport(@"user32.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall)]
         private static extern bool GetMessage(ref MSG message, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
@@ -35,7 +33,19 @@ namespace TVGamingService
             public POINT pt;
         }
 
-        public static void Run() {
+        private static bool running = false;
+        private static List<Action<MSG>> messageHandlers = new List<Action<MSG>>();
+
+        public static bool IsRunning => running;
+
+        public static void Run()
+        {
+            if (running)
+            {
+                throw new InvalidOperationException("Cannot run message loop multiple times, message loop is already running");
+            }
+            running = true;
+
             MSG msg = new MSG();
 
             while (GetMessage(ref msg, IntPtr.Zero, 0, 0))
@@ -45,27 +55,28 @@ namespace TVGamingService
                     break;
                 }
 
-                foreach (var handler in _messageHandlers) {
-                    handler(msg);
-                }
+                messageHandlers.ForEach(handler => handler(msg));
 
                 TranslateMessage(ref msg);
                 DispatchMessage(ref msg);
             }
         }
 
-        public static uint RegisterMessageHandler(Action<MSG> handler) {
-            _messageHandlers.Add(handler);
+        public static uint RegisterMessageHandler(Action<MSG> handler)
+        {
+            messageHandlers.Add(handler);
 
-            return (uint)_messageHandlers.Count - 1;
+            return (uint)messageHandlers.Count - 1;
         }
 
-        public static bool UnregisterMessageHandler(uint id) {
-            if (id >= _messageHandlers.Count) {
+        public static bool UnregisterMessageHandler(uint id)
+        {
+            if (id >= messageHandlers.Count)
+            {
                 return false;
             }
 
-            _messageHandlers.RemoveAt((int)id);
+            messageHandlers.RemoveAt((int)id);
             return true;
         }
     }

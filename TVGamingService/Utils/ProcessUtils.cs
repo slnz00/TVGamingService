@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection;
+using TVGamingService.Providers;
 
-namespace TVGamingService
+namespace TVGamingService.Utils
 {
-    internal static class Utils
+    internal static class ProcessUtils
     {
-        public static string GetFullPath(string relativePath) {
-            string execDir = new FileInfo(Assembly.GetEntryAssembly().Location).DirectoryName;
-            return $"{execDir}/{relativePath}";
-        }
+        private static readonly LoggerProvider Logger = new LoggerProvider(typeof(ProcessUtils).Name);
 
-        public static void CloseProcess(string processName, bool forceKill = false) {
+        public static void CloseProcess(string processName, bool forceKill = false)
+        {
             Process[] playniteProcesses = Process.GetProcessesByName(processName);
+
             foreach (Process process in playniteProcesses)
             {
                 if (!process.CloseMainWindow() || forceKill)
@@ -26,11 +24,12 @@ namespace TVGamingService
 
         public static void StartProcess(
             string path,
-            string args = "", 
+            string args = "",
             ProcessWindowStyle windowStyle = ProcessWindowStyle.Normal,
             bool waitForExit = false,
             Action<ProcessStartInfo> customizeStartInfo = null
-        ) {
+        )
+        {
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = windowStyle == ProcessWindowStyle.Hidden;
             startInfo.UseShellExecute = false;
@@ -38,7 +37,8 @@ namespace TVGamingService
             startInfo.WindowStyle = windowStyle;
             startInfo.Arguments = args;
 
-            if (customizeStartInfo != null) {
+            if (customizeStartInfo != null)
+            {
                 customizeStartInfo(startInfo);
             }
 
@@ -53,9 +53,9 @@ namespace TVGamingService
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine($"Failed to start process: {path}, {ex.Message}");
+                Logger.Error($"Failed to start process: {path}, exception: {e}");
             }
         }
     }
