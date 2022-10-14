@@ -35,8 +35,6 @@ namespace TVGamingService.Source.Services
             Logger.Debug($"Switching desktop to: {desktopName}");
 
             ExecVirtualDesktop($"/New /Name:{desktopName} /Switch");
-
-            Logger.Info($"Desktop switched to: {desktopName}");
         }
 
         public void RemoveDesktop(string desktopName)
@@ -44,17 +42,15 @@ namespace TVGamingService.Source.Services
             Logger.Debug($"Removing desktop: {desktopName}");
 
             ExecVirtualDesktop($"/Remove:{desktopName}");
-
-            Logger.Info($"Desktop removed: {desktopName}");
         }
 
         public void ToggleIconsVisiblity()
         {
+            Logger.Debug("Toggling desktop icons visibility");
+
             var toggleDesktopCommand = new IntPtr(0x7402);
             IntPtr hWnd = GetWindow(FindWindow("Progman", "Program Manager"), GetWindowCommand.GW_CHILD);
             SendMessage(hWnd, WM_ICONS_VISIBILITY_COMMAND, toggleDesktopCommand, IntPtr.Zero);
-
-            Logger.Debug("Desktop icons visibility toggled");
         }
 
         private void ExecVirtualDesktop(string args) {

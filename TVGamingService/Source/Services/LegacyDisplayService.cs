@@ -99,8 +99,6 @@ namespace TVGamingService.Source.Services
                 ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY | ChangeDisplaySettingsFlags.CDS_NORESET,
                 IntPtr.Zero
             );
-
-            Logger.Info($"Display disabled: {display}");
         }
     }
 }

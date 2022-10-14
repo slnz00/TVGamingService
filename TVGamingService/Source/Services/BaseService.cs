@@ -37,8 +37,6 @@ namespace TVGamingService.Source.Services
 
         public void Dispose()
         {
-            Logger.Debug($"Disposing");
-
             var time = TimerUtils.MeasurePerformance(() => OnDispose());
 
             Logger.Debug($"Disposed, took: {time}ms");

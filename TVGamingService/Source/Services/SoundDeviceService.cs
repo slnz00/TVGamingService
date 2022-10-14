@@ -107,7 +107,7 @@ namespace TVGamingService.Source.Services
 
         private void TryToSetDefaultDevice(string deviceName)
         {
-            ProcessUtils.StartProcess(NIRCMD_PATH, $"setdefaultsounddevice \"{deviceName}\"", ProcessWindowStyle.Hidden, true);
+            ExecNIRCMD($"setdefaultsounddevice \"{deviceName}\"");
         }
 
         private void ExecNIRCMD(string args)

@@ -29,8 +29,6 @@ namespace TVGamingService.Source.Services
 
         protected override void OnInitialize()
         {
-            Logger.Debug($"Console window default visibility: {DEFAULT_VISIBILITY}");
-
             SetConsoleVisibility(DEFAULT_VISIBILITY);
         }
 

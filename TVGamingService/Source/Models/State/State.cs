@@ -37,7 +37,6 @@ namespace TVGamingService.Source.Models
 
             var changeActions = GetChangeActions(oldValue, newValue);
             changeActions.ForEach(action => action.Run());
-            Logger.Debug($"State change actions successfully executed, count: {changeActions.Count}");
         }
 
         private List<StateChangeAction<TState>> GetChangeActions(TState oldValue, TState newValue)
