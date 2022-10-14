@@ -13,8 +13,8 @@ namespace TVGamingService
         public static readonly string DESKTOP_TV_NAME = "TVGaming";
 
         public static readonly string PATH_CONFIG = FSUtils.GetAbsolutePath("config.json");
-        public static readonly string PATH_VIRTUAL_DESKTOP = FSUtils.GetAbsolutePath("deps/vd.exe");
-        public static readonly string PATH_NIRCMD = FSUtils.GetAbsolutePath("deps/nircmd.exe");
+        public static readonly string PATH_VIRTUAL_DESKTOP = FSUtils.GetAbsolutePath("Binaries/vd.exe");
+        public static readonly string PATH_NIRCMD = FSUtils.GetAbsolutePath("Binaries/nircmd.exe");
 
         public static readonly uint TIMEOUT_HOTKEY_ACTION = 1000;
         public static readonly uint TIMEOUT_DEFAULT_SOUND_DEVICE_SET = 25_000;
