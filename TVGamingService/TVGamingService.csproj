@@ -144,12 +144,6 @@
     <Compile Include="Providers\LoggerProvider.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\TimerUtils.cs" />
-    <Content Include="Deps\nircmd.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Deps\vd.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
