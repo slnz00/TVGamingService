@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TVGamingService.Properties
+namespace TVGamingService.Source.Properties
 {
 
 
