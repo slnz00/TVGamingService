@@ -43,7 +43,7 @@ namespace TVGamingService.Source
             Services.Hotkey.RegisterAction("SwitchEnvironments", InternalSettings.HOTKEY_SWITCH_ENVIRONMENTS, SwitchEnvironment);
             Services.Hotkey.RegisterAction("SwitchEnvironments", InternalSettings.HOTKEY_RESET_ENVIRONMENT, ResetEnvironment);
             Services.Hotkey.RegisterAction("ToggleConsoleVisibility", InternalSettings.HOTKEY_TOGGLE_CONSOLE_VISIBILITY, ToggleConsoleVisibility);
-            // TODO: Implement environment reset + hotkey
+            Services.Hotkey.RegisterAction("ToggleCursorVisibility", InternalSettings.HOTKEY_TOGGLE_CURSOR_VISIBILITY, ToggleCursorVisibility);
         }
 
         static void RegisterStateChangeActions()
@@ -89,12 +89,22 @@ namespace TVGamingService.Source
             Services.Console.ToggleConsoleVisibility();
         }
 
+        static void ToggleCursorVisibility()
+        {
+            LogControllerEvent("Toggling cursor visibility");
+
+            var currentVisibility = Services.Cursor.CursorVisibility;
+            Services.Cursor.SetCursorVisibility(!currentVisibility);
+        }
+
         static void SwitchToPC()
         {
             LogControllerEvent("Switching to PC environment");
 
             var pcConfig = Services.Config.GetConfig().PC;
             var tvDesktopName = InternalSettings.DESKTOP_TV_NAME;
+
+            Services.Cursor.SetCursorVisibility(true);
 
             // Change display and sound device:
             Services.LegacyDisplay.SwitchToDisplay(pcConfig.Display);
@@ -115,6 +125,8 @@ namespace TVGamingService.Source
         {
             LogControllerEvent("Resetting PC environment");
 
+            Services.Cursor.SetCursorVisibility(true);
+
             Services.Apps.Playnite.ClosePlaynite();
             Services.Apps.DS4Windows.CloseDS4Windows(true);
             Services.Apps.GameStore.CloseGameStore(GameStoreTypes.STEAM);
@@ -127,6 +139,8 @@ namespace TVGamingService.Source
 
             var tvConfig = Services.Config.GetConfig().TV;
             var tvDesktopName = InternalSettings.DESKTOP_TV_NAME;
+
+            Services.Cursor.SetCursorVisibility(false);
 
             // Change display and sound device:
             Services.LegacyDisplay.SwitchToDisplay(tvConfig.Display);
@@ -150,6 +164,8 @@ namespace TVGamingService.Source
         static void ResetTV()
         {
             LogControllerEvent("Resetting TV environment");
+
+            Services.Cursor.SetCursorVisibility(false);
 
             Services.Apps.Playnite.ClosePlaynite();
             Services.Apps.DS4Windows.CloseDS4Windows(true);

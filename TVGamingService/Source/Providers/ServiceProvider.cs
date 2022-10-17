@@ -23,6 +23,7 @@ namespace TVGamingService.Source.Providers
         public readonly HotkeyService Hotkey;
         public readonly LegacyDisplayService LegacyDisplay;
         public readonly SoundDeviceService SoundDevice;
+        public readonly CursorService Cursor;
 
         public readonly AppServices Apps;
 
@@ -37,6 +38,7 @@ namespace TVGamingService.Source.Providers
             Hotkey = RegisterService(new HotkeyService(this));
             LegacyDisplay = RegisterService(new LegacyDisplayService(this));
             SoundDevice = RegisterService(new SoundDeviceService(this));
+            Cursor = RegisterService(new CursorService(this));
 
             Apps = new AppServices
             {
