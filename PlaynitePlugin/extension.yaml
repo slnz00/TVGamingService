@@ -1,0 +1,7 @@
+﻿Id: PlaynitePlugin_6dc9c7f6-44f0-4e09-b294-52aac097750a
+Name: Generic Plugin
+Author: slnz00
+Version: 1.0
+Module: TVServicePlugin.dll
+Type: GenericPlugin
+Icon: icon.png
