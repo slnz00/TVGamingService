@@ -84,7 +84,7 @@ namespace BackgroundService.Source.Services.System
             if (IsHiddenCursorRegistry(currentValues))
             {
                 visibleCursorRegistrySnapshot = GetDefaultCursorRegistryValues();
-                Logger.Debug($"Failed to take cursor registry snapshot, hidden cursor values are saved used, reverting to default...");
+                Logger.Debug($"Failed to take cursor registry snapshot since hidden cursor style is used, reverting to default cursor style");
                 SetCursorVisibility(true);
                 return;
             }

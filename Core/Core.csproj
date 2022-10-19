@@ -47,8 +47,11 @@
     <Compile Include="PlaynitePipe\PlaynitePipeServer.cs" />
     <Compile Include="PlaynitePipe\PlaynitePipeSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SystemComponents\DisplayWinAPI.cs" />
+    <Compile Include="SystemComponents\DisplayWinApi.cs" />
     <Compile Include="SystemComponents\MessageLoop.cs" />
+    <Compile Include="SystemComponents\RestartManagerApi.cs" />
+    <Compile Include="Utils\AsyncUtils.cs" />
+    <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\FSUtils.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\TimerUtils.cs" />

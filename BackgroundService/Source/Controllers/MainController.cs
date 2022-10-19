@@ -15,6 +15,8 @@ namespace BackgroundService.Source.Controllers
         private Dictionary<Environments, Func<EnvironmentController>> EnvironmentControllerFactory;
         private EnvironmentController EnvironmentController = null;
 
+        private object threadLock = new object();
+
         public void Run()
         {
             DisplayStartupTitle();
@@ -48,60 +50,74 @@ namespace BackgroundService.Source.Controllers
 
         public void SwitchEnvironment()
         {
-            // Default, startup environment is PC:
-            var isStartupEnvironment = EnvironmentController == null;
-            var isPcEnvironment = isStartupEnvironment || EnvironmentController.Environment == Environments.PC;
-            if (isPcEnvironment)
+            lock (threadLock)
             {
-                ChangeEnvironmentTo(Environments.TV);
-            }
-            else
-            {
-                ChangeEnvironmentTo(Environments.PC);
+                // Default, startup environment is PC:
+                var isStartupEnvironment = EnvironmentController == null;
+                var isPcEnvironment = isStartupEnvironment || EnvironmentController.Environment == Environments.PC;
+                if (isPcEnvironment)
+                {
+                    ChangeEnvironmentTo(Environments.TV);
+                }
+                else
+                {
+                    ChangeEnvironmentTo(Environments.PC);
+                }
             }
         }
 
         public void ChangeEnvironmentTo(Environments environment)
         {
-            LogControllerEvent($"Switching environment to: {GetEnvironmentName(environment)}");
-
-
-            bool controllerExist = EnvironmentControllerFactory.TryGetValue(environment, out var createEnvironmentController);
-            if (!controllerExist)
+            lock (threadLock)
             {
-                Logger.Error($"Failed to change environment, controller instance does not exist for environment: {GetEnvironmentName(environment)}");
-                return;
+                LogControllerEvent($"Switching environment to: {GetEnvironmentName(environment)}");
+
+                bool controllerExist = EnvironmentControllerFactory.TryGetValue(environment, out var createEnvironmentController);
+                if (!controllerExist)
+                {
+                    Logger.Error($"Failed to change environment, controller instance does not exist for environment: {GetEnvironmentName(environment)}");
+                    return;
+                }
+
+                var newController = createEnvironmentController();
+                var currentController = EnvironmentController;
+
+                currentController?.Teardown();
+                newController.Setup();
+
+                EnvironmentController = newController;
             }
-
-            var newController = createEnvironmentController();
-            var currentController = EnvironmentController;
-
-            currentController?.Teardown();
-            newController.Setup();
-
-            EnvironmentController = newController;
         }
 
         private void ResetEnvironment()
         {
-            LogControllerEvent($"Resetting environment: {EnvironmentController.EnvironmentName}");
+            lock (threadLock)
+            {
+                LogControllerEvent($"Resetting environment: {EnvironmentController.EnvironmentName}");
 
-            EnvironmentController.Reset();
+                EnvironmentController.Reset();
+            }
         }
 
         private void ToggleConsoleVisibility()
         {
-            LogControllerEvent("Toggling console visibility");
+            lock (threadLock)
+            {
+                LogControllerEvent("Toggling console visibility");
 
-            Services.System.Console.ToggleConsoleVisibility();
+                Services.System.Console.ToggleConsoleVisibility();
+            }
         }
 
         private void ToggleCursorVisibility()
         {
-            LogControllerEvent("Toggling cursor visibility");
+            lock (threadLock)
+            {
+                LogControllerEvent("Toggling cursor visibility");
 
-            var currentVisibility = Services.System.Cursor.CursorVisibility;
-            Services.System.Cursor.SetCursorVisibility(!currentVisibility);
+                var currentVisibility = Services.System.Cursor.CursorVisibility;
+                Services.System.Cursor.SetCursorVisibility(!currentVisibility);
+            }
         }
 
         private string GetEnvironmentName(Environments environment)

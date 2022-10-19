@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
 using BackgroundService.Source.Services.System.Models;
-using static Core.SystemComponents.DisplayWinAPI;
+using static Core.SystemComponents.DisplayWinApi;
 
 namespace BackgroundService.Source.Services.System
 {

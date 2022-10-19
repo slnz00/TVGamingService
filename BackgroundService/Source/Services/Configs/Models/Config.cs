@@ -17,6 +17,7 @@
     {
         public SoundDeviceConfig SoundDevice { get; set; }
         public DisplayConfig Display { get; set; }
+        public string WallpaperPath { get; set; }
     }
 
     internal class SoundDeviceConfig

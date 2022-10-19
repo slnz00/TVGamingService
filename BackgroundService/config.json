@@ -4,13 +4,14 @@
       "DeviceName": "Headset Earphone"
     },
     "Display": {
-      "DeviceName": "GSM5B38",
+      "DeviceName": "GSM5BD3",
       "Resolution": {
-        "Width": 1920,
-        "Height": 1080
+        "Width": 2560,
+        "Height": 1440
       },
       "RefreshRate": 144
-    }
+    },
+    "WallpaperPath": "C:/TVGaming/Wallpapers/PC.jpg"
   },
   "TV": {
     "SoundDevice": {
@@ -23,17 +24,18 @@
         "Height": 2160
       },
       "RefreshRate": 60
-    }
+    },
+    "WallpaperPath": "C:/TVGaming/Wallpapers/TV.jpg"
   },
 
   "ThirdParty": {
     "Playnite": {
       "ProcessName": "Playnite.FullscreenApp",
-      "Path": "C:/Users/Balint/AppData/Local/Playnite/Playnite.FullscreenApp.exe"
+      "Path": "C:/TVGaming/Playnite_v10.3/Playnite.FullscreenApp.exe"
     },
     "DS4Windows": {
       "ProcessName": "d4w",
-      "Path": "C:/TVGaming/DS4Windows_v3010/d4w.exe"
+      "Path": "C:/TVGaming/DS4Windows_v3.1.6/d4w.exe"
     },
     "EpicGames": {
       "ProcessName": "EpicGamesLauncher",

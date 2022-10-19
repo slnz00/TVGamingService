@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BackgroundService.Source.Services;
 using BackgroundService.Source.Services.Configs;
+using BackgroundService.Source.Services.Jobs;
 using BackgroundService.Source.Services.System;
 using BackgroundService.Source.Services.ThirdParty;
 using Core.Utils;
@@ -27,6 +28,7 @@ namespace BackgroundService.Source.Providers
             public LegacyDisplayService LegacyDisplay;
             public SoundDeviceService SoundDevice;
             public CursorService Cursor;
+            public WindowService Window;
         }
 
         public readonly ThirdPartyServices ThirdParty;
@@ -34,6 +36,7 @@ namespace BackgroundService.Source.Providers
 
         // Common services should be defined without grouping:
         public readonly ConfigService Config;
+        public readonly JobService Jobs;
 
         // Initialization order is based on service registration order:
         public ServiceProvider()
@@ -41,6 +44,7 @@ namespace BackgroundService.Source.Providers
             Logger = new LoggerProvider(GetType().Name);
 
             Config = RegisterService(new ConfigService(this));
+            Jobs = RegisterService(new JobService(this));
 
             System = new SystemServices
             {
@@ -50,6 +54,7 @@ namespace BackgroundService.Source.Providers
                 LegacyDisplay = RegisterService(new LegacyDisplayService(this)),
                 SoundDevice = RegisterService(new SoundDeviceService(this)),
                 Cursor = RegisterService(new CursorService(this)),
+                Window = RegisterService(new WindowService(this)),
             };
 
 

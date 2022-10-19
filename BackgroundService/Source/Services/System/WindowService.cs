@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.System.Models;
 
 namespace BackgroundService.Source.Services.System
 {
     internal class WindowService : Service
     {
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        static extern int GetWindowTextLength(IntPtr hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+        private delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
 
         [DllImport("user32.dll")]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -20,56 +17,47 @@ namespace BackgroundService.Source.Services.System
         [DllImport("user32.dll")]
         private static extern IntPtr FindWindowEx(IntPtr hWndParent, IntPtr hWndChildAfter, string lpszClass, string lpszWindow);
 
-        public class WindowComponent
-        {
-            public string Type { get; set; }
-            public IntPtr Handle { get; set; }
-            public string Name { get; set; }
-            public bool IsValid => Handle != IntPtr.Zero;
-
-            public WindowComponent(string type, IntPtr handle)
-            {
-                Type = type;
-                Handle = handle;
-                Name = GetName();
-            }
-
-            private string GetName()
-            {
-                if (!IsValid)
-                {
-                    return "";
-                }
-
-                var length = GetWindowTextLength(Handle) + 1;
-                var nameBuffer = new StringBuilder(length);
-                GetWindowText(Handle, nameBuffer, nameBuffer.Capacity);
-
-                var name = nameBuffer.ToString();
-
-                return name.Replace("&", " ").Trim();
-            }
-        }
+        [DllImport("user32.dll")]
+        private static extern bool EnumThreadWindows(int dwThreadId, EnumThreadDelegate lpfn, IntPtr lParam);
 
 
         public WindowService(ServiceProvider services) : base(services) { }
 
-        WindowComponent FindWindowByName(string name)
+        public List<WindowComponent> GetProcessWindows(int processId)
+        {
+            var windows = new List<WindowComponent>();
+
+            EnumThreadDelegate addWindow = (handle, lParam) =>
+            {
+                windows.Add(new WindowComponent("Window", handle));
+
+                return true;
+            };
+
+            foreach (ProcessThread thread in Process.GetProcessById(processId).Threads)
+            {
+                EnumThreadWindows(thread.Id, addWindow, IntPtr.Zero);
+            }
+
+            return windows;
+        }
+
+        public WindowComponent FindWindowByName(string name)
         {
             var handle = FindWindow(null, name);
             return new WindowComponent("Window", handle);
         }
 
-        List<WindowComponent> GetChildComponents(WindowComponent window, string componentType)
+        public List<WindowComponent> GetChildComponents(WindowComponent component, string componentType)
         {
             List<WindowComponent> components = new List<WindowComponent>();
-            if (window.Handle == null)
+            if (component.Handle == null)
             {
-                throw new ArgumentNullException(nameof(window));
+                throw new ArgumentNullException(nameof(component));
             }
 
             IntPtr curentHandle = IntPtr.Zero;
-            Func<IntPtr> NextComponentHandle = () => FindWindowEx(window.Handle, curentHandle, componentType, null);
+            Func<IntPtr> NextComponentHandle = () => FindWindowEx(component.Handle, curentHandle, componentType, null);
 
             while ((curentHandle = NextComponentHandle()) != IntPtr.Zero)
             {

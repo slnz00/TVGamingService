@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Core.SystemComponents
 {
-    public static class DisplayWinAPI
+    public static class DisplayWinApi
     {
         [DllImport("user32.dll")]
         public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);

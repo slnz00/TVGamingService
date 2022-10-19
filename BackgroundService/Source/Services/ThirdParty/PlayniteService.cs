@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
+using System.IO;
+using BackgroundService.Source.Common;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
 using Core.Utils;
@@ -11,14 +12,13 @@ namespace BackgroundService.Source.Services.ThirdParty
     {
         public class PlayniteEvents
         {
-            public Action onPlayniteClosed = null;
+            public Action OnPlayniteClosed { get; set; } = null;
         }
 
-        private readonly object threadLock = new object();
-        private Thread watcherThread = null;
+        private ProcessWatcher watcher = null;
         private AppConfig playniteConfig;
 
-        public bool IsPlayniteOpen => watcherThread != null && watcherThread.IsAlive;
+        public bool IsPlayniteOpen => watcher != null && watcher.IsProcessOpen;
 
         public PlayniteService(ServiceProvider services) : base(services) { }
 
@@ -31,58 +31,46 @@ namespace BackgroundService.Source.Services.ThirdParty
         {
             Logger.Debug("Opening Playnite");
 
-            var config = Services.Config.GetConfig();
+            var playnitePath = Path.GetFullPath(playniteConfig.Path);
+            var playniteDir = Path.GetDirectoryName(playnitePath);
 
-            ProcessUtils.StartProcess(playniteConfig.Path);
-            StartPlayniteWatcher(events);
+            ProcessUtils.StartProcess(playnitePath, "", ProcessWindowStyle.Normal, false, (startInfo) =>
+            {
+                startInfo.WorkingDirectory = playniteDir;
+            });
+
+            StartWatcher(events);
         }
 
         public void ClosePlaynite()
         {
             Logger.Debug("Closing Playnite");
 
-            var config = Services.Config.GetConfig();
-
-            StopPlayniteWatcher();
+            StopWatcher();
             ProcessUtils.CloseProcess(playniteConfig.ProcessName);
         }
 
-        private void StartPlayniteWatcher(PlayniteEvents events)
+        private void StartWatcher(PlayniteEvents events)
         {
-            var config = Services.Config.GetConfig();
+            StopWatcher();
 
-            Logger.Debug("Starting Playnite watcher");
-
-            StopPlayniteWatcher();
-
-            watcherThread = new Thread(() =>
+            watcher = new ProcessWatcher(playniteConfig.ProcessName, new ProcessWatcher.Events
             {
-                while (true)
-                {
-                    lock (threadLock)
-                    {
-                        if (Process.GetProcessesByName(playniteConfig.ProcessName).Length == 0)
-                        {
-                            events?.onPlayniteClosed?.Invoke();
-                            break;
-                        }
-                    }
-
-                    Thread.Sleep(1000);
-                }
+                OnProcessClosed = events.OnPlayniteClosed
             });
 
-            watcherThread.Start();
+            watcher.Start();
         }
 
-        private void StopPlayniteWatcher()
+        private void StopWatcher()
         {
-            if (IsPlayniteOpen)
+            if (watcher == null)
             {
-                Logger.Debug("Stopping Playnite watcher");
-
-                watcherThread.Abort();
+                return;
             }
+
+            watcher.Stop();
+            watcher = null;
         }
     }
 }

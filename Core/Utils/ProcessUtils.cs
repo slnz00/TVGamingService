@@ -1,22 +1,48 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Core.Utils
 {
     public static class ProcessUtils
     {
+        public static void InteractWithProcess(string processName, Action<Process> action)
+        {
+            Process[] processes = Process.GetProcessesByName(processName);
+
+            foreach (Process process in processes)
+            {
+                action(process);
+                process.Dispose();
+            }
+        }
+
+        public static List<int> GetProcessIdsByProcessName(string processName)
+        {
+            Process[] processes = Process.GetProcessesByName(processName);
+
+            var processIds = processes
+                .Select((process) =>
+                {
+                    return process.Id;
+                }).
+                ToList();
+
+            Array.ForEach(processes, process => process.Dispose());
+
+            return processIds;
+        }
+
         public static void CloseProcess(string processName, bool forceKill = false)
         {
-            Process[] playniteProcesses = Process.GetProcessesByName(processName);
-
-            foreach (Process process in playniteProcesses)
+            InteractWithProcess(processName, (process) =>
             {
                 if (!process.CloseMainWindow() || forceKill)
                 {
                     process.Kill();
                 }
-                process.Dispose();
-            }
+            });
         }
 
         public static void StartProcess(
@@ -40,7 +66,8 @@ namespace Core.Utils
             }
 
             Process proc = Process.Start(startInfo);
-            if (proc == null) {
+            if (proc == null)
+            {
                 throw new NullReferenceException("Failed to start process");
             }
 

@@ -9,11 +9,11 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         private PlayniteEvents playniteEvents;
 
         public TVController(MainController mainController, ServiceProvider services) :
-            base(Environments.TV, services.Config.GetConfig().TV, mainController, services)
+            base(Environments.TV, services.Config.GetConfig().TV, services.Config.GetJobsConfig().TV, mainController, services)
         {
             playniteEvents = new PlayniteEvents()
             {
-                onPlayniteClosed = () => MainController.ChangeEnvironmentTo(Environments.PC)
+                OnPlayniteClosed = () => MainController.ChangeEnvironmentTo(Environments.PC)
             };
         }
 
@@ -28,8 +28,9 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             Services.System.SoundDevice.SetDefaultSoundDevice(Config.SoundDevice.DeviceName);
 
             // Change windows desktop, hide desktop icons:
+            Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
             Services.System.Desktop.CreateAndSwitchToDesktop(tvDesktopName);
-            Services.System.Desktop.ToggleIconsVisiblity();
+            Services.System.Desktop.ToggleIconsVisiblity(false);
 
             // Close third party apps to make sure they get a clean start:
             Services.ThirdParty.Playnite.ClosePlaynite();
@@ -39,7 +40,6 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             // Open DS4Windows and Playnite:
             Services.ThirdParty.DS4Windows.OpenDS4Windows();
             Services.ThirdParty.Playnite.OpenPlaynite(playniteEvents);
-
         }
 
         protected override void OnReset()
