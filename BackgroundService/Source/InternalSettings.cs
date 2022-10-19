@@ -6,7 +6,7 @@ namespace BackgroundService.Source
 {
     internal static class InternalSettings
     {
-        public static readonly HotkeyDefinition HOTKEY_SWITCH_ENVIRONMENTS = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad0);
+        public static readonly HotkeyDefinition HOTKEY_SWITCH_ENVIRONMENT = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad0);
         public static readonly HotkeyDefinition HOTKEY_RESET_ENVIRONMENT = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad1);
         public static readonly HotkeyDefinition HOTKEY_TOGGLE_CURSOR_VISIBILITY = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad8);
         public static readonly HotkeyDefinition HOTKEY_TOGGLE_CONSOLE_VISIBILITY = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad9);

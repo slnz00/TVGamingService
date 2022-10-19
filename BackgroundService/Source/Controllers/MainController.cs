@@ -32,8 +32,8 @@ namespace BackgroundService.Source.Controllers
 
         private void SetupHotkeys()
         {
-            Services.System.Hotkey.RegisterAction("SwitchEnvironments", InternalSettings.HOTKEY_SWITCH_ENVIRONMENTS, SwitchEnvironments);
-            Services.System.Hotkey.RegisterAction("SwitchEnvironments", InternalSettings.HOTKEY_RESET_ENVIRONMENT, ResetEnvironment);
+            Services.System.Hotkey.RegisterAction("SwitchEnvironment", InternalSettings.HOTKEY_SWITCH_ENVIRONMENT, SwitchEnvironment);
+            Services.System.Hotkey.RegisterAction("ResetEnvironment", InternalSettings.HOTKEY_RESET_ENVIRONMENT, ResetEnvironment);
             Services.System.Hotkey.RegisterAction("ToggleConsoleVisibility", InternalSettings.HOTKEY_TOGGLE_CONSOLE_VISIBILITY, ToggleConsoleVisibility);
             Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", InternalSettings.HOTKEY_TOGGLE_CURSOR_VISIBILITY, ToggleCursorVisibility);
         }
@@ -46,7 +46,7 @@ namespace BackgroundService.Source.Controllers
             EnvironmentControllerFactory.Add(Environments.TV, () => new TVController(this, Services));
         }
 
-        public void SwitchEnvironments()
+        public void SwitchEnvironment()
         {
             // Default, startup environment is PC:
             var isStartupEnvironment = EnvironmentController == null;
