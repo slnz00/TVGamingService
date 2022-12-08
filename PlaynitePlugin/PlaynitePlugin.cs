@@ -1,12 +1,11 @@
-﻿using Playnite.SDK;
+﻿using Core.Playnite.Communication.Models;
+using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
+using PlaynitePlugin.Communication;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace PlaynitePlugin
@@ -14,6 +13,10 @@ namespace PlaynitePlugin
     public class PlaynitePlugin : GenericPlugin
     {
         private static readonly ILogger logger = LogManager.GetLogger();
+        private static readonly CommunicationClient tvGamingService = new CommunicationClient();
+
+        // GameId -> Game path
+        private static readonly Dictionary<string, string> gamePaths = new Dictionary<string, string>();
 
         private PlaynitePluginSettingsViewModel settings { get; set; }
 
@@ -30,42 +33,42 @@ namespace PlaynitePlugin
 
         public override void OnGameInstalled(OnGameInstalledEventArgs args)
         {
-            // Add code to be executed when game is finished installing.
         }
 
         public override void OnGameStarted(OnGameStartedEventArgs args)
         {
-            // Add code to be executed when game is started running.
         }
 
         public override void OnGameStarting(OnGameStartingEventArgs args)
         {
-            // Add code to be executed when game is preparing to be started.
+            SetGamePath(args.Game, args.SourceAction.Path);
+
+            var gameInfo = GetGameInfo(args.Game);
+
+            tvGamingService.PlayniteEvents.Service.SendGameStarting(gameInfo);
         }
 
         public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
-            // Add code to be executed when game is preparing to be started.
+            var gameInfo = GetGameInfo(args.Game);
+
+            tvGamingService.PlayniteEvents.Service.SendGameStopped(gameInfo);
         }
 
         public override void OnGameUninstalled(OnGameUninstalledEventArgs args)
         {
-            // Add code to be executed when game is uninstalled.
         }
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
-            // Add code to be executed when Playnite is initialized.
         }
 
         public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
         {
-            // Add code to be executed when Playnite is shutting down.
         }
 
         public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
         {
-            // Add code to be executed when library is updated.
         }
 
         public override ISettings GetSettings(bool firstRunSettings)
@@ -76,6 +79,33 @@ namespace PlaynitePlugin
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
             return new PlaynitePluginSettingsView();
+        }
+
+        private PlayniteGameInfo GetGameInfo(Game game)
+        {
+            return new PlayniteGameInfo
+            {
+                Id = game.GameId,
+                Name = game.Name,
+                Path = GetGamePath(game),
+            };
+        }
+
+        private string GetGamePath(Game game)
+        {
+            if (!gamePaths.ContainsKey(game.GameId))
+            {
+                return null;
+            }
+
+            return gamePaths[game.GameId];
+        }
+
+        private void SetGamePath(Game game, string path)
+        {
+            var gameId = game.GameId;
+
+            gamePaths[gameId] = path;
         }
     }
 }

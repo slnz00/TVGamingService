@@ -1,4 +1,4 @@
-﻿using BackgroundService.Source.Common;
+﻿using BackgroundService.Source.Components;
 using BackgroundService.Source.Providers;
 using System;
 

@@ -1,7 +1,5 @@
-﻿using System;
-using BackgroundService.Source.Controllers.Models;
+﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
-using static BackgroundService.Source.Services.ThirdParty.GameStoreService;
 
 namespace BackgroundService.Source.Controllers.EnvironmentControllers
 {

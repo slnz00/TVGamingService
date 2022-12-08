@@ -24,7 +24,7 @@ namespace BackgroundService.Source
         public static readonly uint TIMEOUT_HOTKEY_ACTION = 1000;
         public static readonly uint TIMEOUT_DEFAULT_SOUND_DEVICE_SET = 25_000;
 
-        public static readonly bool CONSOLE_DEFAULT_VISIBILITY = false;
+        public static readonly bool CONSOLE_DEFAULT_VISIBILITY = true;
 
         public static readonly bool DEBUG_ENABLED = true;
     }

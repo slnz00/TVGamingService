@@ -1,6 +1,6 @@
-﻿using BackgroundService.Source.Controllers.Models;
+﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
-using static BackgroundService.Source.Services.ThirdParty.PlayniteService;
+using static BackgroundService.Source.Services.ThirdParty.Playnite.PlayniteService;
 
 namespace BackgroundService.Source.Controllers.EnvironmentControllers
 {

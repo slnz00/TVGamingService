@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Core.SystemComponents
+namespace Core.Components.System
 {
     public static class DisplayWinApi
     {

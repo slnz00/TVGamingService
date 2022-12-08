@@ -4,6 +4,7 @@ using BackgroundService.Source.Services.Configs;
 using BackgroundService.Source.Services.Jobs;
 using BackgroundService.Source.Services.System;
 using BackgroundService.Source.Services.ThirdParty;
+using BackgroundService.Source.Services.ThirdParty.Playnite;
 using Core.Utils;
 
 namespace BackgroundService.Source.Providers

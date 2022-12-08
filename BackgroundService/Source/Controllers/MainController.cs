@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Controllers.EnvironmentControllers;
-using Core.SystemComponents;
-using BackgroundService.Source.Controllers.Models;
+using Core.Components.System;
+using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 
 namespace BackgroundService.Source.Controllers
 {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace BackgroundService.Source.Common
+namespace BackgroundService.Source.Components
 {
     internal abstract class DynamicOptions
     {

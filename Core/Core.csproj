@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,15 +42,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlaynitePipe\Models\EventArgs\OnGameStartedArgs.cs" />
-    <Compile Include="PlaynitePipe\Models\PlayniteEvents.cs" />
-    <Compile Include="PlaynitePipe\PlaynitePipeClient.cs" />
-    <Compile Include="PlaynitePipe\PlaynitePipeServer.cs" />
-    <Compile Include="PlaynitePipe\PlaynitePipeSettings.cs" />
+    <Compile Include="Components\EventListenerRegistry.cs" />
+    <Compile Include="Playnite\Communication\Models\PlayniteGameInfo.cs" />
+    <Compile Include="Playnite\Communication\PlayniteCommunicationSettings.cs" />
+    <Compile Include="Playnite\Communication\Services\IPlayniteAppEventsService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SystemComponents\DisplayWinApi.cs" />
-    <Compile Include="SystemComponents\MessageLoop.cs" />
-    <Compile Include="SystemComponents\RestartManagerApi.cs" />
+    <Compile Include="Components\System\DisplayWinApi.cs" />
+    <Compile Include="Components\System\MessageLoop.cs" />
+    <Compile Include="Components\System\RestartManagerApi.cs" />
     <Compile Include="Utils\AsyncUtils.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\FSUtils.cs" />

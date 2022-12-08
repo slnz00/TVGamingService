@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.System.Models;
-using Core.SystemComponents;
+using Core.Components.System;
 
 namespace BackgroundService.Source.Services.System
 {

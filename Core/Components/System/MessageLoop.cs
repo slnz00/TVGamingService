@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Core.SystemComponents
+namespace Core.Components.System
 {
     public static class MessageLoop
     {

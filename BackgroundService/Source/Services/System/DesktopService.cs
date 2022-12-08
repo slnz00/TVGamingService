@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using Core.SystemComponents;
+using Core.Components.System;
 using Core.Utils;
 using Microsoft.Win32;
 

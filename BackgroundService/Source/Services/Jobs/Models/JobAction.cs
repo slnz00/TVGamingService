@@ -1,4 +1,4 @@
-﻿using BackgroundService.Source.Common;
+﻿using BackgroundService.Source.Components;
 
 namespace BackgroundService.Source.Services.Jobs.Models
 {
