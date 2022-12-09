@@ -12,6 +12,9 @@ namespace BackgroundService.Source.Services.Jobs
 {
     internal class JobService : Service
     {
+        private const string JOB_TRIGGER_NAMESPACE = "BackgroundService.Source.Services.Jobs.Models.JobTriggers";
+        private const string JOB_ACTION_NAMESPACE = "BackgroundService.Source.Services.Jobs.Models.JobActions";
+
         private Dictionary<string, Job> jobs = new Dictionary<string, Job>();
 
         public JobService(ServiceProvider services) : base(services) { }
@@ -34,7 +37,7 @@ namespace BackgroundService.Source.Services.Jobs
             var job = new Job(Services, options);
 
             jobs[options.Id] = job;
-            job.Execute();
+            job.Open();
 
             return true;
         }
@@ -49,7 +52,7 @@ namespace BackgroundService.Source.Services.Jobs
             var job = jobs[id];
 
             jobs.Remove(id);
-            job.Stop(true);
+            job.Close();
 
             return true;
         }
@@ -64,32 +67,27 @@ namespace BackgroundService.Source.Services.Jobs
             return new JobOptions()
             {
                 Id = jobConfig.Id,
-                ExecutionMode = EnumUtils.GetValue<JobExecutionMode>(jobConfig.ExecutionMode),
-                TriggerMode = EnumUtils.GetValue<JobTriggerMode>(jobConfig.TriggerMode),
-                Trigger = CreateJobTriggerFromConfig(jobConfig.Trigger),
+                Mode = EnumUtils.GetValue<JobMode>(jobConfig.Mode),
+                TriggerWhen = CreateJobTriggerFromConfig(jobConfig.TriggerWhen, JobTrigger.TriggerAction.START_JOB_TASK),
+                RepeatUntil = CreateJobTriggerFromConfig(jobConfig.RepeatUntil, JobTrigger.TriggerAction.CLOSE_JOB),
                 Actions = CreateJobActionsFromConfigs(jobConfig.Actions),
-                Timeout = jobConfig.Timeout,
                 TimeBetweenExecutions = jobConfig.TimeBetweenExecutions,
             };
         }
 
-        private JobTrigger CreateJobTriggerFromConfig(JobTriggerConfig triggerConfig)
+        private JobTrigger CreateJobTriggerFromConfig(JobTriggerConfig triggerConfig, JobTrigger.TriggerAction triggerAction)
         {
-            const string JOB_TRIGGER_NAMESPACE = "BackgroundService.Source.Services.Jobs.Models.JobTriggers";
-
             if (triggerConfig == null)
             {
                 return null;
             }
 
             var TriggerType = Type.GetType($"{JOB_TRIGGER_NAMESPACE}.{triggerConfig.Type}");
-            return (JobTrigger)Activator.CreateInstance(TriggerType, triggerConfig.Options);
+            return (JobTrigger)Activator.CreateInstance(TriggerType, triggerAction, triggerConfig.Options);
         }
 
         private List<JobAction> CreateJobActionsFromConfigs(List<JobActionConfig> actionConfigs)
         {
-            const string JOB_ACTION_NAMESPACE = "BackgroundService.Source.Services.Jobs.Models.JobActions";
-
             if (actionConfigs == null)
             {
                 return new List<JobAction>();

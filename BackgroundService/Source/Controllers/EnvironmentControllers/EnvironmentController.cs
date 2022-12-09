@@ -50,14 +50,14 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         public void Reset()
         {
-            CreateEnvironmentJobsForEvent("Reset", new List<JobTriggerMode> { JobTriggerMode.SYNC });
+            CreateEnvironmentJobsForEvent("Reset", new List<JobMode> { JobMode.SYNC });
 
             OnReset();
         }
 
         public void Teardown()
         {
-            CreateEnvironmentJobsForEvent("Teardown", new List<JobTriggerMode> { JobTriggerMode.SYNC });
+            CreateEnvironmentJobsForEvent("Teardown", new List<JobMode> { JobMode.SYNC });
 
             OnTeardown();
 
@@ -96,7 +96,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             new List<string>(environmentJobIds).ForEach(RemoveEnvironmentJob);
         }
 
-        private void CreateEnvironmentJobsForEvent(string eventName, List<JobTriggerMode> allowedTriggerModes = null)
+        private void CreateEnvironmentJobsForEvent(string eventName, List<JobMode> allowedJobModes = null)
         {
             var configs = (List<JobConfig>)JobsConfig.GetType().GetProperty(eventName).GetValue(JobsConfig, null);
 
@@ -104,12 +104,12 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             {
                 var options = Services.Jobs.CreateJobOptionsFromJobConfig(config);
 
-                var notSupported = allowedTriggerModes != null && !allowedTriggerModes.Contains(options.TriggerMode);
+                var notSupported = allowedJobModes != null && !allowedJobModes.Contains(options.Mode);
                 if (notSupported)
                 {
-                    var triggerModeName = EnumUtils.GetName(options.TriggerMode);
+                    var triggerModeName = EnumUtils.GetName(options.Mode);
                     Logger.Error(
-                        $"Failed to create environment job with id: {options.Id}, {triggerModeName} trigger mode is not supported during \"{eventName}\" event."
+                        $"Failed to create environment job with id: {options.Id}, {triggerModeName} job mode is not supported during \"{eventName}\" event."
                     );
                     return;
                 }

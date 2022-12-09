@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Core.Utils
 {
@@ -10,12 +6,7 @@ namespace Core.Utils
     {
         public static bool IsTaskAlive(Task task)
         {
-            if (task == null)
-            {
-                return false;
-            }
-
-            switch (task.Status)
+            switch (task?.Status)
             {
                 case TaskStatus.WaitingForActivation:
                 case TaskStatus.WaitingToRun:

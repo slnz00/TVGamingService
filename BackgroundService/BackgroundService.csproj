@@ -149,6 +149,7 @@
     <Compile Include="Source\Services\Jobs\Models\JobActions\StartProcess.cs" />
     <Compile Include="Source\Services\Jobs\Models\JobOptions.cs" />
     <Compile Include="Source\Services\Jobs\Models\JobActions\MinimizeProcessWindows.cs" />
+    <Compile Include="Source\Services\Jobs\Models\JobTriggers\Timer.cs" />
     <Compile Include="Source\Services\System\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
     <Compile Include="Source\Services\System\Models\WindowComponent.cs" />
@@ -230,8 +231,6 @@
       <Name>Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Source\Services\Jobs\Models\JobTriggers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

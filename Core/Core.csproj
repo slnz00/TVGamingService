@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\EventListenerRegistry.cs" />
+    <Compile Include="Components\ManagedTask.cs" />
     <Compile Include="Playnite\Communication\Models\PlayniteGameInfo.cs" />
     <Compile Include="Playnite\Communication\PlayniteCommunicationSettings.cs" />
     <Compile Include="Playnite\Communication\Services\IPlayniteAppEventsService.cs" />

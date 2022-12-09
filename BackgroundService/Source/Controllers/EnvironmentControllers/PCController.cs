@@ -22,20 +22,17 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
             Services.System.Desktop.RemoveDesktop(tvDesktopName);
             Services.System.Desktop.ToggleIconsVisiblity(true);
-
-            // Close third party apps:
-            Services.ThirdParty.Playnite.ClosePlaynite();
-            Services.ThirdParty.DS4Windows.CloseDS4Windows();
-            Services.ThirdParty.GameStore.CloseAllGameStores();
         }
 
         protected override void OnReset()
         {
+            var tvDesktopName = InternalSettings.DESKTOP_TV_NAME;
+
             Services.System.Cursor.SetCursorVisibility(true);
 
-            Services.ThirdParty.Playnite.ClosePlaynite();
-            Services.ThirdParty.DS4Windows.CloseDS4Windows(true);
-            Services.ThirdParty.GameStore.CloseAllGameStores();
+            Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
+            Services.System.Desktop.RemoveDesktop(tvDesktopName);
+            Services.System.Desktop.ToggleIconsVisiblity(true);
         }
 
         protected override void OnTeardown() { }

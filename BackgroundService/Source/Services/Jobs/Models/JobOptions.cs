@@ -4,17 +4,7 @@ namespace BackgroundService.Source.Services.Jobs.Models
 {
     internal class JobOptions
     {
-        public enum JobExecutionMode
-        {
-            // Runs job actions once
-            // Timeout, TimeBetweenExecutions options are ignored
-            RUN_ONCE,
-
-            // Runs actions several times until Timeout time elapses
-            REPEAT,
-        }
-
-        public enum JobTriggerMode
+        public enum JobMode
         {
             // Runs the job actions synchronously when the job is created, main thread is halted until job execution finishes
             // Trigger option is ignored
@@ -24,26 +14,24 @@ namespace BackgroundService.Source.Services.Jobs.Models
             // Trigger option is ignored
             ASYNC,
 
-            // Sets up the JobTrigger defined in Trigger option, trigger will start the job asynchronously
-            ASYNC_TRIGGER,
+            // Sets up the JobTrigger defined in TriggerWhen option, trigger will start the job asynchronously
+            TRIGGERED,
         }
 
         // Unique job id (job names with "$Internal." are preserved for internal use):
         public string Id { get; set; }
 
-        public JobExecutionMode ExecutionMode { get; set; }
+        public JobMode Mode { get; set; }
 
-        public JobTriggerMode TriggerMode { get; set; }
+        // Only used when job's Type set to TRIGGERED, actions are executed after the specified trigger gets fired
+        public JobTrigger TriggerWhen { get; set; }
 
-        // Only used when TriggerMode set to ASYNC_TRIGGER
-        public JobTrigger Trigger { get; set; }
+        // Only used when job's Type set to TRIGGERED, actions are executed multiple times, 
+        public JobTrigger RepeatUntil { get; set; }
 
         public List<JobAction> Actions { get; set; }
 
-        // Used in REPEAT mode, Actions will be ran multiple times until the indicated time amount elapses (milliseconds)
-        public int Timeout { get; set; } = 0;
-
-        // Used in REPEAT mode, time amount before executing actions again
-        public int TimeBetweenExecutions { get; set; } = 500;
+        // Used in TRIGGERED mode, when RepeatUntil option is defined 
+        public int TimeBetweenExecutions { get; set; } = 1000;
     }
 }

@@ -14,20 +14,21 @@ namespace BackgroundService.Source.Services.Jobs.Models.JobActions
             public bool MinimizeOnce { get; set; } = true;
         }
 
+        private MinimizeProcessWindowsOptions Options => GetOptions<MinimizeProcessWindowsOptions>();
+
         private List<string> alreadyMinimizedWindowNames = new List<string>();
 
         public MinimizeProcessWindows(object options) : base(options) { }
 
         public MinimizeProcessWindows(MinimizeProcessWindowsOptions options) : base(options) { }
 
-        public override void Run(Job job)
+        public override void Run(Job.Context context)
         {
-            var options = GetOptions<MinimizeProcessWindowsOptions>();
-            var services = job.Services;
+            var services = context.Services;
 
-            ValidateOptions(options);
+            ValidateOptions();
 
-            ProcessUtils.InteractWithProcess(options.ProcessName, (process) =>
+            ProcessUtils.InteractWithProcess(Options.ProcessName, (process) =>
             {
                 var allWindows = services.System.Window.GetProcessWindows(process.Id);
 
@@ -59,11 +60,11 @@ namespace BackgroundService.Source.Services.Jobs.Models.JobActions
             }
         }
 
-        private void ValidateOptions(MinimizeProcessWindowsOptions options)
+        private void ValidateOptions()
         {
-            if (string.IsNullOrEmpty(options.ProcessName))
+            if (string.IsNullOrEmpty(Options.ProcessName))
             {
-                throw new NullReferenceException(nameof(options.ProcessName));
+                throw new NullReferenceException(nameof(Options.ProcessName));
             }
         }
     }

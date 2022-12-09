@@ -88,7 +88,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             return listener.Id;
         }
 
-        public void RemoveEventListener(uint listenerId)
+        public void RemoveEventListener(UInt32 listenerId)
         {
             eventListenerRegistry.RemoveListener(listenerId);
         }

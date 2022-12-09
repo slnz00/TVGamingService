@@ -1,7 +1,6 @@
 ﻿using BackgroundService.Source.Providers;
-using Core.Utils;
+using Core.Components;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 using static BackgroundService.Source.Services.Jobs.Models.JobOptions;
@@ -10,85 +9,94 @@ namespace BackgroundService.Source.Services.Jobs.Models
 {
     internal class Job
     {
+        public class Context
+        {
+            public Job Job { get; set; }
+            public ServiceProvider Services { get; set; }
+            public LoggerProvider Logger { get; set; }
+        }
+
         public JobOptions Options { get; private set; }
         public string Id => Options.Id;
-        public bool IsRunning => AsyncUtils.IsTaskAlive(jobTask);
+        public bool IsRunning => jobTask != null ? jobTask.IsAlive : false;
         public bool Closed => closed;
-
-        private readonly LoggerProvider Logger;
-        public readonly ServiceProvider Services;
 
         private readonly object threadLock = new object();
 
-        private Task jobTask;
-        private CancellationTokenSource jobCancellation;
+        private readonly Context context;
+        private ServiceProvider Services => context.Services;
+        private LoggerProvider Logger => context.Logger;
+
+        private ManagedTask jobTask;
 
         private bool closed = false;
 
         public Job(ServiceProvider services, JobOptions options)
         {
             Options = options;
-            Services = services;
 
-            Logger = new LoggerProvider($"Job:{options.Id}");
+            context = new Context
+            {
+                Job = this,
+                Services = services,
+                Logger = new LoggerProvider($"Job:{options.Id}")
+            };
 
             ValidateOptions();
         }
 
-        public void Execute()
-        {
-            if (Options.TriggerMode == JobTriggerMode.SYNC)
-            {
-                StartSync();
-            }
-            else if (Options.TriggerMode == JobTriggerMode.ASYNC)
-            {
-                StartAsync();
-            }
-            else if (Options.TriggerMode == JobTriggerMode.ASYNC_TRIGGER)
-            {
-                Options.Trigger.StartListening(this);
-            }
-        }
-
-        public void StartSync()
+        public void Open()
         {
             lock (threadLock)
             {
-                Start(true);
-            }
-        }
-
-        public void StartAsync()
-        {
-            lock (threadLock)
-            {
-                Start(false);
-            }
-        }
-
-        // After closing a job, it cannot be restarted and its trigger will be destroyed:
-        public void Stop(bool close = false)
-        {
-            lock (threadLock)
-            {
-                if (IsRunning)
+                if (Options.Mode == JobMode.SYNC)
                 {
-                    jobCancellation.Cancel();
-                    jobTask.Wait();
+                    StartTask();
+                }
+                else if (Options.Mode == JobMode.ASYNC)
+                {
+                    StartTaskAsync();
+                }
+                else if (Options.Mode == JobMode.TRIGGERED)
+                {
+                    StartTriggers();
+                }
+            }
+        }
+
+        public void Close()
+        {
+            lock (threadLock)
+            {
+                if (closed)
+                {
+                    return;
                 }
 
-                if (close)
-                {
-                    Close();
-                }
+                StopTask();
+                StopTriggers();
 
-                jobTask = null;
-                jobCancellation = null;
+                closed = true;
             }
         }
 
-        private void Start(bool sync)
+        public void StartTask()
+        {
+            lock (threadLock)
+            {
+                StartTask(true);
+            }
+        }
+
+        public void StartTaskAsync()
+        {
+            lock (threadLock)
+            {
+                StartTask(false);
+            }
+        }
+
+        private void StartTask(bool sync)
         {
             if (IsRunning)
             {
@@ -102,20 +110,7 @@ namespace BackgroundService.Source.Services.Jobs.Models
                 return;
             }
 
-            jobCancellation = new CancellationTokenSource();
-
-            jobTask = Task.Run(() =>
-            {
-                try
-                {
-                    RunActions();
-                }
-                catch (TaskCanceledException) { }
-                catch (Exception ex)
-                {
-                    Logger.Error($"An exception occurred while running job actions: {ex}");
-                }
-            });
+            CreateAndRunJobTask();
 
             if (sync)
             {
@@ -123,74 +118,88 @@ namespace BackgroundService.Source.Services.Jobs.Models
             }
         }
 
+        public void StopTask()
+        {
+            lock (threadLock)
+            {
+                if (IsRunning)
+                {
+                    jobTask.Cancel();
+                    jobTask.Wait();
+                }
+
+                jobTask = null;
+            }
+        }
+
         private void ValidateOptions()
         {
-            if (Options.TriggerMode != JobTriggerMode.ASYNC_TRIGGER && Options.Trigger != null)
+            if (Options.Mode != JobMode.TRIGGERED && Options.TriggerWhen != null)
             {
-                Logger.Warn("Trigger option is defined while job is not in ASYNC_TRIGGER mode");
+                Logger.Warn("TriggerWhen option is defined, while job type set to TRIGGERED");
             }
 
-            if (Options.TriggerMode == JobTriggerMode.ASYNC_TRIGGER && Options.Trigger == null)
+            if (Options.Mode == JobMode.TRIGGERED && Options.TriggerWhen == null)
             {
-                throw new NullReferenceException("Trigger option null, while job is in ASYNC_TRIGGER mode");
-            }
-        }
-
-        private void Close()
-        {
-            if (IsRunning)
-            {
-                throw new InvalidOperationException("Running jobs cannot be closed");
-            }
-            if (closed)
-            {
-                return;
-            }
-
-            if (Options.TriggerMode == JobTriggerMode.ASYNC_TRIGGER)
-            {
-                Options.Trigger.StopListening();
-            }
-
-            closed = true;
-        }
-
-        private void RunActions()
-        {
-            switch (Options.ExecutionMode)
-            {
-                case JobExecutionMode.RUN_ONCE:
-                    RunActionsOnce();
-                    break;
-                case JobExecutionMode.REPEAT:
-                    RunActionsOnRepeat();
-                    break;
-                default:
-                    throw new NotImplementedException("Unimplemented job execution mode");
+                throw new NullReferenceException("TriggerWhen option is null, while job type set to TRIGGERED");
             }
         }
 
-        private void RunActionsOnce()
-        {
-            Options.Actions.ForEach(action =>
-            {
-                Logger.Debug($"Running job action: {action.GetType().Name}");
+        private void StartTriggers() {
+            Options.TriggerWhen.StartListening(context);
+            Options.RepeatUntil?.StartListening(context);
+        }
 
-                action.Run(this);
+        private void StopTriggers()
+        {
+            Options.TriggerWhen?.StopListening();
+            Options.RepeatUntil?.StopListening();
+        }
+
+        private void CreateAndRunJobTask()
+        {
+            jobTask = ManagedTask.Run(async (ctx) =>
+            {
+                Action RunActionsOnce = () =>
+                {
+                    foreach (var action in Options.Actions)
+                    {
+                        if (ctx.Cancellation.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
+                        action.Run(context);
+                    }
+                };
+
+                Func<Task> RunActionsUntilCancellation = async () =>
+                {
+                    while (!ctx.Cancellation.IsCancellationRequested)
+                    {
+                        RunActionsOnce();
+
+                        await Task.Delay(Options.TimeBetweenExecutions, ctx.Cancellation.Token);
+                    }
+                };
+
+                try
+                {
+                    if (Options.RepeatUntil != null)
+                    {
+                        await RunActionsUntilCancellation();
+                    }
+                    else
+                    {
+                        RunActionsOnce();
+                    }
+                }
+                catch (TaskCanceledException) { }
+                catch (Exception ex)
+                {
+                    Logger.Error($"An exception occurred while running job actions: {ex}");
+                }
             });
-        }
-
-        private void RunActionsOnRepeat()
-        {
-            Func<int> now = () => DateTime.Now.Millisecond;
-
-            var runUntil = now() + Options.Timeout;
-
-            do
-            {
-                RunActionsOnce();
-                Task.Delay(Options.TimeBetweenExecutions, jobCancellation.Token);
-            } while (now() < runUntil);
         }
     }
 }

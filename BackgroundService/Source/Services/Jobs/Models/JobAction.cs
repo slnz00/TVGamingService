@@ -7,6 +7,6 @@ namespace BackgroundService.Source.Services.Jobs.Models
     {
         protected JobAction(object options) : base(options) { }
 
-        public abstract void Run(Job job);
+        public abstract void Run(Job.Context context);
     }
 }

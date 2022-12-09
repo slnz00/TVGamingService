@@ -5,7 +5,28 @@
     "Teardown": []
   },
   "TV": {
-    "Setup": [],
+    "Setup": [
+      {
+        "Id": "Test",
+        "Mode": "TRIGGERED",
+        "Actions": [
+          {
+            "Type": "StartProcess",
+            "Options": {
+              "Path": "C:\\Users\\Balint\\Home\\Projects\\Programming\\MessageBoxExample\\MessageBoxExample\\bin\\Debug\\net6.0-windows\\MessageBoxExample.exe"
+            }
+          }
+        ],
+        "TriggerWhen": [
+          {
+            "Type": "Timer",
+            "Options": {
+              "Time": 1000
+            }
+          }
+        ]
+      }
+    ],
     "Reset": [],
     "Teardown": []
   }

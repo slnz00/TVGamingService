@@ -19,19 +19,14 @@ namespace BackgroundService.Source.Services.Configs.Models
     {
         public string Id { get; set; }
 
-        public string ExecutionMode { get; set; }
+        public string Mode { get; set; }
 
-        public string TriggerMode { get; set; }
+        public JobTriggerConfig TriggerWhen { get; set; }
 
-        // Only used when TriggerMode set to ASYNC_TRIGGER
-        public JobTriggerConfig Trigger { get; set; }
+        public JobTriggerConfig RepeatUntil { get; set; }
 
         public List<JobActionConfig> Actions { get; set; }
 
-        // Used in REPEAT mode, Actions will be ran multiple times until the indicated time amount elapses (milliseconds)
-        public int Timeout { get; set; } = 0;
-
-        // Used in REPEAT mode, time amount before executing actions again
         public int TimeBetweenExecutions { get; set; } = 500;
     }
 

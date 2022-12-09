@@ -1,4 +1,5 @@
 ﻿using BackgroundService.Source.Providers;
+using Core.Components;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -25,8 +26,7 @@ namespace BackgroundService.Source.Common
         private int timeBetweenChecks;
         private Events events;
 
-        private Task watcherTask = null;
-        private CancellationTokenSource watcherCancellation = null;
+        private ManagedTask watcherTask = null;
 
         public ProcessWatcher(string processName, Events events, int timeBetweenChecks = 500)
         {
@@ -51,7 +51,6 @@ namespace BackgroundService.Source.Common
                     ResetWatcher();
                 }
 
-                watcherCancellation = new CancellationTokenSource();
                 watcherTask = WatchProcess();
 
                 IsWatcherRunning = true;
@@ -62,8 +61,7 @@ namespace BackgroundService.Source.Common
         {
             lock (threadLock)
             {
-                watcherCancellation.Cancel();
-                watcherTask.Wait();
+                watcherTask.Cancel();
 
                 ResetWatcher();
             }
@@ -71,23 +69,19 @@ namespace BackgroundService.Source.Common
 
         private void ResetWatcher()
         {
-            if (!watcherCancellation.IsCancellationRequested)
-            {
-                watcherCancellation.Cancel();
-            }
+            watcherTask.Cancel();
 
             IsWatcherRunning = false;
             IsProcessOpen = false;
 
-            watcherCancellation = null;
             watcherTask = null;
         }
 
-        private async Task WatchProcess()
+        private ManagedTask WatchProcess()
         {
-            try
+            return ManagedTask.Run(async (ctx) =>
             {
-                while (!watcherCancellation.IsCancellationRequested)
+                while (!ctx.Cancellation.IsCancellationRequested)
                 {
                     bool currentlyOpen = Process.GetProcessesByName(ProcessName).Length != 0;
 
@@ -102,10 +96,9 @@ namespace BackgroundService.Source.Common
 
                     IsProcessOpen = currentlyOpen;
 
-                    await Task.Delay(timeBetweenChecks, watcherCancellation.Token);
+                    await Task.Delay(timeBetweenChecks, ctx.Cancellation.Token);
                 }
-            }
-            catch (TaskCanceledException) { }
+            });
         }
 
         private void RunEvent(Action e)

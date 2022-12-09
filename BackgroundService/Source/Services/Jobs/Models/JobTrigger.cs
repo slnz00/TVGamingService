@@ -1,5 +1,6 @@
 ﻿using BackgroundService.Source.Components;
 using BackgroundService.Source.Providers;
+using Core.Utils;
 using System;
 
 namespace BackgroundService.Source.Services.Jobs.Models
@@ -7,26 +8,48 @@ namespace BackgroundService.Source.Services.Jobs.Models
     // Each JobTrigger implementation must have a JobTrigger(object options) constructor to work with reflection based factory:
     internal abstract class JobTrigger : DynamicOptions
     {
+        public enum TriggerAction
+        {
+            START_JOB_TASK,
+            CLOSE_JOB
+        }
+
         public bool Closed => closed;
 
-        private ServiceProvider Services => ownerJob.Services;
+        protected ServiceProvider Services => context?.Services;
+        protected LoggerProvider Logger => context?.Logger;
+        protected Job OwnerJob => context?.Job;
 
-        private Job ownerJob = null;
+        private Job.Context context = null;
         private bool closed = false;
+        private TriggerAction action;
 
-        public JobTrigger(object options) : base(options) { }
-
-        protected void TriggerJob()
+        public JobTrigger(TriggerAction action, object options) : base(options)
         {
-            if (ownerJob == null)
+            this.action = action;
+        }
+
+        protected void ExecuteTrigger()
+        {
+            if (OwnerJob == null)
             {
                 throw new InvalidOperationException("JobTrigger does not have an owner Job.");
             }
 
-            ownerJob.StartAsync();
+            switch (action)
+            {
+                case TriggerAction.START_JOB_TASK:
+                    OwnerJob.StartTaskAsync();
+                    break;
+                case TriggerAction.CLOSE_JOB:
+                    OwnerJob.Close();
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unknown TriggerAction: {EnumUtils.GetName(action)}");
+            }
         }
 
-        public void StartListening(Job ownerJob)
+        public void StartListening(Job.Context context)
         {
             if (closed)
             {
@@ -34,12 +57,12 @@ namespace BackgroundService.Source.Services.Jobs.Models
             }
 
             // Should be only owned by one job and its owner should not change:
-            if (ownerJob != null)
+            if (OwnerJob != null)
             {
                 throw new InvalidOperationException("JobTrigger already started (has an owner Job)");
             }
 
-            this.ownerJob = ownerJob;
+            this.context = context;
 
             OnSetup();
         }
@@ -54,7 +77,7 @@ namespace BackgroundService.Source.Services.Jobs.Models
             OnTeardown();
 
             closed = true;
-            ownerJob = null;
+            context = null;
         }
 
         // Trigger listeners, resources should be setup during setup event:
