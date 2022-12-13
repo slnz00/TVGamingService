@@ -52,8 +52,10 @@
     <Compile Include="Components\System\MessageLoop.cs" />
     <Compile Include="Components\System\RestartManagerApi.cs" />
     <Compile Include="Utils\AsyncUtils.cs" />
+    <Compile Include="Utils\CollectionUtils.cs" />
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\FSUtils.cs" />
+    <Compile Include="Utils\HashUtils.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\TimerUtils.cs" />
   </ItemGroup>

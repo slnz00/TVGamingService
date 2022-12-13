@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BackgroundService.Source.Services.Jobs.Models
+namespace BackgroundService.Source.Services.Jobs.Components
 {
     internal class JobOptions
     {
@@ -8,14 +8,14 @@ namespace BackgroundService.Source.Services.Jobs.Models
         {
             // Runs the job actions synchronously when the job is created, main thread is halted until job execution finishes
             // Trigger option is ignored
-            SYNC,
+            Sync,
 
             // Runs the job actions asynchronously when the job is created
             // Trigger option is ignored
-            ASYNC,
+            Async,
 
             // Sets up the JobTrigger defined in TriggerWhen option, trigger will start the job asynchronously
-            TRIGGERED,
+            Triggered,
         }
 
         // Unique job id (job names with "$Internal." are preserved for internal use):

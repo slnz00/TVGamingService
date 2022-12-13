@@ -10,8 +10,8 @@ namespace BackgroundService.Source.Services.ThirdParty
     {
         public enum GameStoreTypes
         {
-            STEAM,
-            EPIC_GAMES
+            Steam,
+            EpicGames
         }
 
         private IReadOnlyDictionary<GameStoreTypes, AppConfig> storeConfigs;
@@ -24,8 +24,8 @@ namespace BackgroundService.Source.Services.ThirdParty
 
             storeConfigs = new Dictionary<GameStoreTypes, AppConfig>
             {
-               { GameStoreTypes.STEAM, config.ThirdParty.Steam },
-               { GameStoreTypes.EPIC_GAMES, config.ThirdParty.EpicGames },
+               { GameStoreTypes.Steam, config.ThirdParty.Steam },
+               { GameStoreTypes.EpicGames, config.ThirdParty.EpicGames },
             };
         }
 

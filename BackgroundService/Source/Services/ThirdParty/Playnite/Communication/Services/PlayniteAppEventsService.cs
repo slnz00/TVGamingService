@@ -10,6 +10,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Se
     {
         public class Events {
             public Action<PlayniteGameInfo> OnGameStarting { get; set; }
+            public Action<PlayniteGameInfo> OnGameStarted { get; set; }
             public Action<PlayniteGameInfo> OnGameStopped { get; set; }
         }
 
@@ -21,6 +22,11 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Se
         }
 
         public void SendGameStarting(PlayniteGameInfo gameInfo)
+        {
+            events.OnGameStarting(gameInfo);
+        }
+
+        public void SendGameStarted(PlayniteGameInfo gameInfo)
         {
             events.OnGameStarting(gameInfo);
         }

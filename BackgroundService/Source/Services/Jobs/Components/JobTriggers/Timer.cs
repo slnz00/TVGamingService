@@ -1,7 +1,7 @@
 ﻿using Core.Components;
 using System.Threading.Tasks;
 
-namespace BackgroundService.Source.Services.Jobs.Models.JobTriggers
+namespace BackgroundService.Source.Services.Jobs.Components.JobTriggers
 {
     internal class Timer : JobTrigger
     {
@@ -10,15 +10,15 @@ namespace BackgroundService.Source.Services.Jobs.Models.JobTriggers
             public int Time { get; set; }
         }
 
-        private ManagedTask task;
-
         private TimerOptions Options => GetOptions<TimerOptions>();
 
-        public Timer(TriggerAction action, object options) : base(action, options) { }
+        private ManagedTask timerTask;
 
-        protected override void OnSetup()
+        public Timer(JobTriggerAction action, object options) : base(action, options) { }
+
+        protected override void OnOpen()
         {
-            task = ManagedTask.Run(async (ctx) =>
+            timerTask = ManagedTask.Run(async (ctx) =>
             {
                 await Task.Delay(Options.Time, ctx.Cancellation.Token);
 
@@ -26,8 +26,8 @@ namespace BackgroundService.Source.Services.Jobs.Models.JobTriggers
             });
         }
 
-        protected override void OnTeardown() {
-            task.Cancel();
+        protected override void OnClose() {
+            timerTask.Cancel(false);
         }
     }
 }

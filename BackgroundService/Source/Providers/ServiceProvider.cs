@@ -37,6 +37,7 @@ namespace BackgroundService.Source.Providers
 
         // Common services should be defined without grouping:
         public readonly ConfigService Config;
+        public readonly GameConfigService GameConfig;
         public readonly JobService Jobs;
 
         // Initialization order is based on service registration order:
@@ -45,6 +46,7 @@ namespace BackgroundService.Source.Providers
             Logger = new LoggerProvider(GetType().Name);
 
             Config = RegisterService(new ConfigService(this));
+            GameConfig = RegisterService(new GameConfigService(this));
             Jobs = RegisterService(new JobService(this));
 
             System = new SystemServices

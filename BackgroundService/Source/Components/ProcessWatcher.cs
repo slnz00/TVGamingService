@@ -2,7 +2,6 @@
 using Core.Components;
 using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace BackgroundService.Source.Common
@@ -17,7 +16,7 @@ namespace BackgroundService.Source.Common
 
         public string ProcessName { get; private set; }
 
-        public bool IsWatcherRunning { get; private set; }
+        public bool IsWatcherRunning => watcherTask != null && watcherTask.IsAlive;
         public bool IsProcessOpen { get; private set; }
 
         private LoggerProvider Logger;
@@ -44,16 +43,11 @@ namespace BackgroundService.Source.Common
             {
                 if (IsWatcherRunning)
                 {
-                    return;
-                }
-                if (watcherTask != null)
-                {
-                    ResetWatcher();
+                    Stop();
                 }
 
+                IsProcessOpen = RequestProcessRunningStatus();
                 watcherTask = WatchProcess();
-
-                IsWatcherRunning = true;
             }
         }
 
@@ -63,18 +57,10 @@ namespace BackgroundService.Source.Common
             {
                 watcherTask.Cancel();
 
-                ResetWatcher();
+
+                IsProcessOpen = false;
+                watcherTask = null;
             }
-        }
-
-        private void ResetWatcher()
-        {
-            watcherTask.Cancel();
-
-            IsWatcherRunning = false;
-            IsProcessOpen = false;
-
-            watcherTask = null;
         }
 
         private ManagedTask WatchProcess()
@@ -83,7 +69,7 @@ namespace BackgroundService.Source.Common
             {
                 while (!ctx.Cancellation.IsCancellationRequested)
                 {
-                    bool currentlyOpen = Process.GetProcessesByName(ProcessName).Length != 0;
+                    bool currentlyOpen = RequestProcessRunningStatus();
 
                     if (IsProcessOpen && !currentlyOpen)
                     {
@@ -99,6 +85,10 @@ namespace BackgroundService.Source.Common
                     await Task.Delay(timeBetweenChecks, ctx.Cancellation.Token);
                 }
             });
+        }
+
+        private bool RequestProcessRunningStatus() {
+            return Process.GetProcessesByName(ProcessName).Length != 0;
         }
 
         private void RunEvent(Action e)

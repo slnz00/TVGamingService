@@ -3,9 +3,9 @@ using Core.Components;
 using System;
 using System.Threading.Tasks;
 
-using static BackgroundService.Source.Services.Jobs.Models.JobOptions;
+using static BackgroundService.Source.Services.Jobs.Components.JobOptions;
 
-namespace BackgroundService.Source.Services.Jobs.Models
+namespace BackgroundService.Source.Services.Jobs.Components
 {
     internal class Job
     {
@@ -17,19 +17,18 @@ namespace BackgroundService.Source.Services.Jobs.Models
         }
 
         public JobOptions Options { get; private set; }
+
         public string Id => Options.Id;
-        public bool IsRunning => jobTask != null ? jobTask.IsAlive : false;
-        public bool Closed => closed;
+        public bool Running => jobTask != null && jobTask.IsAlive;
+        public bool Closed { get; private set; }
 
         private readonly object threadLock = new object();
 
         private readonly Context context;
-        private ServiceProvider Services => context.Services;
-        private LoggerProvider Logger => context.Logger;
-
         private ManagedTask jobTask;
 
-        private bool closed = false;
+        private ServiceProvider Services => context.Services;
+        private LoggerProvider Logger => context.Logger;
 
         public Job(ServiceProvider services, JobOptions options)
         {
@@ -43,23 +42,26 @@ namespace BackgroundService.Source.Services.Jobs.Models
             };
 
             ValidateOptions();
+
+            SetupActions();
+            SetupTriggers();
         }
 
         public void Open()
         {
             lock (threadLock)
             {
-                if (Options.Mode == JobMode.SYNC)
+                if (Options.Mode == JobMode.Sync)
                 {
                     StartTask();
                 }
-                else if (Options.Mode == JobMode.ASYNC)
+                else if (Options.Mode == JobMode.Async)
                 {
                     StartTaskAsync();
                 }
-                else if (Options.Mode == JobMode.TRIGGERED)
+                else if (Options.Mode == JobMode.Triggered)
                 {
-                    StartTriggers();
+                    OpenTriggers();
                 }
             }
         }
@@ -68,15 +70,15 @@ namespace BackgroundService.Source.Services.Jobs.Models
         {
             lock (threadLock)
             {
-                if (closed)
+                if (Closed)
                 {
                     return;
                 }
 
                 StopTask();
-                StopTriggers();
+                CloseTriggers();
 
-                closed = true;
+                Closed = true;
             }
         }
 
@@ -98,7 +100,7 @@ namespace BackgroundService.Source.Services.Jobs.Models
 
         private void StartTask(bool sync)
         {
-            if (IsRunning)
+            if (Running)
             {
                 return;
             }
@@ -122,10 +124,9 @@ namespace BackgroundService.Source.Services.Jobs.Models
         {
             lock (threadLock)
             {
-                if (IsRunning)
+                if (Running)
                 {
                     jobTask.Cancel();
-                    jobTask.Wait();
                 }
 
                 jobTask = null;
@@ -134,26 +135,38 @@ namespace BackgroundService.Source.Services.Jobs.Models
 
         private void ValidateOptions()
         {
-            if (Options.Mode != JobMode.TRIGGERED && Options.TriggerWhen != null)
+            if (Options.Mode != JobMode.Triggered && Options.TriggerWhen != null)
             {
                 Logger.Warn("TriggerWhen option is defined, while job type set to TRIGGERED");
             }
 
-            if (Options.Mode == JobMode.TRIGGERED && Options.TriggerWhen == null)
+            if (Options.Mode == JobMode.Triggered && Options.TriggerWhen == null)
             {
                 throw new NullReferenceException("TriggerWhen option is null, while job type set to TRIGGERED");
             }
         }
 
-        private void StartTriggers() {
-            Options.TriggerWhen.StartListening(context);
-            Options.RepeatUntil?.StartListening(context);
+        private void SetupActions()
+        {
+            Options.Actions.ForEach(action => action.SetOwner(context));
         }
 
-        private void StopTriggers()
+        private void SetupTriggers()
         {
-            Options.TriggerWhen?.StopListening();
-            Options.RepeatUntil?.StopListening();
+            Options.TriggerWhen?.SetOwner(context);
+            Options.RepeatUntil?.SetOwner(context);
+        }
+
+        private void OpenTriggers()
+        {
+            Options.TriggerWhen?.Open();
+            Options.RepeatUntil?.Open();
+        }
+
+        private void CloseTriggers()
+        {
+            Options.TriggerWhen?.Close();
+            Options.RepeatUntil?.Close();
         }
 
         private void CreateAndRunJobTask()
@@ -164,12 +177,7 @@ namespace BackgroundService.Source.Services.Jobs.Models
                 {
                     foreach (var action in Options.Actions)
                     {
-                        if (ctx.Cancellation.IsCancellationRequested)
-                        {
-                            break;
-                        }
-
-                        action.Run(context);
+                        action.Execute();
                     }
                 };
 

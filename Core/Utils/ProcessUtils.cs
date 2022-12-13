@@ -18,6 +18,16 @@ namespace Core.Utils
             }
         }
 
+        public static void InteractWithProcess(int processId, Action<Process> action)
+        {
+            using (var process = Process.GetProcessById(processId))
+            {
+                action(process);
+
+                process.Dispose();
+            }
+        }
+
         public static List<int> GetProcessIdsByProcessName(string processName)
         {
             Process[] processes = Process.GetProcessesByName(processName);
@@ -45,6 +55,17 @@ namespace Core.Utils
             });
         }
 
+        public static void CloseProcess(int processId, bool forceKill = false)
+        {
+            InteractWithProcess(processId, (process) =>
+            {
+                if (!process.CloseMainWindow() || forceKill)
+                {
+                    process.Kill();
+                }
+            });
+        }
+
         public static void StartProcess(
             string path,
             string args = "",
@@ -55,7 +76,7 @@ namespace Core.Utils
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = windowStyle == ProcessWindowStyle.Hidden;
-            startInfo.UseShellExecute = false;
+            startInfo.UseShellExecute = true;
             startInfo.FileName = path;
             startInfo.WindowStyle = windowStyle;
             startInfo.Arguments = args;

@@ -16,10 +16,11 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
     {
         private enum PlayniteEventID
         {
-            PLAYNITE_OPENED,
-            PLAYNITE_CLOSED,
-            GAME_STARTING,
-            GAME_STOPPED,
+            PlayniteOpened,
+            PlayniteClosed,
+            GameStarting,
+            GameStarted,
+            GameStopped,
         }
 
         private readonly EventListenerRegistry<PlayniteEventID, Action<object>> eventListenerRegistry = new EventListenerRegistry<PlayniteEventID, Action<object>>();
@@ -42,14 +43,15 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
             watcherEvents = new ProcessWatcher.Events
             {
-                OnProcessOpened = () => RunEventListeners(PlayniteEventID.PLAYNITE_OPENED, null),
-                OnProcessClosed = () => RunEventListeners(PlayniteEventID.PLAYNITE_CLOSED, null)
+                OnProcessOpened = () => RunEventListeners(PlayniteEventID.PlayniteOpened, null),
+                OnProcessClosed = () => RunEventListeners(PlayniteEventID.PlayniteClosed, null)
             };
 
             playniteAppEvents = new PlayniteAppEventsService.Events
             {
-                OnGameStarting = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GAME_STARTING, gameInfo),
-                OnGameStopped = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GAME_STOPPED, gameInfo),
+                OnGameStarting = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStarting, gameInfo),
+                OnGameStarted = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStarted, gameInfo),
+                OnGameStopped = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStopped, gameInfo),
             };
 
             watcher = new ProcessWatcher(playniteConfig.ProcessName, watcherEvents, 1000);
@@ -66,25 +68,31 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
         }
 
         public uint OnPlayniteOpened(Action action) {
-            var listener = eventListenerRegistry.AddListener(PlayniteEventID.PLAYNITE_OPENED, (_args) => action());
+            var listener = eventListenerRegistry.AddListener(PlayniteEventID.PlayniteOpened, (_args) => action());
             return listener.Id;
         }
 
         public uint OnPlayniteClosed(Action action)
         {
-            var listener = eventListenerRegistry.AddListener(PlayniteEventID.PLAYNITE_CLOSED, (_args) => action());
+            var listener = eventListenerRegistry.AddListener(PlayniteEventID.PlayniteClosed, (_args) => action());
             return listener.Id;
         }
 
         public uint OnGameStarting(Action<PlayniteGameInfo> action)
         {
-            var listener = eventListenerRegistry.AddListener(PlayniteEventID.GAME_STARTING, (args) => action((PlayniteGameInfo)args));
+            var listener = eventListenerRegistry.AddListener(PlayniteEventID.GameStarting, (args) => action((PlayniteGameInfo)args));
+            return listener.Id;
+        }
+
+        public uint OnGameStarted(Action<PlayniteGameInfo> action)
+        {
+            var listener = eventListenerRegistry.AddListener(PlayniteEventID.GameStarted, (args) => action((PlayniteGameInfo)args));
             return listener.Id;
         }
 
         public uint OnGameStopped(Action<PlayniteGameInfo> action)
         {
-            var listener = eventListenerRegistry.AddListener(PlayniteEventID.GAME_STOPPED, (args) => action((PlayniteGameInfo)args));
+            var listener = eventListenerRegistry.AddListener(PlayniteEventID.GameStopped, (args) => action((PlayniteGameInfo)args));
             return listener.Id;
         }
 

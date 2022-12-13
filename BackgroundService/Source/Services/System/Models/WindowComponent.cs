@@ -9,9 +9,9 @@ namespace BackgroundService.Source.Services.System.Models
     {
         public enum WindowComponentState
         {
-            NORMAL,
-            MINIMIZED,
-            MAXIMIZED
+            Normal,
+            Minimized,
+            Maximized
         }
 
         private enum ShowWindowCommands
@@ -56,8 +56,12 @@ namespace BackgroundService.Source.Services.System.Models
         [DllImport("user32.dll")]
         private static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
         public string Type { get; private set; }
         public IntPtr Handle { get; private set; }
+        public uint ProcessID => GetProcessID();
         public string Name => GetName();
         public WindowComponentState State => GetState();
         public bool IsValid => Handle != IntPtr.Zero;
@@ -82,6 +86,13 @@ namespace BackgroundService.Source.Services.System.Models
             SendMessage(Handle, WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero);
         }
 
+        public void Close()
+        {
+            const int WM_CLOSE = 0x0010;
+
+            SendMessage(Handle, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+        }
+
         public void Show()
         {
             ShowWindow(Handle, (int)ShowWindowCommands.SW_NORMAL);
@@ -90,6 +101,11 @@ namespace BackgroundService.Source.Services.System.Models
         public void Minimize()
         {
             ShowWindow(Handle, (int)ShowWindowCommands.SW_SHOWMINNOACTIVE);
+        }
+
+        public void Maximize()
+        {
+            ShowWindow(Handle, (int)ShowWindowCommands.SW_MAXIMIZE);
         }
 
         private string GetName()
@@ -113,18 +129,24 @@ namespace BackgroundService.Source.Services.System.Models
             WindowPlacement placement = new WindowPlacement();
             GetWindowPlacement(Handle, ref placement);
 
-            Console.WriteLine($"Window: \"{Name}\", state: {placement.showCmd}");
             switch (placement.showCmd)
             {
                 case 1:
-                    return WindowComponentState.NORMAL;
+                    return WindowComponentState.Normal;
                 case 2:
-                    return WindowComponentState.MINIMIZED;
+                    return WindowComponentState.Minimized;
                 case 3:
-                    return WindowComponentState.MAXIMIZED;
+                    return WindowComponentState.Maximized;
                 default:
-                    return WindowComponentState.NORMAL;
+                    return WindowComponentState.Normal;
             }
+        }
+
+        private uint GetProcessID()
+        {
+            GetWindowThreadProcessId(Handle, out uint pid);
+
+            return pid;
         }
     }
 }

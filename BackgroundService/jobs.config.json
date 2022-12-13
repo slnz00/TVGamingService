@@ -7,24 +7,101 @@
   "TV": {
     "Setup": [
       {
-        "Id": "Test",
-        "Mode": "TRIGGERED",
+        "Id": "TurnOnTV",
+        "Mode": "Async",
         "Actions": [
           {
             "Type": "StartProcess",
             "Options": {
-              "Path": "C:\\Users\\Balint\\Home\\Projects\\Programming\\MessageBoxExample\\MessageBoxExample\\bin\\Debug\\net6.0-windows\\MessageBoxExample.exe"
-            }
-          }
-        ],
-        "TriggerWhen": [
-          {
-            "Type": "Timer",
-            "Options": {
-              "Time": 1000
+              "WindowStyle": "Hidden",
+              "Path": "C:\\Program Files\\nodejs\\node.exe",
+              "Args": "C:\\TVGaming\\Scripts\\TurnOnTV\\turn-on-tv.js"
             }
           }
         ]
+      },
+
+      {
+        "Id": "CloseCyberpunkCrashWindow",
+        "Mode": "Triggered",
+        "TimeBetweenExecutions": 1000,
+        "Actions": [
+          {
+            "Type": "WindowInteraction",
+            "Options": {
+              "Interaction": "Close",
+              "WindowName": "Cyberpunk 2077 hibajelentõ"
+            }
+          }
+        ],
+        "TriggerWhen": {
+          "Type": "GameStarting",
+          "Options": {
+            "Filter": {
+              "Name": "Cyberpunk 2077"
+            }
+          }
+        },
+        "RepeatUntil": {
+          "Type": "GameStopped",
+          "Options": {}
+        }
+      },
+
+      {
+        "Id": "MinimizeSteam",
+        "Mode": "Triggered",
+        "TimeBetweenExecutions": 500,
+        "Actions": [
+          {
+            "Type": "MinimizeProcessWindows",
+            "Options": {
+              "ProcessName": "Steam"
+            }
+          }
+        ],
+        "TriggerWhen": {
+          "Type": "GameStarting",
+          "Options": {
+            "Filter": {
+              "Library": "Steam"
+            }
+          }
+        },
+        "RepeatUntil": {
+          "Type": "Timer",
+          "Options": {
+            "Time": 10000
+          }
+        }
+      },
+
+      {
+        "Id": "MinimizeEpicGames",
+        "Mode": "Triggered",
+        "TimeBetweenExecutions": 500,
+        "Actions": [
+          {
+            "Type": "MinimizeProcessWindows",
+            "Options": {
+              "ProcessName": "EpicGamesLauncher"
+            }
+          }
+        ],
+        "TriggerWhen": {
+          "Type": "GameStarting",
+          "Options": {
+            "Filter": {
+              "Library": "Epic"
+            }
+          }
+        },
+        "RepeatUntil": {
+          "Type": "Timer",
+          "Options": {
+            "Time": 10000
+          }
+        }
       }
     ],
     "Reset": [],

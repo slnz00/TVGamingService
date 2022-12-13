@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
+using System.Text;
 
 namespace BackgroundService.Source.Services.Configs
 {
@@ -45,13 +46,12 @@ namespace BackgroundService.Source.Services.Configs
         {
             Logger.Debug($"Loading config from JSON file: {CONFIG_PATH}");
 
-            string configJson = File.ReadAllText(CONFIG_PATH);
+            string configJson = File.ReadAllText(CONFIG_PATH, Encoding.Default);
             config = JsonConvert.DeserializeObject<Config>(configJson);
-
 
             Logger.Debug($"Loading jobs config from JSON file: {JOB_CONFIG_PATH}");
 
-            string jobsConfigJson = File.ReadAllText(JOB_CONFIG_PATH);
+            string jobsConfigJson = File.ReadAllText(JOB_CONFIG_PATH, Encoding.Default);
             jobsConfig = JsonConvert.DeserializeObject<JobsConfig>(jobsConfigJson);
         }
     }

@@ -1,8 +1,10 @@
-﻿using Core.Utils;
+﻿using BackgroundService.Source.Services.Jobs.Components.Common;
+using Core.Utils;
+using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace BackgroundService.Source.Services.Jobs.Models.JobActions
+namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 {
     internal class StartProcess : JobAction
     {
@@ -18,7 +20,12 @@ namespace BackgroundService.Source.Services.Jobs.Models.JobActions
 
         public StartProcess(object options) : base(options) { }
 
-        public override void Run(Job.Context context)
+        protected override void OnOptionsValidation()
+        {
+            Validations.ValidateNotEmptyOrNull(nameof(Options.Path), Options.Path);
+        }
+
+        protected override void OnExecution()
         {
             var path = Path.GetFullPath(Options.Path);
             var args = Options.Args;

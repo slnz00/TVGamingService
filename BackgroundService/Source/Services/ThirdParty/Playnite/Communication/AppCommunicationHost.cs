@@ -13,7 +13,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication
 
         public AppCommunicationHost(PlayniteAppEventsService.Events playniteAppEvents)
         {
-            CreateServiceHost(new PlayniteAppEventsService(playniteAppEvents));
+            CreateServiceHost<IPlayniteAppEventsService>(new PlayniteAppEventsService(playniteAppEvents));
         }
 
         public void Open()

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
-using BackgroundService.Source.Services.Jobs.Models;
+using BackgroundService.Source.Services.Jobs.Components;
 using Core.Utils;
 
-using static BackgroundService.Source.Services.Jobs.Models.JobOptions;
+using static BackgroundService.Source.Services.Jobs.Components.JobOptions;
 
 namespace BackgroundService.Source.Controllers.EnvironmentControllers
 {
@@ -50,14 +50,14 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         public void Reset()
         {
-            CreateEnvironmentJobsForEvent("Reset", new List<JobMode> { JobMode.SYNC });
+            CreateEnvironmentJobsForEvent("Reset", new List<JobMode> { JobMode.Sync });
 
             OnReset();
         }
 
         public void Teardown()
         {
-            CreateEnvironmentJobsForEvent("Teardown", new List<JobMode> { JobMode.SYNC });
+            CreateEnvironmentJobsForEvent("Teardown", new List<JobMode> { JobMode.Sync });
 
             OnTeardown();
 
@@ -92,8 +92,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected void RemoveAllEnvironmentJobs()
         {
-            // Make a copy to avoid issues when removing an element during iteration:
-            new List<string>(environmentJobIds).ForEach(RemoveEnvironmentJob);
+            CollectionUtils.CloneList(environmentJobIds).ForEach(RemoveEnvironmentJob);
         }
 
         private void CreateEnvironmentJobsForEvent(string eventName, List<JobMode> allowedJobModes = null)

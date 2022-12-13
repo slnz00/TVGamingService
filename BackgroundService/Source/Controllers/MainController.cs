@@ -21,7 +21,7 @@ namespace BackgroundService.Source.Controllers
         {
             DisplayStartupTitle();
             InitializeComponents();
-            SetupEnvironmentControllerFactory();
+            SetupEnvironmentController();
             SetupHotkeys();
 
             MessageLoop.Run();
@@ -40,12 +40,14 @@ namespace BackgroundService.Source.Controllers
             Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", InternalSettings.HOTKEY_TOGGLE_CURSOR_VISIBILITY, ToggleCursorVisibility);
         }
 
-        private void SetupEnvironmentControllerFactory()
+        private void SetupEnvironmentController()
         {
             EnvironmentControllerFactory = new Dictionary<Environments, Func<EnvironmentController>>();
 
             EnvironmentControllerFactory.Add(Environments.PC, () => new PCController(this, Services));
             EnvironmentControllerFactory.Add(Environments.TV, () => new TVController(this, Services));
+
+            EnvironmentController = EnvironmentControllerFactory[Environments.PC]();
         }
 
         public void SwitchEnvironment()

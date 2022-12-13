@@ -144,23 +144,34 @@
     <Compile Include="Source\Controllers\MainController.cs" />
     <Compile Include="Source\Controllers\EnvironmentControllers\Models\Environments.cs" />
     <Compile Include="Source\Services\Configs\Models\JobsConfig.cs" />
-    <Compile Include="Source\Services\Jobs\Models\Job.cs" />
-    <Compile Include="Source\Services\Jobs\Models\JobAction.cs" />
-    <Compile Include="Source\Services\Jobs\Models\JobActions\StartProcess.cs" />
-    <Compile Include="Source\Services\Jobs\Models\JobOptions.cs" />
-    <Compile Include="Source\Services\Jobs\Models\JobActions\MinimizeProcessWindows.cs" />
-    <Compile Include="Source\Services\Jobs\Models\JobTriggers\Timer.cs" />
+    <Compile Include="Source\Services\Configs\GameConfigService.cs" />
+    <Compile Include="Source\Services\Jobs\Components\Common\Filters.cs" />
+    <Compile Include="Source\Services\Jobs\Components\Common\Validations.cs" />
+    <Compile Include="Source\Services\Jobs\Components\Job.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobAction.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobActions\Log.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobActions\StartProcess.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobActions\StopProcess.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobActions\WindowInteraction.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobComponent.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobOptions.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobActions\MinimizeProcessWindows.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobTriggerAction.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStarted.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStarting.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStopped.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobTriggers\Timer.cs" />
     <Compile Include="Source\Services\System\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
     <Compile Include="Source\Services\System\Models\WindowComponent.cs" />
     <Compile Include="Source\Services\ThirdParty\DS4WindowsService.cs" />
     <Compile Include="Source\Services\ThirdParty\Playnite\Communication\AppCommunicationHost.cs" />
-    <Compile Include="Source\Services\ThirdParty\Playnite\Communication\Services\PlayniteEventsService.cs" />
+    <Compile Include="Source\Services\ThirdParty\Playnite\Communication\Services\PlayniteAppEventsService.cs" />
     <Compile Include="Source\Services\ThirdParty\Playnite\PlayniteService.cs" />
     <Compile Include="Source\Services\ThirdParty\GameStoreService.cs" />
     <Compile Include="Source\Services\System\CursorService.cs" />
     <Compile Include="Source\Services\Jobs\JobService.cs" />
-    <Compile Include="Source\Services\Jobs\Models\JobTrigger.cs" />
+    <Compile Include="Source\Services\Jobs\Components\JobTrigger.cs" />
     <Compile Include="Source\Services\System\WindowService.cs" />
     <Compile Include="Source\Services\Configs\Models\Config.cs" />
     <Compile Include="Source\Services\System\Models\HotkeyAction.cs" />
@@ -197,10 +208,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="jobs.config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="game-configs.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

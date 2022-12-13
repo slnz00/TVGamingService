@@ -3,7 +3,6 @@ using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
-using PlaynitePlugin.Communication;
 using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
@@ -37,11 +36,14 @@ namespace PlaynitePlugin
 
         public override void OnGameStarted(OnGameStartedEventArgs args)
         {
+            var gameInfo = GetGameInfo(args.Game);
+
+            tvGamingService.PlayniteEvents.Service.SendGameStarted(gameInfo);
         }
 
         public override void OnGameStarting(OnGameStartingEventArgs args)
         {
-            SetGamePath(args.Game, args.SourceAction.Path);
+            SetGamePath(args.Game, args.SourceAction?.Path);
 
             var gameInfo = GetGameInfo(args.Game);
 
@@ -88,7 +90,23 @@ namespace PlaynitePlugin
                 Id = game.GameId,
                 Name = game.Name,
                 Path = GetGamePath(game),
+                Library = GetGameLibraryName(game),
             };
+        }
+
+        private string GetGameLibraryName(Game game)
+        {
+            if (game.PluginId == null)
+            {
+                return null;
+            }
+
+            var library = PlayniteApi.Addons.Plugins.Find(l => l.Id == game.PluginId);
+            if (library == null) {
+                return null;
+            }
+
+            return (string)library.GetType().GetProperty("Name")?.GetValue(library, null);
         }
 
         private string GetGamePath(Game game)

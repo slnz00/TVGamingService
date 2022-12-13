@@ -1,11 +1,13 @@
-﻿using BackgroundService.Source.Services.System.Models;
+﻿using BackgroundService.Source.Services.Jobs.Components.Common;
+using BackgroundService.Source.Services.System.Models;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BackgroundService.Source.Services.Jobs.Models.JobActions
+namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 {
+
     internal class MinimizeProcessWindows : JobAction
     {
         public class MinimizeProcessWindowsOptions
@@ -20,20 +22,19 @@ namespace BackgroundService.Source.Services.Jobs.Models.JobActions
 
         public MinimizeProcessWindows(object options) : base(options) { }
 
-        public MinimizeProcessWindows(MinimizeProcessWindowsOptions options) : base(options) { }
-
-        public override void Run(Job.Context context)
+        protected override void OnOptionsValidation()
         {
-            var services = context.Services;
+            Validations.ValidateNotEmptyOrNull(nameof(Options.ProcessName), Options.ProcessName);
+        }
 
-            ValidateOptions();
-
+        protected override void OnExecution()
+        {
             ProcessUtils.InteractWithProcess(Options.ProcessName, (process) =>
             {
-                var allWindows = services.System.Window.GetProcessWindows(process.Id);
+                var allWindows = Services.System.Window.GetProcessWindows(process.Id);
 
                 Func<WindowComponent, bool> windowIsValid = win => win.IsValid && !string.IsNullOrWhiteSpace(win.Name);
-                Func<WindowComponent, bool> windowIsNotMinimized = win => win.State != WindowComponent.WindowComponentState.MINIMIZED;
+                Func<WindowComponent, bool> windowIsNotMinimized = win => win.State != WindowComponent.WindowComponentState.Minimized;
 
                 var windowsToMinimize = allWindows
                     .Where(windowIsValid)
@@ -57,14 +58,6 @@ namespace BackgroundService.Source.Services.Jobs.Models.JobActions
             if (!alreadyMinimized)
             {
                 alreadyMinimizedWindowNames.Add(window.Name);
-            }
-        }
-
-        private void ValidateOptions()
-        {
-            if (string.IsNullOrEmpty(Options.ProcessName))
-            {
-                throw new NullReferenceException(nameof(Options.ProcessName));
             }
         }
     }

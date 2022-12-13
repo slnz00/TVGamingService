@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Utils;
+using System;
 using System.Collections.Generic;
 
 namespace Core.Components
@@ -20,6 +21,8 @@ namespace Core.Components
 
     public class EventListenerRegistry<TEventID, TEventAction> where TEventID : Enum
     {
+        private readonly object threadLock = new object();
+
         private uint listenerIdCounter = 0;
 
         private Dictionary<uint, EventListener<TEventID, TEventAction>> listenersById = new Dictionary<uint, EventListener<TEventID, TEventAction>>();
@@ -32,49 +35,63 @@ namespace Core.Components
 
         public EventListener<TEventID, TEventAction> GetListenerById(uint id)
         {
-            bool listenerExists = listenersById.TryGetValue(id, out EventListener<TEventID, TEventAction> listener);
+            lock (threadLock)
+            {
+                bool listenerExists = listenersById.TryGetValue(id, out EventListener<TEventID, TEventAction> listener);
 
-            return listenerExists ? listener : null;
+                return listenerExists ? listener : null;
+            }
         }
 
         public List<EventListener<TEventID, TEventAction>> GetListenersByEventId(TEventID EventId)
         {
-            return listenersByEventId[EventId];
+            lock (threadLock)
+            {
+                return CollectionUtils.CloneList(listenersByEventId[EventId]);
+            }
         }
 
         public EventListener<TEventID, TEventAction> AddListener(TEventID eventId, TEventAction action)
         {
-            var listener = new EventListener<TEventID, TEventAction>(listenerIdCounter++, eventId, action);
+            lock (threadLock)
+            {
+                var listener = new EventListener<TEventID, TEventAction>(listenerIdCounter++, eventId, action);
 
-            listenersById[listener.Id] = listener;
-            listenersByEventId[listener.EventId].Add(listener);
+                listenersById[listener.Id] = listener;
+                listenersByEventId[listener.EventId].Add(listener);
 
-            return listener;
+                return listener;
+            }
         }
 
         public void RemoveListener(uint id)
         {
-            bool listenerExists = listenersById.TryGetValue(id, out EventListener<TEventID, TEventAction> listener);
-            if (!listenerExists)
-            {
-                return;
-            }
+            lock (threadLock) {
+                bool listenerExists = listenersById.TryGetValue(id, out EventListener<TEventID, TEventAction> listener);
+                if (!listenerExists)
+                {
+                    return;
+                }
 
-            var listenersForEvent = listenersByEventId[listener.EventId];
+                var listenersForEvent = listenersByEventId[listener.EventId];
 
-            var listenerIndex = listenersForEvent.IndexOf(listener);
-            if (listenerIndex != -1)
-            {
-                listenersForEvent.RemoveAt(listenerIndex);
+                var listenerIndex = listenersForEvent.IndexOf(listener);
+                if (listenerIndex != -1)
+                {
+                    listenersForEvent.RemoveAt(listenerIndex);
+                }
             }
         }
 
         public void Clear()
         {
-            listenersById.Clear();
-            listenersByEventId.Clear();
+            lock (threadLock)
+            {
+                listenersById.Clear();
+                listenersByEventId.Clear();
 
-            Initialize();
+                Initialize();
+            }
         }
 
         private void Initialize()

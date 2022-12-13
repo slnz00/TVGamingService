@@ -15,7 +15,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         {
             var tvDesktopName = InternalSettings.DESKTOP_TV_NAME;
 
-            Services.System.Cursor.SetCursorVisibility(false);
+            //Services.System.Cursor.SetCursorVisibility(false);
 
             // Change display and sound device:
             Services.System.LegacyDisplay.SwitchToDisplay(Config.Display);
@@ -28,6 +28,8 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             CloseThirdPartyApps();
             OpenThirdPartyApps();
+
+            Services.GameConfig.LoadGameConfigsForEnvironment(Environment);
         }
 
         protected override void OnReset()
@@ -41,6 +43,8 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         protected override void OnTeardown()
         {
             CloseThirdPartyApps();
+
+            Services.GameConfig.SaveGameConfigsForEnvironment(Environment);
         }
 
         private void OpenThirdPartyApps()

@@ -6,8 +6,11 @@ namespace Core.Playnite.Communication.Services
     [ServiceContract]
     public interface IPlayniteAppEventsService
     {
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void SendGameStarting(PlayniteGameInfo gameInfo);
+
+        [OperationContract(IsOneWay = true)]
+        void SendGameStarted(PlayniteGameInfo gameInfo);
 
         [OperationContract(IsOneWay = true)]
         void SendGameStopped(PlayniteGameInfo gameInfo);

@@ -1,19 +1,19 @@
 ﻿using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
-using BackgroundService.Source.Services.Jobs.Models;
+using BackgroundService.Source.Services.Jobs.Components;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using static BackgroundService.Source.Services.Jobs.Models.JobOptions;
+using static BackgroundService.Source.Services.Jobs.Components.JobOptions;
 
 namespace BackgroundService.Source.Services.Jobs
 {
     internal class JobService : Service
     {
-        private const string JOB_TRIGGER_NAMESPACE = "BackgroundService.Source.Services.Jobs.Models.JobTriggers";
-        private const string JOB_ACTION_NAMESPACE = "BackgroundService.Source.Services.Jobs.Models.JobActions";
+        private const string JOB_TRIGGER_NAMESPACE = "BackgroundService.Source.Services.Jobs.Components.JobTriggers";
+        private const string JOB_ACTION_NAMESPACE = "BackgroundService.Source.Services.Jobs.Components.JobActions";
 
         private Dictionary<string, Job> jobs = new Dictionary<string, Job>();
 
@@ -68,14 +68,14 @@ namespace BackgroundService.Source.Services.Jobs
             {
                 Id = jobConfig.Id,
                 Mode = EnumUtils.GetValue<JobMode>(jobConfig.Mode),
-                TriggerWhen = CreateJobTriggerFromConfig(jobConfig.TriggerWhen, JobTrigger.TriggerAction.START_JOB_TASK),
-                RepeatUntil = CreateJobTriggerFromConfig(jobConfig.RepeatUntil, JobTrigger.TriggerAction.CLOSE_JOB),
+                TriggerWhen = CreateJobTriggerFromConfig(jobConfig.TriggerWhen, JobTriggerAction.StartJob),
+                RepeatUntil = CreateJobTriggerFromConfig(jobConfig.RepeatUntil, JobTriggerAction.StopJob),
                 Actions = CreateJobActionsFromConfigs(jobConfig.Actions),
                 TimeBetweenExecutions = jobConfig.TimeBetweenExecutions,
             };
         }
 
-        private JobTrigger CreateJobTriggerFromConfig(JobTriggerConfig triggerConfig, JobTrigger.TriggerAction triggerAction)
+        private JobTrigger CreateJobTriggerFromConfig(JobTriggerConfig triggerConfig, JobTriggerAction triggerAction)
         {
             if (triggerConfig == null)
             {
