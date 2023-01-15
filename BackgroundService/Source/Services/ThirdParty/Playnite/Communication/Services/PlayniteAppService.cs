@@ -1,13 +1,19 @@
 ﻿using Core.Playnite.Communication.Models;
+using Core.Playnite.Communication.Models.Commands;
 using Core.Playnite.Communication.Services;
 using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 
 namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Services
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    internal class PlayniteAppEventsService : IPlayniteAppEventsService
+    internal class PlayniteAppService : IPlayniteAppService
     {
+        private object threadLock = new object();
+
+        private Queue<AsyncPlayniteTask> asyncTaskQueue = new Queue<AsyncPlayniteTask>();
+
         public class Events {
             public Action<PlayniteGameInfo> OnGameStarting { get; set; }
             public Action<PlayniteGameInfo> OnGameStarted { get; set; }
@@ -16,7 +22,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Se
 
         private readonly Events events;
 
-        public PlayniteAppEventsService(Events events)
+        public PlayniteAppService(Events events)
         {
             this.events = events;
         }
@@ -34,6 +40,25 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Se
         public void SendGameStopped(PlayniteGameInfo gameInfo)
         {
             events.OnGameStopped(gameInfo);
+        }
+
+        public AsyncPlayniteTask GetAsyncTask()
+        {
+            lock (threadLock)
+            {
+                if (asyncTaskQueue.Count == 0)
+                {
+                    return null;
+                }
+
+                return asyncTaskQueue.Dequeue();
+            }
+        }
+
+        public void EnqueueAsyncTask(AsyncPlayniteTask task) {
+            lock (threadLock) {
+                asyncTaskQueue.Enqueue(task);
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         {
             var tvDesktopName = InternalSettings.DESKTOP_TV_NAME;
 
-            //Services.System.Cursor.SetCursorVisibility(false);
+            Services.System.Cursor.SetCursorVisibility(false);
 
             // Change display and sound device:
             Services.System.LegacyDisplay.SwitchToDisplay(Config.Display);

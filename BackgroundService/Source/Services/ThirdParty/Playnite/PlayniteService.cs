@@ -26,7 +26,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
         private readonly EventListenerRegistry<PlayniteEventID, Action<object>> eventListenerRegistry = new EventListenerRegistry<PlayniteEventID, Action<object>>();
 
         private ProcessWatcher.Events watcherEvents;
-        private PlayniteAppEventsService.Events playniteAppEvents;
+        private PlayniteAppService.Events playniteAppEvents;
 
         private AppCommunicationHost playniteCommunication;
         private ProcessWatcher watcher;
@@ -47,7 +47,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
                 OnProcessClosed = () => RunEventListeners(PlayniteEventID.PlayniteClosed, null)
             };
 
-            playniteAppEvents = new PlayniteAppEventsService.Events
+            playniteAppEvents = new PlayniteAppService.Events
             {
                 OnGameStarting = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStarting, gameInfo),
                 OnGameStarted = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStarted, gameInfo),

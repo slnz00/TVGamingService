@@ -44,9 +44,10 @@
   <ItemGroup>
     <Compile Include="Components\EventListenerRegistry.cs" />
     <Compile Include="Components\ManagedTask.cs" />
+    <Compile Include="Playnite\Communication\Models\AsyncPlayniteTask.cs" />
     <Compile Include="Playnite\Communication\Models\PlayniteGameInfo.cs" />
     <Compile Include="Playnite\Communication\PlayniteCommunicationSettings.cs" />
-    <Compile Include="Playnite\Communication\Services\IPlayniteAppEventsService.cs" />
+    <Compile Include="Playnite\Communication\Services\IPlayniteAppService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Components\System\DisplayWinApi.cs" />
     <Compile Include="Components\System\MessageLoop.cs" />

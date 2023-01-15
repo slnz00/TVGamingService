@@ -166,7 +166,7 @@
     <Compile Include="Source\Services\System\Models\WindowComponent.cs" />
     <Compile Include="Source\Services\ThirdParty\DS4WindowsService.cs" />
     <Compile Include="Source\Services\ThirdParty\Playnite\Communication\AppCommunicationHost.cs" />
-    <Compile Include="Source\Services\ThirdParty\Playnite\Communication\Services\PlayniteAppEventsService.cs" />
+    <Compile Include="Source\Services\ThirdParty\Playnite\Communication\Services\PlayniteAppService.cs" />
     <Compile Include="Source\Services\ThirdParty\Playnite\PlayniteService.cs" />
     <Compile Include="Source\Services\ThirdParty\GameStoreService.cs" />
     <Compile Include="Source\Services\System\CursorService.cs" />

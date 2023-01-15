@@ -11,9 +11,9 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication
     {
         private readonly List<ServiceHost> serviceHosts = new List<ServiceHost>();
 
-        public AppCommunicationHost(PlayniteAppEventsService.Events playniteAppEvents)
+        public AppCommunicationHost(PlayniteAppService.Events playniteAppEvents)
         {
-            CreateServiceHost<IPlayniteAppEventsService>(new PlayniteAppEventsService(playniteAppEvents));
+            CreateServiceHost<IPlayniteAppService>(new PlayniteAppService(playniteAppEvents));
         }
 
         public void Open()

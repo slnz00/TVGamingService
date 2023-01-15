@@ -1,10 +1,14 @@
 ﻿using Core.Playnite.Communication.Models;
+using Core.Playnite.Communication.Models.Commands;
+using Core.Playnite.Communication.Services;
 using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
+using PlaynitePlugin.Communication;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Controls;
 
 namespace PlaynitePlugin
@@ -12,12 +16,14 @@ namespace PlaynitePlugin
     public class PlaynitePlugin : GenericPlugin
     {
         private static readonly ILogger logger = LogManager.GetLogger();
-        private static readonly CommunicationClient tvGamingService = new CommunicationClient();
+        private static readonly ServiceClient<IPlayniteAppService> tvGamingService = new ServiceClient<IPlayniteAppService>();
 
         // GameId -> Game path
         private static readonly Dictionary<string, string> gamePaths = new Dictionary<string, string>();
 
         private PlaynitePluginSettingsViewModel settings { get; set; }
+
+        private Timer asyncTaskTimer { get; set; } = null;
 
         public override Guid Id { get; } = Guid.Parse("6dc9c7f6-44f0-4e09-b294-52aac097750a");
 
@@ -38,7 +44,7 @@ namespace PlaynitePlugin
         {
             var gameInfo = GetGameInfo(args.Game);
 
-            tvGamingService.PlayniteEvents.Service.SendGameStarted(gameInfo);
+            tvGamingService.Service.SendGameStarted(gameInfo);
         }
 
         public override void OnGameStarting(OnGameStartingEventArgs args)
@@ -47,14 +53,14 @@ namespace PlaynitePlugin
 
             var gameInfo = GetGameInfo(args.Game);
 
-            tvGamingService.PlayniteEvents.Service.SendGameStarting(gameInfo);
+            tvGamingService.Service.SendGameStarting(gameInfo);
         }
 
         public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
             var gameInfo = GetGameInfo(args.Game);
 
-            tvGamingService.PlayniteEvents.Service.SendGameStopped(gameInfo);
+            tvGamingService.Service.SendGameStopped(gameInfo);
         }
 
         public override void OnGameUninstalled(OnGameUninstalledEventArgs args)
@@ -63,6 +69,7 @@ namespace PlaynitePlugin
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
+
         }
 
         public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
@@ -102,7 +109,8 @@ namespace PlaynitePlugin
             }
 
             var library = PlayniteApi.Addons.Plugins.Find(l => l.Id == game.PluginId);
-            if (library == null) {
+            if (library == null)
+            {
                 return null;
             }
 
@@ -124,6 +132,27 @@ namespace PlaynitePlugin
             var gameId = game.GameId;
 
             gamePaths[gameId] = path;
+        }
+
+        private void StartAsyncTaskProcessor()
+        {
+            var delay = TimeSpan.FromSeconds(0);
+            var sleep = TimeSpan.FromSeconds(1);
+
+            asyncTaskTimer = new Timer((object _) =>
+            {
+                var task = tvGamingService.Service.GetAsyncTask();
+
+                ExecuteAsyncTask(task);
+            }, null, delay, sleep);
+        }
+
+        private void ExecuteAsyncTask(AsyncPlayniteTask task)
+        {
+            if (task == null)
+            {
+                return;
+            }
         }
     }
 }
