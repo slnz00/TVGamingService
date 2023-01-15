@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -61,7 +62,8 @@ namespace BackgroundService.Source.Services.System.Models
 
         public string Type { get; private set; }
         public IntPtr Handle { get; private set; }
-        public uint ProcessID => GetProcessID();
+        public int ProcessID => GetProcessID();
+        public Process Process => GetProcess();
         public string Name => GetName();
         public WindowComponentState State => GetState();
         public bool IsValid => Handle != IntPtr.Zero;
@@ -142,11 +144,16 @@ namespace BackgroundService.Source.Services.System.Models
             }
         }
 
-        private uint GetProcessID()
+        private int GetProcessID()
         {
             GetWindowThreadProcessId(Handle, out uint pid);
 
-            return pid;
+            return (int)pid;
+        }
+
+        private Process GetProcess()
+        {
+            return Process.GetProcessById(GetProcessID());
         }
     }
 }

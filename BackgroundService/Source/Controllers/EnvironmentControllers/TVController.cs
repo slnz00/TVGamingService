@@ -1,5 +1,6 @@
 ﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
+using Core.Utils;
 
 namespace BackgroundService.Source.Controllers.EnvironmentControllers
 {
@@ -13,8 +14,6 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnSetup()
         {
-            var tvDesktopName = InternalSettings.DESKTOP_TV_NAME;
-
             Services.System.Cursor.SetCursorVisibility(false);
 
             // Change display and sound device:
@@ -23,7 +22,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             // Change windows desktop, hide desktop icons:
             Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
-            Services.System.Desktop.CreateAndSwitchToDesktop(tvDesktopName);
+            Services.System.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
             Services.System.Desktop.ToggleIconsVisiblity(false);
 
             CloseThirdPartyApps();
@@ -34,9 +33,9 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnReset()
         {
-            Services.System.Cursor.SetCursorVisibility(false);
-
             CloseThirdPartyApps();
+            ForceCloseAppsOnTVDesktop();
+
             OpenThirdPartyApps();
         }
 
@@ -73,6 +72,13 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             Services.ThirdParty.DS4Windows.CloseDS4Windows();
             Services.ThirdParty.Playnite.ClosePlaynite();
             Services.ThirdParty.GameStore.CloseAllGameStores();
+        }
+
+        private void ForceCloseAppsOnTVDesktop()
+        {
+            var windows = Services.System.Desktop.GetWindowsOnDesktop(InternalSettings.DESKTOP_TV_NAME);
+
+            windows.ForEach(win => ProcessUtils.CloseProcess(win.ProcessID, true));
         }
     }
 }

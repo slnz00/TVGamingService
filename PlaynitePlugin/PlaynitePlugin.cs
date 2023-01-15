@@ -44,6 +44,8 @@ namespace PlaynitePlugin
         {
             var gameInfo = GetGameInfo(args.Game);
 
+            logger.Info($"TVGamingService: Sending GameStarted event, game: {gameInfo.Name}");
+
             tvGamingService.Service.SendGameStarted(gameInfo);
         }
 
@@ -53,12 +55,16 @@ namespace PlaynitePlugin
 
             var gameInfo = GetGameInfo(args.Game);
 
+            logger.Info($"TVGamingService: Sending GameStarting event, game: {gameInfo.Name}");
+
             tvGamingService.Service.SendGameStarting(gameInfo);
         }
 
         public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
             var gameInfo = GetGameInfo(args.Game);
+
+            logger.Info($"TVGamingService: Sending GameStopped event, game: {gameInfo.Name}");
 
             tvGamingService.Service.SendGameStopped(gameInfo);
         }
@@ -69,7 +75,7 @@ namespace PlaynitePlugin
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
-
+            logger.Info("TVGamingService: Plugin is loaded");
         }
 
         public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)

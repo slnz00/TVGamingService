@@ -11,8 +11,6 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnSetup()
         {
-            var tvDesktopName = InternalSettings.DESKTOP_TV_NAME;
-
             Services.System.Cursor.SetCursorVisibility(true);
 
             // Change display and sound device:
@@ -21,7 +19,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             // Change windows desktop, show desktop icons:
             Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
-            Services.System.Desktop.RemoveDesktop(tvDesktopName);
+            Services.System.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
             Services.System.Desktop.ToggleIconsVisiblity(true);
 
             Services.GameConfig.LoadGameConfigsForEnvironment(Environment);
@@ -29,12 +27,10 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnReset()
         {
-            var tvDesktopName = InternalSettings.DESKTOP_TV_NAME;
-
             Services.System.Cursor.SetCursorVisibility(true);
 
             Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
-            Services.System.Desktop.RemoveDesktop(tvDesktopName);
+            Services.System.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
             Services.System.Desktop.ToggleIconsVisiblity(true);
         }
 

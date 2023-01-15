@@ -2,6 +2,7 @@
 using BackgroundService.Source.Services.System.Models;
 using Core.Utils;
 using System;
+using System.Text.RegularExpressions;
 
 namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 {
@@ -21,6 +22,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
         public class WindowInteractionOptions
         {
             public string WindowName { get; set; }
+            public string ProcessName { get; set; }
             public string ComponentName { get; set; } = null;
             public string ComponentType { get; set; } = null;
             public string Interaction { get; set; }
@@ -75,8 +77,8 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 
         protected WindowComponent FindWindowComponent()
         {
-            var window = Services.System.Window.FindWindowByName(Options.WindowName);
-            if (!window.IsValid)
+            var window = GetWindow();
+            if (window?.IsValid != true)
             {
                 return null;
             }
@@ -100,11 +102,26 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
             return components.Find(c => c.Name == Options.ComponentName);
         }
 
+        protected WindowComponent GetWindow()
+        {
+            var currentDesktopName = Services.System.Desktop.GetCurrentDesktopName();
+            var allWindows = Services.System.Desktop.GetWindowsOnDesktop(currentDesktopName);
+
+            var window = allWindows.Find(win => {
+                var windowNameMatching = Regex.IsMatch(win.Name, Options.WindowName);
+                var processNameMatching = !string.IsNullOrEmpty(Options.ProcessName) && Regex.IsMatch(win.Process.ProcessName, Options.ProcessName);
+
+                return windowNameMatching && processNameMatching;
+            });
+
+            return window;
+        }
+
         protected void StopComponentParentProcess(WindowComponent component, bool force)
         {
             var processId = component.ProcessID;
 
-            ProcessUtils.CloseProcess((int)processId, force);
+            ProcessUtils.CloseProcess(processId, force);
         }
     }
 }

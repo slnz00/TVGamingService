@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using Core.Components.System;
+using BackgroundService.Source.Services.System.API;
+using BackgroundService.Source.Services.System.Models;
 using Core.Utils;
 using Microsoft.Win32;
 
@@ -19,6 +22,8 @@ namespace BackgroundService.Source.Services.System
 
         private static readonly string VIRTUAL_DESKTOP_PATH = InternalSettings.PATH_VIRTUAL_DESKTOP;
         private static readonly string DESKTOP_REGISTRY = @"Control Panel\Desktop";
+
+        private readonly object threadLock = new object();
 
         enum GetWindowCommand : uint
         {
@@ -43,6 +48,8 @@ namespace BackgroundService.Source.Services.System
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         [DllImport("user32.dll", SetLastError = true)]
         static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+        [DllImport("user32.dll")]
+        private static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 
         public DesktopService(ServiceProvider services) : base(services) { }
 
@@ -50,14 +57,14 @@ namespace BackgroundService.Source.Services.System
         {
             Logger.Debug($"Switching desktop to: {desktopName}");
 
-            ExecVirtualDesktop($"/New /Name:{desktopName} /Switch");
+            ExecVirtualDesktopBinary($"/New /Name:{desktopName} /Switch");
         }
 
         public void RemoveDesktop(string desktopName)
         {
             Logger.Debug($"Removing desktop: {desktopName}");
 
-            ExecVirtualDesktop($"/Remove:{desktopName}");
+            ExecVirtualDesktopBinary($"/Remove:{desktopName}");
         }
 
         public void ToggleIconsVisiblity(bool visible = false)
@@ -69,7 +76,78 @@ namespace BackgroundService.Source.Services.System
             SendMessage(hWnd, WM_ICONS_VISIBILITY_COMMAND, toggleDesktopCommand, IntPtr.Zero);
         }
 
-        public void RestartExplorer() {
+        public string GetCurrentDesktopName()
+        {
+            var resourceManager = new VirtualDesktopAPI.ResourceManager();
+
+            try
+            {
+                var currentDesktop = resourceManager.GetCurrentVirtualDesktop();
+                var desktopInfo = new VirtualDesktopInfo(0, currentDesktop);
+
+                return desktopInfo.Name;
+            }
+            finally
+            {
+                resourceManager.ReleaseAllResources();
+            }
+        }
+
+        public List<WindowComponent> GetWindowsOnDesktop(string desktopName)
+        {
+            var resourceManager = new VirtualDesktopAPI.ResourceManager();
+            var windows = new List<WindowComponent>();
+
+            try
+            {
+                var views = GetApplicationViews(resourceManager);
+                var desktops = GetVirtualDesktops(resourceManager);
+
+                views.ForEach(view =>
+                {
+                    view.GetThumbnailWindow(out var windowHandle);
+                    view.GetVisibility(out var visibility);
+
+                    var desktop = desktops.Find(d => d.OwnsView(view));
+
+                    var isOnDesktop = desktop != null && desktop.Name == desktopName;
+                    var isVisible = visibility == 1;
+
+                    if (isVisible && isOnDesktop)
+                    {
+                        windows.Add(new WindowComponent("Window", windowHandle));
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to get windows on desktop (name: {desktopName}): {ex}");
+            }
+            finally
+            {
+                resourceManager.ReleaseAllResources();
+            }
+
+            return windows;
+        }
+
+        private List<VirtualDesktopInfo> GetVirtualDesktops(VirtualDesktopAPI.ResourceManager resourceManager)
+        {
+            var virtualDesktops = resourceManager.GetVirtualDesktops();
+
+            return Enumerable
+                .Range(0, virtualDesktops.Count)
+                .Select(i => new VirtualDesktopInfo(i, VirtualDesktopAPI.DesktopManager.GetDesktop(i)))
+                .ToList();
+        }
+
+        private List<VirtualDesktopAPI.IApplicationView> GetApplicationViews(VirtualDesktopAPI.ResourceManager resourceManager)
+        {
+            return resourceManager.GetApplicationViews();
+        }
+
+        public void RestartExplorer()
+        {
             var sessionKey = Guid.NewGuid().ToString();
 
             RestartManagerApi.RmStartSession(out IntPtr session, 0, sessionKey);
@@ -85,8 +163,10 @@ namespace BackgroundService.Source.Services.System
             }
         }
 
-        public void ChangeWallpaper(string wallpaperPath) {
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(DESKTOP_REGISTRY, true)) {
+        public void ChangeWallpaper(string wallpaperPath)
+        {
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(DESKTOP_REGISTRY, true))
+            {
                 // Fill desktop:
                 key.SetValue("WallpaperStyle", "10");
                 key.SetValue("TileWallpaper", "0");
@@ -95,7 +175,7 @@ namespace BackgroundService.Source.Services.System
             }
         }
 
-        private void ExecVirtualDesktop(string args)
+        private void ExecVirtualDesktopBinary(string args)
         {
             Logger.Debug($"Exec virtual desktop, args: {args}");
 

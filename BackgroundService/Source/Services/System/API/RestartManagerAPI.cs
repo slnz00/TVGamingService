@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Core.Components.System
+namespace BackgroundService.Source.Services.System.API
 {
     public static class RestartManagerApi
     {

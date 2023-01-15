@@ -4,6 +4,7 @@ using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 {
@@ -29,27 +30,35 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 
         protected override void OnExecution()
         {
-            ProcessUtils.InteractWithProcess(Options.ProcessName, (process) =>
-            {
-                var allWindows = Services.System.Window.GetProcessWindows(process.Id);
+            var windows = GetWindows();
 
-                Func<WindowComponent, bool> windowIsValid = win => win.IsValid && !string.IsNullOrWhiteSpace(win.Name);
-                Func<WindowComponent, bool> windowIsNotMinimized = win => win.State != WindowComponent.WindowComponentState.Minimized;
+            Func<WindowComponent, bool> windowIsValid = win => win.IsValid && !string.IsNullOrWhiteSpace(win.Name);
+            Func<WindowComponent, bool> windowIsNotMinimized = win => win.State != WindowComponent.WindowComponentState.Minimized;
 
-                var windowsToMinimize = allWindows
-                    .Where(windowIsValid)
-                    .Where(windowIsNotMinimized)
-                    .ToList();
+            var windowsToMinimize = windows
+                .Where(windowIsValid)
+                .Where(windowIsNotMinimized)
+                .ToList();
 
-                windowsToMinimize.ForEach(MinimizeWindow);
-            });
+            windowsToMinimize.ForEach(MinimizeWindow);
         }
 
-        private void MinimizeWindow(WindowComponent window) {
+        private List<WindowComponent> GetWindows()
+        {
+            var currentDesktopName = Services.System.Desktop.GetCurrentDesktopName();
+
+            var windowsOnDesktop = Services.System.Desktop.GetWindowsOnDesktop(currentDesktopName);
+
+            return windowsOnDesktop.FindAll(win => Regex.IsMatch(win.Process.ProcessName, Options.ProcessName));
+        }
+
+        private void MinimizeWindow(WindowComponent window)
+        {
             var options = GetOptions<MinimizeProcessWindowsOptions>();
 
             bool alreadyMinimized = alreadyMinimizedWindowNames.Contains(window.Name);
-            if (alreadyMinimized && options.MinimizeOnce) {
+            if (alreadyMinimized && options.MinimizeOnce)
+            {
                 return;
             }
 

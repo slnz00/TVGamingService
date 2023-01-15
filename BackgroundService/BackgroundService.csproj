@@ -161,6 +161,10 @@
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStarting.cs" />
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStopped.cs" />
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\Timer.cs" />
+    <Compile Include="Source\Services\System\API\DisplayWinAPI.cs" />
+    <Compile Include="Source\Services\System\API\RestartManagerAPI.cs" />
+    <Compile Include="Source\Services\System\API\VirtualDesktopAPI.cs" />
+    <Compile Include="Source\Services\System\Models\VirtualDesktopInfo.cs" />
     <Compile Include="Source\Services\System\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
     <Compile Include="Source\Services\System\Models\WindowComponent.cs" />

@@ -1,4 +1,4 @@
-﻿using static Core.Components.System.DisplayWinApi;
+﻿using static BackgroundService.Source.Services.System.API.DisplayWinAPI;
 
 namespace BackgroundService.Source.Services.System.Models
 {
