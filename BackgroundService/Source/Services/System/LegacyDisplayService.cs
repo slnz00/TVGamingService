@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
@@ -20,16 +21,26 @@ namespace BackgroundService.Source.Services.System
 
         public void SwitchToDisplay(DisplayConfig displayCfg)
         {
-            var displays = GetDisplays();
-            DisableDisplay(displays[0]);
+            var displayExists = GetDisplaysByModelNumber().ContainsKey(displayCfg.DeviceName);
+            if (!displayExists) {
+                Logger.Error($"Display does not exist with DeviceName: {displayCfg.DeviceName}");
+                return;
+            }
 
-            displays = Services.System.LegacyDisplay.GetDisplays();
-            SetDisplayAsPrimary(displays[1], displayCfg.RefreshRate, displayCfg.Resolution);
+            var otherDisplays = GetDisplaysByModelNumber()
+                .Values
+                .Where(displays => displays[0].ModelNumber != displayCfg.DeviceName)
+                .ToList();
 
+            otherDisplays.ForEach(displays => DisableDisplay(displays[0]));
+
+            var selectedDisplay = GetDisplaysByModelNumber()[displayCfg.DeviceName][0];
+
+            SetDisplayAsPrimary(selectedDisplay, displayCfg.RefreshRate, displayCfg.Resolution);
             SaveDisplaySettings();
         }
 
-        public List<LegacyDisplay> GetDisplays()
+        public Dictionary<string, List<LegacyDisplay>> GetDisplaysByModelNumber()
         {
             var displays = new List<LegacyDisplay>();
 
@@ -53,7 +64,9 @@ namespace BackgroundService.Source.Services.System
 
             Logger.Debug($"Legacy displays queried, count: {displays.Count}");
 
-            return displays;
+            return displays
+                .GroupBy(d => d.ModelNumber)
+                .ToDictionary(grp => grp.Key, grp => grp.ToList());
         }
 
         public void SetDisplayAsPrimary(LegacyDisplay display, int refreshRate, DisplayResolutionConfig resolution)
