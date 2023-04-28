@@ -22,10 +22,15 @@ namespace BackgroundService.Source.Services.System
         public void SwitchToDisplay(DisplayConfig displayCfg)
         {
             var displayExists = GetDisplaysByModelNumber().ContainsKey(displayCfg.DeviceName);
-            if (!displayExists) {
+            if (!displayExists)
+            {
                 Logger.Error($"Display does not exist with DeviceName: {displayCfg.DeviceName}");
                 return;
             }
+
+            var selectedDisplay = GetDisplaysByModelNumber()[displayCfg.DeviceName][0];
+
+            SetDisplayAsPrimary(selectedDisplay, displayCfg.RefreshRate, displayCfg.Resolution);
 
             var otherDisplays = GetDisplaysByModelNumber()
                 .Values
@@ -33,14 +38,29 @@ namespace BackgroundService.Source.Services.System
                 .ToList();
 
             otherDisplays.ForEach(displays => DisableDisplay(displays[0]));
+            
+            SaveDisplaySettings();
+        }
 
-            var selectedDisplay = GetDisplaysByModelNumber()[displayCfg.DeviceName][0];
+        public void SwitchToDisplay_Old(DisplayConfig displayCfg)
+        {
+            var displays = GetDisplays();
+            DisableDisplay(displays[0]);
 
-            SetDisplayAsPrimary(selectedDisplay, displayCfg.RefreshRate, displayCfg.Resolution);
+            displays = Services.System.LegacyDisplay.GetDisplays();
+            SetDisplayAsPrimary(displays[1], displayCfg.RefreshRate, displayCfg.Resolution);
+
             SaveDisplaySettings();
         }
 
         public Dictionary<string, List<LegacyDisplay>> GetDisplaysByModelNumber()
+        {
+            return GetDisplays()
+                .GroupBy(d => d.ModelNumber)
+                .ToDictionary(grp => grp.Key, grp => grp.ToList());
+        }
+
+        public List<LegacyDisplay> GetDisplays()
         {
             var displays = new List<LegacyDisplay>();
 
@@ -64,9 +84,7 @@ namespace BackgroundService.Source.Services.System
 
             Logger.Debug($"Legacy displays queried, count: {displays.Count}");
 
-            return displays
-                .GroupBy(d => d.ModelNumber)
-                .ToDictionary(grp => grp.Key, grp => grp.ToList());
+            return displays;
         }
 
         public void SetDisplayAsPrimary(LegacyDisplay display, int refreshRate, DisplayResolutionConfig resolution)

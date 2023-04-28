@@ -17,7 +17,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             Services.System.Cursor.SetCursorVisibility(false);
 
             // Change display and sound device:
-            Services.System.LegacyDisplay.SwitchToDisplay(Config.Display);
+            Services.System.LegacyDisplay.SwitchToDisplay_Old(Config.Display);
             Services.System.SoundDevice.SetDefaultSoundDevice(Config.SoundDevice.DeviceName);
 
             // Change windows desktop, hide desktop icons:

@@ -24,6 +24,8 @@ namespace BackgroundService.Source.Controllers
             SetupEnvironmentController();
             SetupHotkeys();
 
+            Services.System.LegacyDisplay.GetDisplays();
+
             MessageLoop.Run();
         }
 
