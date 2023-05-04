@@ -38,6 +38,7 @@ namespace BackgroundService.Source.Controllers
         {
             Services.System.Hotkey.RegisterAction("SwitchEnvironment", InternalSettings.HOTKEY_SWITCH_ENVIRONMENT, SwitchEnvironment);
             Services.System.Hotkey.RegisterAction("ResetEnvironment", InternalSettings.HOTKEY_RESET_ENVIRONMENT, ResetEnvironment);
+            Services.System.Hotkey.RegisterAction("ResetDisplay", InternalSettings.HOTKEY_RESET_DISPLAY, ResetDisplay);
             Services.System.Hotkey.RegisterAction("ToggleConsoleVisibility", InternalSettings.HOTKEY_TOGGLE_CONSOLE_VISIBILITY, ToggleConsoleVisibility);
             Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", InternalSettings.HOTKEY_TOGGLE_CURSOR_VISIBILITY, ToggleCursorVisibility);
         }
@@ -76,8 +77,8 @@ namespace BackgroundService.Source.Controllers
             {
                 LogControllerEvent($"Switching environment to: {GetEnvironmentName(environment)}");
 
-                bool controllerExist = EnvironmentControllerFactory.TryGetValue(environment, out var createEnvironmentController);
-                if (!controllerExist)
+                bool controllerExists = EnvironmentControllerFactory.TryGetValue(environment, out var createEnvironmentController);
+                if (!controllerExists)
                 {
                     Logger.Error($"Failed to change environment, controller instance does not exist for environment: {GetEnvironmentName(environment)}");
                     return;
@@ -121,6 +122,20 @@ namespace BackgroundService.Source.Controllers
 
                 var currentVisibility = Services.System.Cursor.CursorVisibility;
                 Services.System.Cursor.SetCursorVisibility(!currentVisibility);
+            }
+        }
+
+        private void ResetDisplay()
+        {
+            lock (threadLock)
+            {
+                LogControllerEvent("Resetting display");
+
+                var environment = EnvironmentController != null ? EnvironmentController.Environment : Environments.PC;
+                var config = Services.Config.GetConfig();
+                var environmentConfig = environment == Environments.PC ? config.PC : config.TV;
+
+                Services.System.LegacyDisplay.SwitchToDisplay_Old(environmentConfig.Display);
             }
         }
 

@@ -8,6 +8,7 @@ namespace BackgroundService.Source
     {
         public static readonly HotkeyDefinition HOTKEY_SWITCH_ENVIRONMENT = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad0);
         public static readonly HotkeyDefinition HOTKEY_RESET_ENVIRONMENT = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad1);
+        public static readonly HotkeyDefinition HOTKEY_RESET_DISPLAY = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad2);
         public static readonly HotkeyDefinition HOTKEY_TOGGLE_CURSOR_VISIBILITY = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad8);
         public static readonly HotkeyDefinition HOTKEY_TOGGLE_CONSOLE_VISIBILITY = new HotkeyDefinition(KeyModifiers.Alt, Keys.NumPad9);
 
