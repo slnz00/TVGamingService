@@ -109,7 +109,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 
             var window = allWindows.Find(win => {
                 var windowNameMatching = Regex.IsMatch(win.Name, Options.WindowName);
-                var processNameMatching = !string.IsNullOrEmpty(Options.ProcessName) && Regex.IsMatch(win.Process.ProcessName, Options.ProcessName);
+                var processNameMatching = string.IsNullOrEmpty(Options.ProcessName) || Regex.IsMatch(win.Process.ProcessName, Options.ProcessName);
 
                 return windowNameMatching && processNameMatching;
             });
