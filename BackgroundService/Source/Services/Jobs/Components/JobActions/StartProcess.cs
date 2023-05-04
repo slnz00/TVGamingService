@@ -34,6 +34,8 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
             ProcessUtils.StartProcess(path, args, windowStyle, false, SetupStartInfo);
         }
 
+        protected override void OnReset() { }
+
         private void SetupStartInfo(ProcessStartInfo startInfo)
         {
             if (!string.IsNullOrWhiteSpace(Options.WorkingDirectory))

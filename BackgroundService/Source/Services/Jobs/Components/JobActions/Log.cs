@@ -53,5 +53,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
                     break;
             }
         }
+
+        protected override void OnReset() { }
     }
 }

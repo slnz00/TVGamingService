@@ -61,7 +61,7 @@ namespace BackgroundService.Source.Services.Jobs.Components
                 }
                 else if (Options.Mode == JobMode.Triggered)
                 {
-                    OpenTriggers();
+                    OpenStartTrigger();
                 }
             }
         }
@@ -113,6 +113,7 @@ namespace BackgroundService.Source.Services.Jobs.Components
             }
 
             CreateAndRunJobTask();
+            OpenStopTrigger();
 
             if (sync)
             {
@@ -130,6 +131,9 @@ namespace BackgroundService.Source.Services.Jobs.Components
                 }
 
                 jobTask = null;
+
+                ResetJobActions();
+                OpenStartTrigger();
             }
         }
 
@@ -157,9 +161,18 @@ namespace BackgroundService.Source.Services.Jobs.Components
             Options.RepeatUntil?.SetOwner(context);
         }
 
-        private void OpenTriggers()
+        private void ResetJobActions()
+        {
+            Options.Actions?.ForEach(action => action.Reset());
+        }
+
+        private void OpenStartTrigger()
         {
             Options.TriggerWhen?.Open();
+        }
+
+        private void OpenStopTrigger()
+        {
             Options.RepeatUntil?.Open();
         }
 

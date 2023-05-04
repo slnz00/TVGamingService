@@ -106,12 +106,11 @@ namespace BackgroundService.Source.Services.System
                 views.ForEach(view =>
                 {
                     view.GetThumbnailWindow(out var windowHandle);
-                    view.GetVisibility(out var visibility);
 
                     var desktop = desktops.Find(d => d.OwnsView(view));
 
                     var isOnDesktop = desktop != null && desktop.Name == desktopName;
-                    var isVisible = visibility == 1;
+                    var isVisible = IsViewVisible(view);
 
                     if (isVisible && isOnDesktop)
                     {
@@ -129,6 +128,20 @@ namespace BackgroundService.Source.Services.System
             }
 
             return windows;
+        }
+
+        private bool IsViewVisible(VirtualDesktopAPI.IApplicationView view)
+        {
+            try
+            {
+                view.GetVisibility(out var visibility);
+                return visibility == 1;
+            }
+            catch
+            {
+                Logger.Warn("Failed to get visibility for view");
+                return false;
+            }
         }
 
         private List<VirtualDesktopInfo> GetVirtualDesktops(VirtualDesktopAPI.ResourceManager resourceManager)

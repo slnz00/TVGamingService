@@ -25,5 +25,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
         {
             ProcessUtils.CloseProcess(Options.ProcessName, Options.ForceClose);
         }
+
+        protected override void OnReset() { }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using BackgroundService.Source.Services.Jobs.Components.Common;
 using BackgroundService.Source.Services.System.Models;
-using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +40,11 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
                 .ToList();
 
             windowsToMinimize.ForEach(MinimizeWindow);
+        }
+
+        protected override void OnReset()
+        {
+            alreadyMinimizedWindowNames = new List<string>();
         }
 
         private List<WindowComponent> GetWindows()

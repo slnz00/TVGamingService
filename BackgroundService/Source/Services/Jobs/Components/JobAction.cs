@@ -16,6 +16,12 @@ namespace BackgroundService.Source.Services.Jobs.Components
             OnExecution();
         }
 
+        public void Reset()
+        {
+            OnReset();
+        }
+
         protected abstract void OnExecution();
+        protected abstract void OnReset();
     }
 }

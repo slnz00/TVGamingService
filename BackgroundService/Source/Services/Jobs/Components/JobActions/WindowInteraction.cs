@@ -75,6 +75,8 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
             }
         }
 
+        protected override void OnReset() { }
+
         protected WindowComponent FindWindowComponent()
         {
             var window = GetWindow();

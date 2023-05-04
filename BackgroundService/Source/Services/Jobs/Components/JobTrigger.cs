@@ -36,40 +36,35 @@ namespace BackgroundService.Source.Services.Jobs.Components
                 default:
                     throw new InvalidOperationException($"Unimplemented TriggerAction: {EnumUtils.GetName(Action)}");
             }
+
+            Close();
         }
 
         public void Open()
         {
             if (Opened)
             {
-                Logger.Warn($"JobTrigger ({GetType()}) is already opened");
                 return;
-            }
-            if (Closed)
-            {
-                throw new InvalidOperationException($"JobTrigger ({GetType()}) is already closed");
             }
 
             EnsureOwned();
 
             OnOpen();
+
             Opened = true;
         }
 
         public void Close()
         {
-            if (Closed)
+            if (Closed || !Opened)
             {
-                Logger.Warn($"JobTrigger ({GetType()}) is already closed");
                 return;
-            }
-            if (!Opened)
-            {
-                throw new InvalidOperationException($"JobTrigger ({GetType()}) is not in opened state");
             }
 
             OnClose();
+
             Closed = true;
+            Opened = false;
         }
     }
 }
