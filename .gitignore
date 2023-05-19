@@ -362,3 +362,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# BackgroundService configurations:
+BackgroundService/config.json
+BackgroundService/game-configs.json
+BackgroundService/jobs.config.json
