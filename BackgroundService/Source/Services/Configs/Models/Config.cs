@@ -1,10 +1,20 @@
-﻿namespace BackgroundService.Source.Services.Configs.Models
+﻿using System.Collections.Generic;
+
+namespace BackgroundService.Source.Services.Configs.Models
 {
     internal class Config
     {
         public EnvironmentConfig PC { get; set; }
         public EnvironmentConfig TV { get; set; }
         public ThirdPartyConfig ThirdParty { get; set; }
+        public List<BackupConfig> Backups { get; set; }
+    }
+
+    internal class BackupConfig
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public int? Amount { get; set; } = null;
     }
 
     internal class DisplayResolutionConfig

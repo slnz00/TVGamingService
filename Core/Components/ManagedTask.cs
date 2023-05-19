@@ -10,6 +10,16 @@ namespace Core.Components
         public class Context
         {
             public CancellationTokenSource Cancellation { get; set; }
+
+            public async Task Delay(int millisecondsDelay)
+            {
+                await Task.Delay(millisecondsDelay, Cancellation.Token);
+            }
+
+            public async Task Delay(TimeSpan delay)
+            {
+                await Task.Delay(delay, Cancellation.Token);
+            }
         }
 
         public Task Task => task;
@@ -48,7 +58,8 @@ namespace Core.Components
             task.Start();
         }
 
-        public void Wait() {
+        public void Wait()
+        {
             task.Wait();
         }
 
@@ -67,7 +78,8 @@ namespace Core.Components
             if (wait)
             {
                 bool timedOut = !Wait(TimeSpan.FromSeconds(900));
-                if (timedOut) {
+                if (timedOut)
+                {
                     throw new TimeoutException("ManagedTask cancellation timed out");
                 }
             }

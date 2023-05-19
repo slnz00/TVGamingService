@@ -19,10 +19,13 @@ namespace BackgroundService.Source
         public static readonly string PATH_CONFIG = FSUtils.GetAbsolutePath("config.json");
         public static readonly string PATH_JOBS_CONFIG = FSUtils.GetAbsolutePath("jobs.config.json");
         public static readonly string PATH_GAME_CONFIGS = FSUtils.GetAbsolutePath("game-configs.json");
-        public static readonly string PATH_VIRTUAL_DESKTOP = FSUtils.GetAbsolutePath("Binaries/vd.exe");
-        public static readonly string PATH_NIRCMD = FSUtils.GetAbsolutePath("Binaries/nircmd.exe");
-        public static readonly string PATH_EMPTY_CURSOR = FSUtils.GetAbsolutePath($"Resources/{CURSOR_EMPTY_FILE_NAME}");
-        public static readonly string PATH_DATA_GAME_CONFIGS = FSUtils.GetAbsolutePath("Data/GameConfigs");
+        public static readonly string PATH_VIRTUAL_DESKTOP = FSUtils.GetAbsolutePath("Binaries", "vd.exe");
+        public static readonly string PATH_NIRCMD = FSUtils.GetAbsolutePath("Binaries", "nircmd.exe");
+        public static readonly string PATH_EMPTY_CURSOR = FSUtils.GetAbsolutePath("Resources", CURSOR_EMPTY_FILE_NAME);
+        public static readonly string PATH_DATA_GAME_CONFIGS = FSUtils.GetAbsolutePath("Data", "GameConfigs");
+        public static readonly string PATH_DATA_BACKUPS = FSUtils.GetAbsolutePath("Data", "Backups");
+
+        public static readonly int BACKUP_DEFAULT_AMOUNT = 5;
 
         public static readonly uint TIMEOUT_HOTKEY_ACTION = 1000;
         public static readonly uint TIMEOUT_DEFAULT_SOUND_DEVICE_SET = 25_000;

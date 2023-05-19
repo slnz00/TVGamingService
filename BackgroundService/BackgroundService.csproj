@@ -138,6 +138,10 @@
   <ItemGroup>
     <Compile Include="Source\Components\DynamicOptions.cs" />
     <Compile Include="Source\Components\ProcessWatcher.cs" />
+    <Compile Include="Source\Controllers\BackupController\BackupController.cs" />
+    <Compile Include="Source\Controllers\BackupController\Components\BackupHandler.cs" />
+    <Compile Include="Source\Controllers\BackupController\Components\BackupManager.cs" />
+    <Compile Include="Source\Controllers\BackupController\Components\BackupWatcher.cs" />
     <Compile Include="Source\Controllers\EnvironmentControllers\EnvironmentController.cs" />
     <Compile Include="Source\Controllers\EnvironmentControllers\PCController.cs" />
     <Compile Include="Source\Controllers\EnvironmentControllers\TVController.cs" />
