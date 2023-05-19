@@ -1,0 +1,110 @@
+{
+  "PC": {
+    "Setup": [],
+    "Reset": [],
+    "Teardown": []
+  },
+  "TV": {
+    "Setup": [
+      {
+        "Id": "TurnOnTV",
+        "Mode": "Async",
+        "Actions": [
+          {
+            "Type": "StartProcess",
+            "Options": {
+              "WindowStyle": "Hidden",
+              "Path": "C:/Program Files/nodejs/node.exe",
+              "Args": "C:/TVGaming/Scripts/TurnOnTV/turn-on-tv.js"
+            }
+          }
+        ]
+      },
+
+      {
+        "Id": "CloseCyberpunkCrashWindow",
+        "Mode": "Triggered",
+        "TimeBetweenExecutions": 1000,
+        "Actions": [
+          {
+            "Type": "WindowInteraction",
+            "Options": {
+              "Interaction": "Close",
+              "WindowName": "Cyberpunk 2077 hibajelentõ"
+            }
+          }
+        ],
+        "TriggerWhen": {
+          "Type": "GameStarting",
+          "Options": {
+            "Filter": {
+              "Name": "Cyberpunk 2077"
+            }
+          }
+        },
+        "RepeatUntil": {
+          "Type": "GameStopped",
+          "Options": {}
+        }
+      },
+
+      {
+        "Id": "MinimizeSteam",
+        "Mode": "Triggered",
+        "TimeBetweenExecutions": 500,
+        "Actions": [
+          {
+            "Type": "MinimizeProcessWindows",
+            "Options": {
+              "ProcessName": "steam"
+            }
+          }
+        ],
+        "TriggerWhen": {
+          "Type": "GameStarting",
+          "Options": {
+            "Filter": {
+              "Library": "Steam"
+            }
+          }
+        },
+        "RepeatUntil": {
+          "Type": "Timer",
+          "Options": {
+            "Time": 10000
+          }
+        }
+      },
+
+      {
+        "Id": "MinimizeEpicGames",
+        "Mode": "Triggered",
+        "TimeBetweenExecutions": 500,
+        "Actions": [
+          {
+            "Type": "MinimizeProcessWindows",
+            "Options": {
+              "ProcessName": "EpicGamesLauncher"
+            }
+          }
+        ],
+        "TriggerWhen": {
+          "Type": "GameStarting",
+          "Options": {
+            "Filter": {
+              "Library": "Epic"
+            }
+          }
+        },
+        "RepeatUntil": {
+          "Type": "Timer",
+          "Options": {
+            "Time": 10000
+          }
+        }
+      }
+    ],
+    "Reset": [],
+    "Teardown": []
+  }
+}

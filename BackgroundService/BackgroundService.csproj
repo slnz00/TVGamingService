@@ -224,6 +224,9 @@
     <Content Include="game-configs.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="config.example.json" />
+    <None Include="game-configs.example.json" />
+    <None Include="jobs.config.example.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
