@@ -17,7 +17,7 @@ namespace BackgroundService.Source.Services.System
 
         private static readonly string EMPTY_CURSOR_FILE_NAME = InternalSettings.CURSOR_EMPTY_FILE_NAME;
         private static readonly string EMPTY_CURSOR_FILE_PATH = InternalSettings.PATH_EMPTY_CURSOR;
-        private static readonly string CURSORS_REGISTRY_SUB_KEY = "Control Panel\\Cursors";
+        private static readonly string CURSORS_REGISTRY_SUB_KEY = @"Control Panel\Cursors";
 
         private static readonly List<string> CURSOR_REGISTRY_NAMES = new List<string> {
             "AppStarting",

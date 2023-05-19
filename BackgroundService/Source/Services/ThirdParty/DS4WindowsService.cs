@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using BackgroundService.Source.Common;
 using BackgroundService.Source.Providers;
@@ -46,7 +47,7 @@ namespace BackgroundService.Source.Services.ThirdParty
             }
 
             Logger.Debug("Gracefully shutting down DS4Windows");
-            ProcessUtils.StartProcess(ds4WindowsConfig.Path, "-command shutdown", ProcessWindowStyle.Hidden, true);
+            ProcessUtils.StartProcess(Path.GetFullPath(ds4WindowsConfig.Path), "-command shutdown", ProcessWindowStyle.Hidden, true);
         }
 
         private void ReopenOnUnexpectedExit()

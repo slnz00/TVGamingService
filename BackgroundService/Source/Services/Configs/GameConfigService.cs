@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace BackgroundService.Source.Services
@@ -81,7 +82,11 @@ namespace BackgroundService.Source.Services
             Logger.Debug($"Loading game config paths from JSON file: {GAME_CONFIGS_PATH}");
 
             string pathsJson = File.ReadAllText(GAME_CONFIGS_PATH, Encoding.Default);
-            gameConfigPaths = JsonConvert.DeserializeObject<List<string>>(pathsJson);
+            
+            gameConfigPaths = JsonConvert
+                .DeserializeObject<List<string>>(pathsJson)
+                .Select(path => Path.GetFullPath(path))
+                .ToList();
         }
 
         private string GetGameConfigDataPath(string configPath, Environments env)

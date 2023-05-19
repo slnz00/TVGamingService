@@ -2,7 +2,9 @@
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
 using Core.Components;
+using Core.Utils;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace BackgroundService.Source.Controllers.BackupController
@@ -82,7 +84,7 @@ namespace BackgroundService.Source.Controllers.BackupController
         private BackupManager CreateManagerFromConfig(BackupConfig backupConfig)
         {
             string backupName = backupConfig.Name;
-            string originalPath = backupConfig.Path;
+            string originalPath = Path.GetFullPath(backupConfig.Path);
             int backupAmount = backupConfig.Amount ?? InternalSettings.BACKUP_DEFAULT_AMOUNT;
 
             return new BackupManager(backupName, backupAmount, originalPath);
