@@ -6,7 +6,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
     internal class PCController : EnvironmentController
     {
         public PCController(MainController mainController, ServiceProvider services) :
-            base(Environments.PC, services.Config.GetConfig().PC, services.Config.GetJobsConfig().PC, mainController, services)
+            base(Environments.PC, mainController, services)
         { }
 
         protected override void OnSetup()
@@ -22,7 +22,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             Services.System.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
             Services.System.Desktop.ToggleIconsVisiblity(true);
 
-            Services.GameConfig.LoadGameConfigsForEnvironment(Environment);
+            Services.GameConfig.LoadGameConfigsForEnvironment(EnvironmentType);
         }
 
         protected override void OnReset()
@@ -36,7 +36,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnTeardown()
         {
-            Services.GameConfig.SaveGameConfigsForEnvironment(Environment);
+            Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
         }
     }
 }

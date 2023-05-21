@@ -4,6 +4,7 @@ using System.IO;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
 using System.Text;
+using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 
 namespace BackgroundService.Source.Services.Configs
 {
@@ -32,6 +33,19 @@ namespace BackgroundService.Source.Services.Configs
             return config;
         }
 
+        public EnvironmentConfig GetConfigForEnvironment(Environments environment)
+        {
+            switch (environment)
+            {
+                case Environments.PC:
+                    return GetConfig().PC;
+                case Environments.TV:
+                    return GetConfig().TV;
+                default:
+                    throw new InvalidOperationException("Unimplemented environment configuration");
+            }
+        }
+
         public JobsConfig GetJobsConfig()
         {
             if (jobsConfig == null || !IsInitialized)
@@ -40,6 +54,20 @@ namespace BackgroundService.Source.Services.Configs
             }
 
             return jobsConfig;
+        }
+
+        public EnvironmentJobsConfig GetJobsConfigForEnvironment(Environments environment)
+        {
+
+            switch (environment)
+            {
+                case Environments.PC:
+                    return GetJobsConfig().PC;
+                case Environments.TV:
+                    return GetJobsConfig().TV;
+                default:
+                    throw new InvalidOperationException("Unimplemented environment configuration");
+            }
         }
 
         public void LoadConfigFromFile()

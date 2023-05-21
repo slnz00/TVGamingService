@@ -15,28 +15,24 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         protected ServiceProvider Services { get; private set; }
         protected LoggerProvider Logger { get; private set; }
 
-        public EnvironmentConfig Config { get; private set; }
-        public EnvironmentJobsConfig JobsConfig { get; private set; }
+        public EnvironmentConfig Config => Services.Config.GetConfigForEnvironment(EnvironmentType);
+        public EnvironmentJobsConfig JobsConfig => Services.Config.GetJobsConfigForEnvironment(EnvironmentType);
 
-        public Environments Environment { get; private set; }
         public MainController MainController { get; private set; }
 
-        public string EnvironmentName => Enum.GetName(typeof(Environments), Environment);
+        public Environments EnvironmentType { get; private set; }
+        public string EnvironmentName => Enum.GetName(typeof(Environments), EnvironmentType);
 
         private List<string> environmentJobIds = new List<string>();
 
         public EnvironmentController(
             Environments environment,
-            EnvironmentConfig config,
-            EnvironmentJobsConfig jobConfig,
             MainController mainController,
             ServiceProvider services
         )
         {
             Services = services;
-            Environment = environment;
-            Config = config;
-            JobsConfig = jobConfig;
+            EnvironmentType = environment;
             Logger = new LoggerProvider(GetType().Name);
             MainController = mainController;
         }

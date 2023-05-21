@@ -51,7 +51,7 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
             bool allSlotsAreUsed = Directory.Exists(lastSlotPath);
             if (allSlotsAreUsed)
             {
-                Directory.Delete(lastSlotPath);
+                Directory.Delete(lastSlotPath, true);
             }
 
             for (int i = backupAmount - 1; i >= 1; i--)

@@ -9,19 +9,40 @@ namespace BackgroundService.Source.Controllers
 {
     internal class MainController
     {
-        private readonly LoggerProvider Logger = new LoggerProvider("Controller");
-        private readonly ServiceProvider Services = new ServiceProvider();
+        private class SubControllers
+        {
+            public Dictionary<Environments, Func<EnvironmentController>> EnvironmentFactory;
+            public EnvironmentController Environment;
+            public BackupController.BackupController Backup;
+        }
 
-        private Dictionary<Environments, Func<EnvironmentController>> EnvironmentControllerFactory;
-        private EnvironmentController EnvironmentController = null;
+        private readonly ServiceProvider Services;
+        private readonly LoggerProvider Logger;
+        private readonly SubControllers Controllers;
 
         private object threadLock = new object();
+
+        public MainController()
+        {
+            Logger = new LoggerProvider(GetType().Name);
+            Services = new ServiceProvider();
+
+            Controllers = new SubControllers
+            {
+                EnvironmentFactory = new Dictionary<Environments, Func<EnvironmentController>>
+                {
+                    { Environments.PC, () => new PCController(this, Services) },
+                    { Environments.TV, () => new TVController(this, Services) }
+                },
+                Backup = new BackupController.BackupController(Services)
+            };
+            Controllers.Environment = Controllers.EnvironmentFactory[Environments.PC]();
+        }
 
         public void Run()
         {
             DisplayStartupTitle();
             InitializeComponents();
-            SetupEnvironmentController();
             SetupHotkeys();
 
             Services.System.LegacyDisplay.GetDisplays();
@@ -32,6 +53,7 @@ namespace BackgroundService.Source.Controllers
         private void InitializeComponents()
         {
             Services.Initialize();
+            Controllers.Backup.Initialize();
         }
 
         private void SetupHotkeys()
@@ -43,23 +65,13 @@ namespace BackgroundService.Source.Controllers
             Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", InternalSettings.HOTKEY_TOGGLE_CURSOR_VISIBILITY, ToggleCursorVisibility);
         }
 
-        private void SetupEnvironmentController()
-        {
-            EnvironmentControllerFactory = new Dictionary<Environments, Func<EnvironmentController>>();
-
-            EnvironmentControllerFactory.Add(Environments.PC, () => new PCController(this, Services));
-            EnvironmentControllerFactory.Add(Environments.TV, () => new TVController(this, Services));
-
-            EnvironmentController = EnvironmentControllerFactory[Environments.PC]();
-        }
-
         public void SwitchEnvironment()
         {
             lock (threadLock)
             {
                 // Default, startup environment is PC:
-                var isStartupEnvironment = EnvironmentController == null;
-                var isPcEnvironment = isStartupEnvironment || EnvironmentController.Environment == Environments.PC;
+                var isStartupEnvironment = Controllers.Environment == null;
+                var isPcEnvironment = isStartupEnvironment || Controllers.Environment.EnvironmentType == Environments.PC;
                 if (isPcEnvironment)
                 {
                     ChangeEnvironmentTo(Environments.TV);
@@ -77,7 +89,7 @@ namespace BackgroundService.Source.Controllers
             {
                 LogControllerEvent($"Switching environment to: {GetEnvironmentName(environment)}");
 
-                bool controllerExists = EnvironmentControllerFactory.TryGetValue(environment, out var createEnvironmentController);
+                bool controllerExists = Controllers.EnvironmentFactory.TryGetValue(environment, out var createEnvironmentController);
                 if (!controllerExists)
                 {
                     Logger.Error($"Failed to change environment, controller instance does not exist for environment: {GetEnvironmentName(environment)}");
@@ -85,12 +97,12 @@ namespace BackgroundService.Source.Controllers
                 }
 
                 var newController = createEnvironmentController();
-                var currentController = EnvironmentController;
+                var currentController = Controllers.Environment;
 
                 currentController?.Teardown();
                 newController.Setup();
 
-                EnvironmentController = newController;
+                Controllers.Environment = newController;
             }
         }
 
@@ -98,9 +110,9 @@ namespace BackgroundService.Source.Controllers
         {
             lock (threadLock)
             {
-                LogControllerEvent($"Resetting environment: {EnvironmentController.EnvironmentName}");
+                LogControllerEvent($"Resetting environment: {Controllers.Environment.EnvironmentName}");
 
-                EnvironmentController.Reset();
+                Controllers.Environment.Reset();
             }
         }
 
@@ -131,7 +143,7 @@ namespace BackgroundService.Source.Controllers
             {
                 LogControllerEvent("Resetting display");
 
-                var environment = EnvironmentController != null ? EnvironmentController.Environment : Environments.PC;
+                var environment = Controllers.Environment.EnvironmentType;
                 var config = Services.Config.GetConfig();
                 var environmentConfig = environment == Environments.PC ? config.PC : config.TV;
 

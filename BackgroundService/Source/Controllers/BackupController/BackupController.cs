@@ -2,7 +2,6 @@
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
 using Core.Components;
-using Core.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,8 +27,8 @@ namespace BackgroundService.Source.Controllers.BackupController
         public void Initialize()
         {
             var backupConfigs = GetBackupConfigs();
-            bool haveBackupsConfigured = backupConfigs == null || backupConfigs.Count == 0;
-            if (!haveBackupsConfigured)
+
+            if (backupConfigs?.Count == 0)
             {
                 Logger.Info("No backups were configured, skipping initialization...");
 

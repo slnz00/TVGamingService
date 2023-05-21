@@ -9,7 +9,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         private uint? playniteClosedListenerId = null;
 
         public TVController(MainController mainController, ServiceProvider services) :
-            base(Environments.TV, services.Config.GetConfig().TV, services.Config.GetJobsConfig().TV, mainController, services)
+            base(Environments.TV, mainController, services)
         { }
 
         protected override void OnSetup()
@@ -28,7 +28,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             CloseThirdPartyApps();
             OpenThirdPartyApps();
 
-            Services.GameConfig.LoadGameConfigsForEnvironment(Environment);
+            Services.GameConfig.LoadGameConfigsForEnvironment(EnvironmentType);
         }
 
         protected override void OnReset()
@@ -43,7 +43,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         {
             CloseThirdPartyApps();
 
-            Services.GameConfig.SaveGameConfigsForEnvironment(Environment);
+            Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
         }
 
         private void OpenThirdPartyApps()
