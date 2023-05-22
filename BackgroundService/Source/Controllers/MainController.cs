@@ -4,6 +4,7 @@ using BackgroundService.Source.Providers;
 using BackgroundService.Source.Controllers.EnvironmentControllers;
 using Core.Components.System;
 using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
+using System.Reflection;
 
 namespace BackgroundService.Source.Controllers
 {
@@ -165,7 +166,10 @@ namespace BackgroundService.Source.Controllers
 
         private void DisplayStartupTitle()
         {
-            Console.WriteLine($"[TV Gaming Service]\n[Startup: {DateTime.Now}]");
+            var ver = Assembly.GetEntryAssembly().GetName().Version;
+            var versionString = $"{ver.Major}.{ver.Minor}:{ver.Build}";
+
+            Console.WriteLine($"[TV Gaming Service] [Version: {versionString}] [Startup: {DateTime.Now}] \n");
         }
     }
 }
