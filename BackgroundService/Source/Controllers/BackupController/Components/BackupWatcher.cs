@@ -33,6 +33,7 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
                 directoryWatcher.NotifyFilter = NotifyFilters.LastWrite;
                 directoryWatcher.Filter = "*.*";
                 directoryWatcher.EnableRaisingEvents = true;
+                directoryWatcher.IncludeSubdirectories = true;
 
                 directoryWatcher.Changed += new FileSystemEventHandler((object source, FileSystemEventArgs e) =>
                 {
