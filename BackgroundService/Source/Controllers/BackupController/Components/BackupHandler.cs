@@ -34,7 +34,6 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
             {
                 Logger.Error($"Backup failed: {ex}");
             }
-
         }
 
         private string SetupBackupDirectory()
@@ -68,7 +67,9 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
 
         private string GetBackupSlotPath(int slot)
         {
-            return FSUtils.JoinPaths(backupBasePath, slot.ToString());
+            string paddedSlot = slot.ToString().PadLeft(3, '0');
+
+            return FSUtils.JoinPaths(backupBasePath, paddedSlot);
         }
     }
 }
