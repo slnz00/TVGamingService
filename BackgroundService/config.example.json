@@ -1,57 +1,41 @@
 {
   "PC": {
     "SoundDevice": {
-      "DeviceName": "Headset Earphone"
+      "DeviceName": ""
     },
     "Display": {
-      "DeviceName": "GSM5BD3",
       "Resolution": {
         "Width": 2560,
         "Height": 1440
       },
       "RefreshRate": 144
     },
-    "WallpaperPath": "C:/Wallpapers/PC.jpg"
+    "WallpaperPath": ""
   },
   "TV": {
     "SoundDevice": {
-      "DeviceName": "4 - SAMSUNG"
+      "DeviceName": ""
     },
     "Display": {
-      "DeviceName": "SAM0FA0",
       "Resolution": {
         "Width": 3840,
         "Height": 2160
       },
       "RefreshRate": 60
     },
-    "WallpaperPath": "C:/Wallpapers/TV.jpg"
+    "WallpaperPath": ""
   },
 
-  "Backups": [
-    { "Name":  "ExampleSaveGameDirectory", "Path": "C:/ExampleGame/Saves" }
-  ],
+  "Backups": [],
 
   "ThirdParty": {
     "PlayniteFullscreen": {
       "ProcessName": "Playnite.FullscreenApp",
-      "Path": "C:/TVGaming/Playnite_v10.3/Playnite.FullscreenApp.exe"
+      "Path": "Bundle/Playnite/Playnite.FullscreenApp.exe"
     },
     "PlayniteDesktop": {
       "ProcessName": "Playnite.DesktopApp",
-      "Path": "C:/TVGaming/Playnite_v10.3/Playnite.DesktopApp.exe"
-    },
-    "DS4Windows": {
-      "ProcessName": "d4w",
-      "Path": "C:/TVGaming/DS4Windows_v3.1.6/d4w.exe"
-    },
-    "EpicGames": {
-      "ProcessName": "EpicGamesLauncher",
-      "Path": "C:/Program Files (x86)/Epic Games/Launcher/Portal/Binaries/Win32/EpicGamesLauncher.exe"
-    },
-    "Steam": {
-      "ProcessName": "Steam",
-      "Path": "C:/Program Files (x86)/Steam/steam.exe"
+      "Path": "Bundle/Playnite/Playnite.DesktopApp.exe"
     }
   }
 }
