@@ -18,7 +18,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             // Change display and sound device:
             Services.System.LegacyDisplay.SwitchToDisplay_Old(Config.Display);
-            Services.System.SoundDevice.SetDefaultSoundDevice(Config.SoundDevice.DeviceName);
+            Services.System.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
 
             // Change windows desktop, hide desktop icons:
             Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
@@ -59,7 +59,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             });
 
             Services.ThirdParty.DS4Windows.OpenDS4Windows();
-            Services.ThirdParty.Playnite.OpenPlaynite();
+            Services.ThirdParty.Playnite.OpenFullscreenPlaynite();
         }
 
         private void CloseThirdPartyApps()
@@ -70,7 +70,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             }
 
             Services.ThirdParty.DS4Windows.CloseDS4Windows();
-            Services.ThirdParty.Playnite.ClosePlaynite();
+            Services.ThirdParty.Playnite.CloseFullscreenPlaynite();
             Services.ThirdParty.GameStore.CloseAllGameStores();
         }
 

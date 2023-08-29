@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using BackgroundService.Source.Common;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Configs.Models;
@@ -14,11 +13,14 @@ namespace BackgroundService.Source.Services.ThirdParty
 
         private AppConfig ds4WindowsConfig;
 
+        private bool enabled;
+
         public DS4WindowsService(ServiceProvider services) : base(services) { }
 
         protected override void OnInitialize()
         {
             ds4WindowsConfig = Services.Config.GetConfig().ThirdParty.DS4Windows;
+            enabled = ds4WindowsConfig != null;
 
             watcher = new ProcessWatcher(ds4WindowsConfig.ProcessName, new ProcessWatcher.Events
             {
@@ -29,6 +31,13 @@ namespace BackgroundService.Source.Services.ThirdParty
         public void OpenDS4Windows()
         {
             Logger.Debug("Opening DS4Windows");
+
+            if (!enabled)
+            {
+                Logger.Debug("DS4Windows is disabled, skipping...");
+                return;
+            }
+
             ProcessUtils.StartProcess(ds4WindowsConfig.Path);
 
             StartWatcher();
@@ -36,18 +45,26 @@ namespace BackgroundService.Source.Services.ThirdParty
 
         public void CloseDS4Windows(bool forceClose = false)
         {
+            Logger.Debug("Closing DS4Windows");
+
+            if (!enabled)
+            {
+                Logger.Debug("DS4Windows is disabled, skipping...");
+                return;
+            }
+
             StopWatcher();
 
             if (forceClose)
             {
-                Logger.Debug("Forcefully closing DS4Windows");
                 ProcessUtils.CloseProcess(ds4WindowsConfig.ProcessName, true);
+                Logger.Debug("DS4Windows is forcefully closed");
 
                 return;
             }
 
-            Logger.Debug("Gracefully shutting down DS4Windows");
             ProcessUtils.StartProcess(Path.GetFullPath(ds4WindowsConfig.Path), "-command shutdown", ProcessWindowStyle.Hidden, true);
+            Logger.Debug("DS4Windows is gracefully stopped");
         }
 
         private void ReopenOnUnexpectedExit()

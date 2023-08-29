@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.System.API;
@@ -12,20 +10,17 @@ using Microsoft.Win32;
 
 namespace BackgroundService.Source.Services.System
 {
-    internal class DesktopService : Service
+    internal abstract class DesktopService : Service
     {
-        private const int SPI_SETDESKWALLPAPER = 20;
-        private const int SPIF_UPDATEINIFILE = 0x01;
-        private const int SPIF_SENDWININICHANGE = 0x02;
+        protected const int SPI_SETDESKWALLPAPER = 20;
+        protected const int SPIF_UPDATEINIFILE = 0x01;
+        protected const int SPIF_SENDWININICHANGE = 0x02;
 
-        private const uint WM_ICONS_VISIBILITY_COMMAND = 0x111;
+        protected const uint WM_ICONS_VISIBILITY_COMMAND = 0x111;
 
-        private static readonly string VIRTUAL_DESKTOP_PATH = InternalSettings.PATH_VIRTUAL_DESKTOP;
-        private static readonly string DESKTOP_REGISTRY = @"Control Panel\Desktop";
+        protected static readonly string DESKTOP_REGISTRY = @"Control Panel\Desktop";
 
-        private readonly object threadLock = new object();
-
-        enum GetWindowCommand : uint
+        protected enum GetWindowCommand : uint
         {
             GW_HWNDFIRST = 0,
             GW_HWNDLAST = 1,
@@ -36,36 +31,42 @@ namespace BackgroundService.Source.Services.System
         }
 
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        private protected static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommand uCmd);
+        private protected static extern IntPtr GetWindow(IntPtr hWnd, GetWindowCommand uCmd);
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        private protected static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+        private protected static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
 
         [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        static protected extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
         [DllImport("user32.dll", SetLastError = true)]
-        static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+        static protected extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
         [DllImport("user32.dll")]
-        private static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
+        private protected static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 
-        public DesktopService(ServiceProvider services) : base(services) { }
-
-        public void CreateAndSwitchToDesktop(string desktopName)
+        public static DesktopService Create(ServiceProvider services)
         {
-            Logger.Debug($"Switching desktop to: {desktopName}");
+            string windowsVersion = OSUtils.GetCurrentWindowsVersion();
+            bool isWindows11 = OSUtils.IsWindows11(windowsVersion);
 
-            ExecVirtualDesktopBinary($"/New /Name:{desktopName} /Switch");
+            if (isWindows11) {
+                return new DesktopServiceW11(services);
+            }
+
+            return new DesktopServiceW10(services);
         }
 
-        public void RemoveDesktop(string desktopName)
-        {
-            Logger.Debug($"Removing desktop: {desktopName}");
+        protected DesktopService(ServiceProvider services) : base(services) { }
 
-            ExecVirtualDesktopBinary($"/Remove:{desktopName}");
-        }
+        public abstract void CreateAndSwitchToDesktop(string desktopName);
+
+        public abstract void RemoveDesktop(string desktopName);
+
+        public abstract string GetCurrentDesktopName();
+
+        public abstract List<WindowComponent> GetWindowsOnDesktop(string desktopName);
 
         public void ToggleIconsVisiblity(bool visible = false)
         {
@@ -76,89 +77,6 @@ namespace BackgroundService.Source.Services.System
             SendMessage(hWnd, WM_ICONS_VISIBILITY_COMMAND, toggleDesktopCommand, IntPtr.Zero);
         }
 
-        public string GetCurrentDesktopName()
-        {
-            var resourceManager = new VirtualDesktopAPI.ResourceManager();
-
-            try
-            {
-                var currentDesktop = resourceManager.GetCurrentVirtualDesktop();
-                var desktopInfo = new VirtualDesktopInfo(0, currentDesktop);
-
-                return desktopInfo.Name;
-            }
-            finally
-            {
-                resourceManager.ReleaseAllResources();
-            }
-        }
-
-        public List<WindowComponent> GetWindowsOnDesktop(string desktopName)
-        {
-            var resourceManager = new VirtualDesktopAPI.ResourceManager();
-            var windows = new List<WindowComponent>();
-
-            try
-            {
-                var views = GetApplicationViews(resourceManager);
-                var desktops = GetVirtualDesktops(resourceManager);
-
-                views.ForEach(view =>
-                {
-                    view.GetThumbnailWindow(out var windowHandle);
-
-                    var desktop = desktops.Find(d => d.OwnsView(view));
-
-                    var isOnDesktop = desktop != null && desktop.Name == desktopName;
-                    var isVisible = IsViewVisible(view);
-
-                    if (isVisible && isOnDesktop)
-                    {
-                        windows.Add(new WindowComponent("Window", windowHandle));
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to get windows on desktop (name: {desktopName}): {ex}");
-            }
-            finally
-            {
-                resourceManager.ReleaseAllResources();
-            }
-
-            return windows;
-        }
-
-        private bool IsViewVisible(VirtualDesktopAPI.IApplicationView view)
-        {
-            try
-            {
-                view.GetVisibility(out var visibility);
-                return visibility == 1;
-            }
-            catch
-            {
-                Logger.Warn("Failed to get visibility for view");
-                return false;
-            }
-        }
-
-        private List<VirtualDesktopInfo> GetVirtualDesktops(VirtualDesktopAPI.ResourceManager resourceManager)
-        {
-            var virtualDesktops = resourceManager.GetVirtualDesktops();
-
-            return Enumerable
-                .Range(0, virtualDesktops.Count)
-                .Select(i => new VirtualDesktopInfo(i, VirtualDesktopAPI.DesktopManager.GetDesktop(i)))
-                .ToList();
-        }
-
-        private List<VirtualDesktopAPI.IApplicationView> GetApplicationViews(VirtualDesktopAPI.ResourceManager resourceManager)
-        {
-            return resourceManager.GetApplicationViews();
-        }
-
         public void RestartExplorer()
         {
             var sessionKey = Guid.NewGuid().ToString();
@@ -166,7 +84,9 @@ namespace BackgroundService.Source.Services.System
             RestartManagerApi.RmStartSession(out IntPtr session, 0, sessionKey);
             try
             {
-                RestartManagerApi.RmRegisterResources(session, 1, new[] { Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe") }, 0, null, 0, null);
+                var explorerPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
+
+                RestartManagerApi.RmRegisterResources(session, 1, new[] { explorerPath }, 0, null, 0, null);
                 RestartManagerApi.RmShutdown(session, 0, null);
                 RestartManagerApi.RmRestart(session, 0, null);
             }
@@ -178,6 +98,14 @@ namespace BackgroundService.Source.Services.System
 
         public void ChangeWallpaper(string wallpaperPath)
         {
+            Logger.Debug("Changing wallpaper");
+
+            if (string.IsNullOrEmpty(wallpaperPath)) {
+                Logger.Debug("Provided wallpaper path is empty, skipping...");
+
+                return;
+            }
+
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(DESKTOP_REGISTRY, true))
             {
                 // Fill desktop:
@@ -186,13 +114,6 @@ namespace BackgroundService.Source.Services.System
 
                 SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, Path.GetFullPath(wallpaperPath), SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
             }
-        }
-
-        private void ExecVirtualDesktopBinary(string args)
-        {
-            Logger.Debug($"Exec virtual desktop, args: {args}");
-
-            ProcessUtils.StartProcess(VIRTUAL_DESKTOP_PATH, args, ProcessWindowStyle.Hidden, true);
         }
     }
 }

@@ -25,12 +25,12 @@ namespace BackgroundService.Source.Services.Configs.Models
 
     internal class EnvironmentConfig
     {
-        public SoundDeviceConfig SoundDevice { get; set; }
+        public SoundConfig Sound { get; set; }
         public DisplayConfig Display { get; set; }
         public string WallpaperPath { get; set; }
     }
 
-    internal class SoundDeviceConfig
+    internal class SoundConfig
     {
         public string DeviceName { get; set; }
     }
@@ -44,7 +44,8 @@ namespace BackgroundService.Source.Services.Configs.Models
 
     internal class ThirdPartyConfig
     {
-        public AppConfig Playnite { get; set; }
+        public AppConfig PlayniteFullscreen { get; set; }
+        public AppConfig PlayniteDesktop { get; set; }
         public AppConfig DS4Windows { get; set; }
         public AppConfig Steam { get; set; }
         public AppConfig EpicGames { get; set; }

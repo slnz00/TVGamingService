@@ -1,22 +1,22 @@
-﻿using BackgroundService.Source.Services.System.API;
+﻿using BackgroundService.Source.Services.System.API.VirtualDesktop;
 using System;
 
-namespace BackgroundService.Source.Services.System.Models
+namespace BackgroundService.Source.Services.System.Models.VirtualDesktop
 {
-    internal class VirtualDesktopInfo
+    internal class VirtualDesktopInfoW11
     {
         public int Index { get; private set; }
         public string Name => GetDesktopName();
         public Guid Id => GetDesktopGuid();
-        public VirtualDesktopAPI.IVirtualDesktop DesktopInstance { get; private set; }
+        public VirtualDesktopAPIW11.IVirtualDesktop DesktopInstance { get; private set; }
 
-        public VirtualDesktopInfo(int index, VirtualDesktopAPI.IVirtualDesktop desktopInstance)
+        public VirtualDesktopInfoW11(int index, VirtualDesktopAPIW11.IVirtualDesktop desktopInstance)
         {
             DesktopInstance = desktopInstance;
             Index = index;
         }
 
-        public bool OwnsView(VirtualDesktopAPI.IApplicationView view)
+        public bool OwnsView(VirtualDesktopAPIW11.IApplicationView view)
         {
             view.GetVirtualDesktopId(out var ownerDesktopId);
 

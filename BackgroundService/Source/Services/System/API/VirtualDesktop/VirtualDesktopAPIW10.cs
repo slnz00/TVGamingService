@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-namespace BackgroundService.Source.Services.System.API
+namespace BackgroundService.Source.Services.System.API.VirtualDesktop
 {
-    internal class VirtualDesktopAPI
+    internal class VirtualDesktopAPIW10
     {
 		internal class ResourceManager
 		{

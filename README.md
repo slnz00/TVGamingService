@@ -4,7 +4,6 @@ Creates and manages a separate environment for playing PC games on a TV, to have
 ## Requirements:
 - Visual Studio 2022
 - .NET Framework 4.7.2
-- DS4Windows
 - Playnite
 
 ## Installation:
@@ -25,7 +24,7 @@ Hotkeys can be changed from source code (See: `./BackgroundService/Source/Intern
 
 - **Switch environment** (`Alt + NumPad 0`): Switches between TV and PC environments.
 - **Reset current environment** (`Alt + NumPad 1`): Restarts third-party applications (e.g.: Playnite, DS4Windows). Closes game stores and resets environment settings (e.g. desktop, display, cursor visibility). Useful when a third-party app is bugged or enters into an invalid state.
-- **Reset current environment's display** (`Alt + NumPad 2`): Resets current environment's display settings.
+- **Reset current environment's display and sound devices** (`Alt + NumPad 2`): Resets the current environment's display and sound settings. This is useful after a system crash or restart when settings are stuck in a TV configuration.
 - **Toggle cursor visibility** (`Alt + NumPad 8`): Toggles cursor's global visibility. This hotkey is usable to show the cursor and be able to use mouse input in TV environment (in this environment cursor is invisible by default).
 - **Toggle console visibility** (`Alt + NumPad 9`): Toggles `BackgroundProcess`'s console window's visibility. By default the window is hidden. Hotkey can be used to show the console with debug logs and events.
 

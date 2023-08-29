@@ -30,12 +30,16 @@
 
   "Backups": [
     { "Name":  "ExampleSaveGameDirectory", "Path": "C:/ExampleGame/Saves" }
-  ];
+  ],
 
   "ThirdParty": {
-    "Playnite": {
+    "PlayniteFullscreen": {
       "ProcessName": "Playnite.FullscreenApp",
       "Path": "C:/TVGaming/Playnite_v10.3/Playnite.FullscreenApp.exe"
+    },
+    "PlayniteDesktop": {
+      "ProcessName": "Playnite.DesktopApp",
+      "Path": "C:/TVGaming/Playnite_v10.3/Playnite.DesktopApp.exe"
     },
     "DS4Windows": {
       "ProcessName": "d4w",

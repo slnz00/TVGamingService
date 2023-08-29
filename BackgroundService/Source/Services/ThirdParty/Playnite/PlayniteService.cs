@@ -29,17 +29,24 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
         private PlayniteAppService.Events playniteAppEvents;
 
         private AppCommunicationHost playniteCommunication;
-        private ProcessWatcher watcher;
+        private ProcessWatcher watcherPlayniteFullscreen;
 
-        private AppConfig playniteConfig;
+        private AppConfig configPlayniteFullscreen;
+        private AppConfig configPlayniteDesktop;
 
-        public bool IsPlayniteOpen => watcher != null && watcher.IsProcessOpen;
+        public bool IsPlayniteFullscreenOpen => watcherPlayniteFullscreen != null && watcherPlayniteFullscreen.IsProcessOpen;
 
         public PlayniteService(ServiceProvider services) : base(services) { }
 
         protected override void OnInitialize()
         {
-            playniteConfig = Services.Config.GetConfig().ThirdParty.Playnite;
+            configPlayniteFullscreen = Services.Config.GetConfig().ThirdParty.PlayniteFullscreen;
+            configPlayniteDesktop = Services.Config.GetConfig().ThirdParty.PlayniteDesktop;
+
+            if (configPlayniteFullscreen == null || configPlayniteDesktop == null)
+            {
+                throw new NullReferenceException("PlayniteDesktop and PlayniteFullscreen third-party configurations are not defined");
+            }
 
             watcherEvents = new ProcessWatcher.Events
             {
@@ -54,20 +61,21 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
                 OnGameStopped = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStopped, gameInfo),
             };
 
-            watcher = new ProcessWatcher(playniteConfig.ProcessName, watcherEvents, 1000);
+            watcherPlayniteFullscreen = new ProcessWatcher(configPlayniteFullscreen.ProcessName, watcherEvents, 1000);
             playniteCommunication = new AppCommunicationHost(playniteAppEvents);
 
             playniteCommunication.Open();
-            watcher.Start();
+            watcherPlayniteFullscreen.Start();
         }
 
         protected override void OnDispose()
         {
             playniteCommunication.Close();
-            watcher.Stop();
+            watcherPlayniteFullscreen.Stop();
         }
 
-        public uint OnPlayniteOpened(Action action) {
+        public uint OnPlayniteOpened(Action action)
+        {
             var listener = eventListenerRegistry.AddListener(PlayniteEventID.PlayniteOpened, (_args) => action());
             return listener.Id;
         }
@@ -101,11 +109,11 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             eventListenerRegistry.RemoveListener(listenerId);
         }
 
-        public void OpenPlaynite()
+        public void OpenFullscreenPlaynite()
         {
-            Logger.Debug("Opening Playnite");
+            Logger.Debug("Opening Playnite fullscreen app");
 
-            var playnitePath = Path.GetFullPath(playniteConfig.Path);
+            var playnitePath = Path.GetFullPath(configPlayniteFullscreen.Path);
             var playniteDir = Path.GetDirectoryName(playnitePath);
 
             ProcessUtils.StartProcess(playnitePath, "", ProcessWindowStyle.Normal, false, (startInfo) =>
@@ -114,11 +122,18 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             });
         }
 
-        public void ClosePlaynite()
+        public void CloseFullscreenPlaynite()
         {
-            Logger.Debug("Closing Playnite");
-            
-            ProcessUtils.CloseProcess(playniteConfig.ProcessName);
+            Logger.Debug("Closing Playnite fullscreen app");
+
+            ProcessUtils.CloseProcess(configPlayniteFullscreen.ProcessName);
+        }
+
+        public void CloseDesktopPlaynite()
+        {
+            Logger.Debug("Closing Playnite desktop app");
+
+            ProcessUtils.CloseProcess(configPlayniteDesktop.ProcessName);
         }
 
         private void RunEventListeners(PlayniteEventID eventId, object args)

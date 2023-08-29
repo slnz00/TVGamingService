@@ -52,7 +52,7 @@ namespace BackgroundService.Source.Providers
             System = new SystemServices
             {
                 Console = RegisterService(new ConsoleService(this)),
-                Desktop = RegisterService(new DesktopService(this)),
+                Desktop = RegisterService(DesktopService.Create(this)),
                 Hotkey = RegisterService(new HotkeyService(this)),
                 LegacyDisplay = RegisterService(new LegacyDisplayService(this)),
                 SoundDevice = RegisterService(new SoundDeviceService(this)),

@@ -34,6 +34,7 @@
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -56,6 +57,7 @@
     <Compile Include="Utils\EnumUtils.cs" />
     <Compile Include="Utils\FSUtils.cs" />
     <Compile Include="Utils\HashUtils.cs" />
+    <Compile Include="Utils\OSUtils.cs" />
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\TimerUtils.cs" />
   </ItemGroup>

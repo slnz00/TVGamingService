@@ -45,9 +45,13 @@ namespace BackgroundService.Source.Services.ThirdParty
                 return;
             }
 
+            var store = storeConfigs[type];
+            if (store == null) {
+                return;
+            }
+
             Logger.Debug($"Closing game store: {type}");
 
-            var store = storeConfigs[type];
             ProcessUtils.CloseProcess(store.ProcessName, true);
         }
     }
