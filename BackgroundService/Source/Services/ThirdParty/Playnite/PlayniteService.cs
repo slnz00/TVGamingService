@@ -113,7 +113,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
         {
             Logger.Debug("Opening Playnite fullscreen app");
 
-            var playnitePath = Path.GetFullPath(configPlayniteFullscreen.Path);
+            var playnitePath = FSUtils.GetAbsolutePath(configPlayniteFullscreen.Path);
             var playniteDir = Path.GetDirectoryName(playnitePath);
 
             ProcessUtils.StartProcess(playnitePath, "", ProcessWindowStyle.Normal, false, (startInfo) =>

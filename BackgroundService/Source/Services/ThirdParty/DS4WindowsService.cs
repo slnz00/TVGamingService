@@ -38,7 +38,9 @@ namespace BackgroundService.Source.Services.ThirdParty
                 return;
             }
 
-            ProcessUtils.StartProcess(ds4WindowsConfig.Path);
+            var fullPath = FSUtils.GetAbsolutePath(ds4WindowsConfig.Path);
+
+            ProcessUtils.StartProcess(fullPath);
 
             StartWatcher();
         }
@@ -63,7 +65,7 @@ namespace BackgroundService.Source.Services.ThirdParty
                 return;
             }
 
-            ProcessUtils.StartProcess(Path.GetFullPath(ds4WindowsConfig.Path), "-command shutdown", ProcessWindowStyle.Hidden, true);
+            ProcessUtils.StartProcess(FSUtils.GetAbsolutePath(ds4WindowsConfig.Path), "-command shutdown", ProcessWindowStyle.Hidden, true);
             Logger.Debug("DS4Windows is gracefully stopped");
         }
 

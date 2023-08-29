@@ -13,9 +13,15 @@ namespace Core.Utils
 
         public static string GetAbsolutePath(params string[] paths)
         {
+            string joinedPath = JoinPaths(paths);
+
+            if (Path.IsPathRooted(joinedPath)) {
+                return joinedPath;
+            }
+
             string execDir = new FileInfo(Assembly.GetEntryAssembly().Location).DirectoryName;
 
-            return Path.GetFullPath(JoinPaths(execDir, JoinPaths(paths)));
+            return Path.GetFullPath(JoinPaths(execDir, joinedPath));
         }
 
         public static void CopyDirectory(string fromDirectory, string toDirectory)
