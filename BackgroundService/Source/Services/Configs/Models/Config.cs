@@ -49,6 +49,7 @@ namespace BackgroundService.Source.Services.Configs.Models
         public AppConfig DS4Windows { get; set; }
         public AppConfig Steam { get; set; }
         public AppConfig EpicGames { get; set; }
+        public AppConfig BattleNet { get; set; }
     }
 
     internal class AppConfig

@@ -11,7 +11,8 @@ namespace BackgroundService.Source.Services.ThirdParty
         public enum GameStoreTypes
         {
             Steam,
-            EpicGames
+            EpicGames,
+            BattleNet
         }
 
         private IReadOnlyDictionary<GameStoreTypes, AppConfig> storeConfigs;
@@ -26,6 +27,7 @@ namespace BackgroundService.Source.Services.ThirdParty
             {
                { GameStoreTypes.Steam, config.ThirdParty.Steam },
                { GameStoreTypes.EpicGames, config.ThirdParty.EpicGames },
+               { GameStoreTypes.BattleNet, config.ThirdParty.BattleNet },
             };
         }
 
