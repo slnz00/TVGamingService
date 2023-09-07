@@ -1,4 +1,5 @@
-﻿using System.Management;
+﻿using IWshRuntimeLibrary;
+using System.Management;
 
 namespace Core.Utils
 {
@@ -28,6 +29,14 @@ namespace Core.Utils
 
                 return result;
             }
+        }
+
+        public static void CreateShortcut(string shortcutPath, string targetPath)
+        {
+            WshShell shell = new WshShell();
+            IWshShortcut shortcut = shell.CreateShortcut(shortcutPath);
+            shortcut.TargetPath = targetPath;
+            shortcut.Save();
         }
     }
 }

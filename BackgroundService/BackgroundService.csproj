@@ -174,7 +174,6 @@
     <Compile Include="Source\Services\System\Models\VirtualDesktop\VirtualDesktopInfoW10.cs" />
     <Compile Include="Source\Services\System\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
-    <Compile Include="Source\Services\System\Models\VirtualDesktop\VirtualDesktopInfoW11.cs" />
     <Compile Include="Source\Services\System\Models\WindowComponent.cs" />
     <Compile Include="Source\Services\ThirdParty\DS4WindowsService.cs" />
     <Compile Include="Source\Services\ThirdParty\Playnite\Communication\AppCommunicationHost.cs" />
@@ -200,9 +199,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Services\System\SoundDeviceService.cs" />
     <Compile Include="Source\Providers\LoggerProvider.cs" />
-    <Content Include="Binaries\vd_win11.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\tv-gaming-empty-cursor.cur">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -250,6 +246,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Startup.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

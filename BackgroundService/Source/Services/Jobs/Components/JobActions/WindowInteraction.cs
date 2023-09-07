@@ -53,16 +53,16 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
                     component.Close();
                     break;
                 case Interactions.Minimize:
-                    component.Close();
+                    component.Minimize();
                     break;
                 case Interactions.Maximize:
-                    component.Close();
+                    component.Maximize();
                     break;
                 case Interactions.Show:
-                    component.Close();
+                    component.Show();
                     break;
                 case Interactions.Click:
-                    component.Close();
+                    component.Click();
                     break;
                 case Interactions.StopProcess:
                     StopComponentParentProcess(component, false);

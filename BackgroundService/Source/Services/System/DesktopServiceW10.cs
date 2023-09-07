@@ -7,14 +7,13 @@ using BackgroundService.Source.Services.System.API.VirtualDesktop;
 using BackgroundService.Source.Services.System.Models;
 using BackgroundService.Source.Services.System.Models.VirtualDesktop;
 using Core.Utils;
+using Microsoft.Win32;
 
 namespace BackgroundService.Source.Services.System
 {
     internal class DesktopServiceW10 : DesktopService
     {
         private static readonly string VIRTUAL_DESKTOP_PATH = InternalSettings.PATH_VIRTUAL_DESKTOP_W10;
-
-        private readonly object threadLock = new object();
 
         public DesktopServiceW10(ServiceProvider services) : base(services) { }
 
@@ -30,6 +29,27 @@ namespace BackgroundService.Source.Services.System
             Logger.Debug($"Removing desktop: {desktopName}");
 
             ExecVirtualDesktopBinary($"/Remove:{desktopName}");
+        }
+
+        public override void ChangeWallpaper(string wallpaperPath)
+        {
+            Logger.Debug("Changing wallpaper");
+
+            if (string.IsNullOrEmpty(wallpaperPath))
+            {
+                Logger.Debug("Provided wallpaper path is empty, skipping...");
+
+                return;
+            }
+
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(DESKTOP_REGISTRY, true))
+            {
+                // Fill desktop:
+                key.SetValue("WallpaperStyle", "10");
+                key.SetValue("TileWallpaper", "0");
+
+                SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, FSUtils.GetAbsolutePath(wallpaperPath), SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+            }
         }
 
         public override string GetCurrentDesktopName()

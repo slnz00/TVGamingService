@@ -66,6 +66,8 @@ namespace BackgroundService.Source.Services.System
 
         public abstract string GetCurrentDesktopName();
 
+        public abstract void ChangeWallpaper(string wallpaperPath);
+
         public abstract List<WindowComponent> GetWindowsOnDesktop(string desktopName);
 
         public void ToggleIconsVisiblity(bool visible = false)
@@ -93,26 +95,6 @@ namespace BackgroundService.Source.Services.System
             finally
             {
                 RestartManagerApi.RmEndSession(session);
-            }
-        }
-
-        public void ChangeWallpaper(string wallpaperPath)
-        {
-            Logger.Debug("Changing wallpaper");
-
-            if (string.IsNullOrEmpty(wallpaperPath)) {
-                Logger.Debug("Provided wallpaper path is empty, skipping...");
-
-                return;
-            }
-
-            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(DESKTOP_REGISTRY, true))
-            {
-                // Fill desktop:
-                key.SetValue("WallpaperStyle", "10");
-                key.SetValue("TileWallpaper", "0");
-
-                SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, Path.GetFullPath(wallpaperPath), SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
             }
         }
     }

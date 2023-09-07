@@ -21,8 +21,8 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             Services.System.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
 
             // Change windows desktop, hide desktop icons:
-            Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
             Services.System.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
+            Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
             Services.System.Desktop.ToggleIconsVisiblity(false);
 
             CloseThirdPartyApps();

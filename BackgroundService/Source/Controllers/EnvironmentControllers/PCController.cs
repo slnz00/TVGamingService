@@ -18,8 +18,8 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             Services.System.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
 
             // Change windows desktop, show desktop icons:
-            Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
             Services.System.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
+            Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
             Services.System.Desktop.ToggleIconsVisiblity(true);
 
             Services.GameConfig.LoadGameConfigsForEnvironment(EnvironmentType);

@@ -12,9 +12,10 @@
         "TimeBetweenExecutions": 500,
         "Actions": [
           {
-            "Type": "MinimizeProcessWindows",
+            "Type": "WindowInteraction",
             "Options": {
-              "ProcessName": "steam"
+              "Interaction": "Minimize",
+              "WindowName": "Steam"
             }
           }
         ],
@@ -40,9 +41,10 @@
         "TimeBetweenExecutions": 500,
         "Actions": [
           {
-            "Type": "MinimizeProcessWindows",
+            "Type": "WindowInteraction",
             "Options": {
-              "ProcessName": "EpicGamesLauncher"
+              "Interaction": "Minimize",
+              "WindowName": "Epic Games Launcher"
             }
           }
         ],

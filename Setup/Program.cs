@@ -3,7 +3,6 @@ using NAudio.CoreAudioApi;
 using System;
 using System.IO;
 using System.Linq;
-using IWshRuntimeLibrary;
 using System.Diagnostics;
 
 namespace Setup
@@ -11,7 +10,7 @@ namespace Setup
     internal class Program
     {
         private static readonly string PATH_APPDATA = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        private static readonly string PATH_BACKGROUND_SERVICE = FSUtils.GetAbsolutePath("BackgroundService.exe");
+        private static readonly string PATH_STARTUP_SCRIPT = FSUtils.GetAbsolutePath("Startup.bat");
         private static readonly string PATH_CONFIG = FSUtils.GetAbsolutePath("config.json");
         private static readonly string PATH_EXAMPLE_CONFIG = FSUtils.GetAbsolutePath("config.example.json");
         private static readonly string PATH_GAME_CONFIGS = FSUtils.GetAbsolutePath("game-configs.json");
@@ -83,10 +82,7 @@ namespace Setup
                 return;
             }
 
-            WshShell shell = new WshShell();
-            IWshShortcut shortcut = shell.CreateShortcut(PATH_STARTUP_SHORTCUT);
-            shortcut.TargetPath = PATH_BACKGROUND_SERVICE;
-            shortcut.Save();
+            OSUtils.CreateShortcut(PATH_STARTUP_SHORTCUT, PATH_STARTUP_SCRIPT);
         }
 
         static void OpenConfigFile()
