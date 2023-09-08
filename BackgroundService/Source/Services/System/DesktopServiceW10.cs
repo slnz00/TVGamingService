@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.System.API.VirtualDesktop;
 using BackgroundService.Source.Services.System.Models;
-using BackgroundService.Source.Services.System.Models.VirtualDesktop;
 using Core.Utils;
 using Microsoft.Win32;
+using static BackgroundService.Source.Services.System.API.VirtualDesktop.VirtualDesktopAPIW10;
 
 namespace BackgroundService.Source.Services.System
 {
@@ -15,7 +14,16 @@ namespace BackgroundService.Source.Services.System
     {
         private static readonly string VIRTUAL_DESKTOP_PATH = InternalSettings.PATH_VIRTUAL_DESKTOP_W10;
 
-        public DesktopServiceW10(ServiceProvider services) : base(services) { }
+        private IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
+        private IApplicationViewCollection ApplicationViewCollection;
+
+        public DesktopServiceW10(ServiceProvider services) : base(services)
+        {
+            var shell = (IServiceProvider10)Activator.CreateInstance(Type.GetTypeFromCLSID(Guids.CLSID_ImmersiveShell));
+
+            VirtualDesktopManagerInternal = (IVirtualDesktopManagerInternal)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal, typeof(IVirtualDesktopManagerInternal).GUID);
+            ApplicationViewCollection = (IApplicationViewCollection)shell.QueryService(typeof(IApplicationViewCollection).GUID, typeof(IApplicationViewCollection).GUID);
+        }
 
         public override void CreateAndSwitchToDesktop(string desktopName)
         {
@@ -54,38 +62,27 @@ namespace BackgroundService.Source.Services.System
 
         public override string GetCurrentDesktopName()
         {
-            var resourceManager = new VirtualDesktopAPIW10.ResourceManager();
+            var currentDesktop = VirtualDesktopManagerInternal.GetCurrentDesktop();
 
-            try
-            {
-                var currentDesktop = resourceManager.GetCurrentVirtualDesktop();
-                var desktopInfo = new VirtualDesktopInfoW10(0, currentDesktop);
-
-                return desktopInfo.Name;
-            }
-            finally
-            {
-                resourceManager.ReleaseAllResources();
-            }
+            return GetDesktopName(currentDesktop);
         }
 
         public override List<WindowComponent> GetWindowsOnDesktop(string desktopName)
         {
-            var resourceManager = new VirtualDesktopAPIW10.ResourceManager();
-            var windows = new List<WindowComponent>();
-
             try
             {
-                var views = GetApplicationViews(resourceManager);
-                var desktops = GetVirtualDesktops(resourceManager);
+                var views = GetAllApplicationViews();
+                var desktops = GetAllDesktops();
+                var windows = new List<WindowComponent>();
 
                 views.ForEach(view =>
                 {
                     view.GetThumbnailWindow(out var windowHandle);
+                    view.GetVirtualDesktopId(out var desktopId);
 
-                    var desktop = desktops.Find(d => d.OwnsView(view));
+                    var desktop = desktops.Find(d => d.GetId().CompareTo(desktopId) == 0);
 
-                    var isOnDesktop = desktop != null && desktop.Name == desktopName;
+                    var isOnDesktop = desktop != null && GetDesktopName(desktop) == desktopName;
                     var isVisible = IsViewVisible(view);
 
                     if (isVisible && isOnDesktop)
@@ -93,20 +90,72 @@ namespace BackgroundService.Source.Services.System
                         windows.Add(new WindowComponent("Window", windowHandle));
                     }
                 });
+
+                return windows;
             }
             catch (Exception ex)
             {
                 Logger.Error($"Failed to get windows on desktop (name: {desktopName}): {ex}");
             }
-            finally
-            {
-                resourceManager.ReleaseAllResources();
-            }
 
-            return windows;
+            return new List<WindowComponent>();
         }
 
-        private bool IsViewVisible(VirtualDesktopAPIW10.IApplicationView view)
+        private List<IVirtualDesktop> GetAllDesktops()
+        {
+            VirtualDesktopManagerInternal.GetDesktops(out IObjectArray desktopsObj);
+
+            return CastAndReleaseObjectArray<IVirtualDesktop>(desktopsObj);
+        }
+
+        private List<IApplicationView> GetAllApplicationViews()
+        {
+            ApplicationViewCollection.GetViews(out IObjectArray viewsObj);
+
+            return CastAndReleaseObjectArray<IApplicationView>(viewsObj);
+        }
+
+        private List<T> CastAndReleaseObjectArray<T>(IObjectArray array)
+        {
+            try
+            {
+                array.GetCount(out int count);
+                var list = new List<T>(count);
+
+                for (int index = 0; index < count; index++)
+                {
+                    array.GetAt(index, typeof(T).GUID, out object value);
+
+                    list.Add((T)value);
+                }
+
+                return list;
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(array);
+            }
+        }
+
+        private string GetDesktopName(IVirtualDesktop desktop)
+        {
+            var desktopId = desktop.GetId();
+
+            try
+            {
+                string registryKey = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VirtualDesktops\Desktops\{" + desktopId.ToString() + "}";
+
+                object registryValue = Microsoft.Win32.Registry.GetValue(registryKey, "Name", null);
+                return registryValue != null ? (string)registryValue : "";
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to get desktop name for [GUID: {desktopId}]: {ex}");
+                return "";
+            }
+        }
+
+        private bool IsViewVisible(IApplicationView view)
         {
             try
             {
@@ -118,21 +167,6 @@ namespace BackgroundService.Source.Services.System
                 Logger.Warn("Failed to get visibility for view");
                 return false;
             }
-        }
-
-        private List<VirtualDesktopInfoW10> GetVirtualDesktops(VirtualDesktopAPIW10.ResourceManager resourceManager)
-        {
-            var virtualDesktops = resourceManager.GetVirtualDesktops();
-
-            return Enumerable
-                .Range(0, virtualDesktops.Count)
-                .Select(i => new VirtualDesktopInfoW10(i, VirtualDesktopAPIW10.DesktopManager.GetDesktop(i)))
-                .ToList();
-        }
-
-        private List<VirtualDesktopAPIW10.IApplicationView> GetApplicationViews(VirtualDesktopAPIW10.ResourceManager resourceManager)
-        {
-            return resourceManager.GetApplicationViews();
         }
 
         private void ExecVirtualDesktopBinary(string args)

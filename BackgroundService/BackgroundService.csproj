@@ -171,7 +171,6 @@
     <Compile Include="Source\Services\System\API\VirtualDesktop\VirtualDesktopAPIW11.cs" />
     <Compile Include="Source\Services\System\DesktopServiceW10.cs" />
     <Compile Include="Source\Services\System\DesktopServiceW11.cs" />
-    <Compile Include="Source\Services\System\Models\VirtualDesktop\VirtualDesktopInfoW10.cs" />
     <Compile Include="Source\Services\System\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
     <Compile Include="Source\Services\System\Models\WindowComponent.cs" />

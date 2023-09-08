@@ -78,13 +78,11 @@ namespace BackgroundService.Source.Services.System
 
         public override List<WindowComponent> GetWindowsOnDesktop(string desktopName)
         {
-            var resourceManager = new VirtualDesktopAPIW10.ResourceManager();
-            var windows = new List<WindowComponent>();
-
             try
             {
                 var views = GetAllApplicationViews();
                 var desktops = GetAllDesktops();
+                var windows = new List<WindowComponent>();
 
                 views.ForEach(view =>
                 {
@@ -101,13 +99,15 @@ namespace BackgroundService.Source.Services.System
                         windows.Add(new WindowComponent("Window", windowHandle));
                     }
                 });
+
+                return windows;
             }
             catch (Exception ex)
             {
                 Logger.Error($"Failed to get windows on desktop (name: {desktopName}): {ex}");
             }
 
-            return windows;
+            return new List<WindowComponent>();
         }
 
         private List<IVirtualDesktop> GetAllDesktops()

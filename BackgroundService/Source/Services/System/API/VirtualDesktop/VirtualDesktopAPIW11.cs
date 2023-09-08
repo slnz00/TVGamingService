@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BackgroundService.Source.Services.System.API.VirtualDesktop
 {
