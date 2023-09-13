@@ -89,7 +89,7 @@ namespace BackgroundService.Source.Services.System
 
         public void SetDisplayAsPrimary(LegacyDisplay display, int refreshRate, DisplayResolutionConfig resolution)
         {
-            Logger.Debug($"Setting display as primary: {display}");
+            Logger.Info($"Setting display as primary: {display}");
             Logger.Debug($"Setting display parameters: refreshRate({refreshRate}), width({resolution.Width}), height({resolution.Height})");
 
             var deviceMode = new DEVMODE();
@@ -108,12 +108,12 @@ namespace BackgroundService.Source.Services.System
                IntPtr.Zero
            );
 
-            Logger.Info($"Display set as primary: {display}");
+            Logger.Debug($"Display set as primary: {display}");
         }
 
         public void DisableDisplay(LegacyDisplay display)
         {
-            Logger.Debug($"Disabling display: {display}");
+            Logger.Info($"Disabling display: {display}");
 
             var deviceMode = new DEVMODE();
             EnumDisplaySettings(display.AdapterDevice.DeviceName, -1, ref deviceMode);

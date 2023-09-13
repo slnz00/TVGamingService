@@ -27,28 +27,28 @@ namespace BackgroundService.Source.Services.System
 
         public override void CreateAndSwitchToDesktop(string desktopName)
         {
-            Logger.Debug($"Switching desktop to: {desktopName}");
+            Logger.Info($"Switching desktop to: {desktopName}");
 
             ExecVirtualDesktopBinary($"/New /Name:{desktopName} /Switch");
         }
 
         public override void RemoveDesktop(string desktopName)
         {
-            Logger.Debug($"Removing desktop: {desktopName}");
+            Logger.Info($"Removing desktop: {desktopName}");
 
             ExecVirtualDesktopBinary($"/Remove:{desktopName}");
         }
 
         public override void ChangeWallpaper(string wallpaperPath)
         {
-            Logger.Debug("Changing wallpaper");
-
             if (string.IsNullOrEmpty(wallpaperPath))
             {
                 Logger.Debug("Provided wallpaper path is empty, skipping...");
 
                 return;
             }
+
+            Logger.Info($"Changing wallpaper to: {wallpaperPath}");
 
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(DESKTOP_REGISTRY, true))
             {

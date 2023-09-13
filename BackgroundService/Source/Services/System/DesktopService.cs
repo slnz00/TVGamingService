@@ -72,7 +72,7 @@ namespace BackgroundService.Source.Services.System
 
         public void ToggleIconsVisiblity(bool visible = false)
         {
-            Logger.Debug("Toggling desktop icons visibility");
+            Logger.Info("Toggling desktop icons visibility");
 
             var toggleDesktopCommand = new IntPtr(0x7402);
             IntPtr hWnd = GetWindow(FindWindow("Progman", "Program Manager"), GetWindowCommand.GW_CHILD);

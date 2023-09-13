@@ -52,7 +52,7 @@ namespace BackgroundService.Source.Services.ThirdParty
                 return;
             }
 
-            Logger.Debug($"Closing game store: {type}");
+            Logger.Info($"Closing game store: {type}");
 
             ProcessUtils.CloseProcess(store.ProcessName, true);
         }

@@ -33,6 +33,9 @@ namespace BackgroundService.Source
 
         public static readonly bool CONSOLE_DEFAULT_VISIBILITY = false;
 
-        public static readonly bool DEBUG_ENABLED = true;
+        public static readonly string LOG_FILE_NAME = "BackgroundService.log";
+        public static readonly string LOG_FILE_NAME_ARCHIVE = "BackgroundService.{#}.log";
+        public static readonly int LOG_FILE_MAX_SIZE = 4_000_000;
+        public static readonly int LOG_FILE_MAX_ARCHIVES = 3;
     }
 }

@@ -19,7 +19,7 @@ namespace BackgroundService.Source.Services.System.Models
 
         public override string ToString()
         {
-            return $"LegacyDisplay(adapter: '{AdapterDevice.DeviceID} - {AdapterDevice.DeviceName}', monitor: '{MonitorDevice.DeviceID} - {MonitorDevice.DeviceName}'";
+            return $"{AdapterDevice.DeviceName}\\{MonitorDevice.DeviceID}'";
         }
 
         private string GetModelNumber()

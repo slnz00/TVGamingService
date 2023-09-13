@@ -111,7 +111,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
         public void OpenFullscreenPlaynite()
         {
-            Logger.Debug("Opening Playnite fullscreen app");
+            Logger.Info("Opening Playnite fullscreen application");
 
             var playnitePath = FSUtils.GetAbsolutePath(configPlayniteFullscreen.Path);
             var playniteDir = Path.GetDirectoryName(playnitePath);
@@ -124,14 +124,14 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
         public void CloseFullscreenPlaynite()
         {
-            Logger.Debug("Closing Playnite fullscreen app");
+            Logger.Info("Closing Playnite fullscreen application");
 
             ProcessUtils.CloseProcess(configPlayniteFullscreen.ProcessName);
         }
 
         public void CloseDesktopPlaynite()
         {
-            Logger.Debug("Closing Playnite desktop app");
+            Logger.Info("Closing Playnite desktop application");
 
             ProcessUtils.CloseProcess(configPlayniteDesktop.ProcessName);
         }

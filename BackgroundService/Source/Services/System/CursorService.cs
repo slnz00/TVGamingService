@@ -66,7 +66,7 @@ namespace BackgroundService.Source.Services.System
 
         public void SetCursorVisibility(bool visible)
         {
-            Logger.Debug($"Setting cursor visibility to: {visible}");
+            Logger.Info($"Setting cursor visibility to: {visible}");
 
             var cursorValues = visible ? visibleCursorRegistrySnapshot : GetHiddenCursorRegistryValues();
 

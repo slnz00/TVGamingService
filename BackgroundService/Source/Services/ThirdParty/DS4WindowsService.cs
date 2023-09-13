@@ -30,7 +30,7 @@ namespace BackgroundService.Source.Services.ThirdParty
 
         public void OpenDS4Windows()
         {
-            Logger.Debug("Opening DS4Windows");
+            Logger.Info("Opening DS4Windows");
 
             if (!enabled)
             {
@@ -47,13 +47,13 @@ namespace BackgroundService.Source.Services.ThirdParty
 
         public void CloseDS4Windows(bool forceClose = false)
         {
-            Logger.Debug("Closing DS4Windows");
-
             if (!enabled)
             {
                 Logger.Debug("DS4Windows is disabled, skipping...");
                 return;
             }
+
+            Logger.Info("Closing DS4Windows");
 
             StopWatcher();
 

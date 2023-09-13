@@ -42,7 +42,7 @@ namespace BackgroundService.Source.Services.System
             ShowWindow(consoleWindowHandle, visibility ? SW_SHOW : SW_HIDE);
             isConsoleVisible = visibility;
 
-            Logger.Debug($"Console window visibility changed to: {visibility}");
+            Logger.Info($"Console window visibility changed to: {visibility}");
         }
     }
 }

@@ -166,8 +166,10 @@ namespace BackgroundService.Source.Controllers
         {
             var ver = Assembly.GetEntryAssembly().GetName().Version;
             var versionString = $"{ver.Major}.{ver.Minor}:{ver.Build}";
+            var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-            Console.WriteLine($"[TV Gaming Service] [Version: {versionString}] [Startup: {DateTime.Now}] \n");
+            Logger.Plain($"[TV Gaming Service] [Version: {versionString}] [Startup: {now}]");
+            Logger.LogEmptyLine();
         }
     }
 }

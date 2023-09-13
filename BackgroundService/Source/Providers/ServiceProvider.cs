@@ -75,7 +75,7 @@ namespace BackgroundService.Source.Providers
 
             var time = TimerUtils.MeasurePerformance(() => services.ForEach(s => s.Initialize()));
 
-            Logger.Info($"Successfully initialized, took: {time}ms");
+            Logger.Debug($"Successfully initialized, took: {time}ms");
         }
 
         private TService RegisterService<TService>(TService service) where TService : Service

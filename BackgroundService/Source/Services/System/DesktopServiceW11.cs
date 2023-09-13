@@ -25,7 +25,7 @@ namespace BackgroundService.Source.Services.System
 
         public override void CreateAndSwitchToDesktop(string desktopName)
         {
-            Logger.Debug($"Switching desktop to: {desktopName}");
+            Logger.Info($"Switching desktop to: {desktopName}");
 
             var desktop = VirtualDesktopManagerInternal.CreateDesktop();
 
@@ -35,7 +35,7 @@ namespace BackgroundService.Source.Services.System
 
         public override void RemoveDesktop(string desktopName)
         {
-            Logger.Debug($"Removing desktop: {desktopName}");
+            Logger.Info($"Removing desktop: {desktopName}");
 
             var allDesktops = GetAllDesktops();
 
@@ -54,14 +54,14 @@ namespace BackgroundService.Source.Services.System
 
         public override void ChangeWallpaper(string wallpaperPath)
         {
-            Logger.Debug("Changing wallpaper");
-
             if (string.IsNullOrEmpty(wallpaperPath))
             {
                 Logger.Debug("Provided wallpaper path is empty, skipping...");
 
                 return;
             }
+
+            Logger.Info($"Changing desktop wallpaper to: {wallpaperPath}");
 
             string desktopName = GetCurrentDesktopName();
             string fullWallpaperPath = FSUtils.GetAbsolutePath(wallpaperPath);

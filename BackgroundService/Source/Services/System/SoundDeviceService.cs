@@ -77,7 +77,7 @@ namespace BackgroundService.Source.Services.System
                 lock (threadLock)
                 {
                     string defaultDeviceName = GetDefaultSoundDeviceName();
-                    Logger.Debug($"Trying to change default sound device: {defaultDeviceName} -> {targetDeviceName}");
+                    Logger.Info($"Changing default sound device: {defaultDeviceName} -> {targetDeviceName}");
 
                     TryToSetDefaultDevice(targetDeviceName);
                     Thread.Sleep(200);
@@ -94,7 +94,7 @@ namespace BackgroundService.Source.Services.System
                     bool deviceSuccesfullySet = defaultDeviceNameAfterChange == targetDeviceName;
                     if (deviceSuccesfullySet)
                     {
-                        Logger.Info($"Default sound device successfully canged to: {targetDeviceName}");
+                        Logger.Debug($"Default sound device successfully changed to: {targetDeviceName}");
                         return;
                     }
                 }
@@ -103,7 +103,7 @@ namespace BackgroundService.Source.Services.System
                 tries--;
             }
 
-            Logger.Error($"Failed to set default sound devicce to: {targetDeviceName} - Timeout");
+            Logger.Error($"Failed to set default sound device to: {targetDeviceName} - Timeout");
         }
 
         private void TryToSetDefaultDevice(string deviceName)

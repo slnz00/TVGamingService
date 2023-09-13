@@ -56,12 +56,12 @@ namespace BackgroundService.Source.Services.System
             bool result = RegisterHotKey(IntPtr.Zero, hotkeyId, (int)def.KeyModifier, def.Key.GetHashCode());
             if (result)
             {
-                var hotkey = new HotkeyAction(def, name, WrapActionWithErrorHandler(name, action), HOTKEY_ACTION_TIMEOUT);
+                var hotkey = new HotkeyAction(def, name, WrapAction(def, name, action), HOTKEY_ACTION_TIMEOUT);
 
                 hotkeys.Add(hotkeyId, hotkey);
                 hotkeyIdCounter++;
 
-                Logger.Info($"Hotkey successfully registered: {name} -> {def.KeyModifierName} + {def.KeyName}");
+                Logger.Info($"Hotkey registered: {name} -> {def.KeyModifierName} + {def.KeyName}");
             }
             else
             {
@@ -71,12 +71,14 @@ namespace BackgroundService.Source.Services.System
             return result;
         }
 
-        private Action WrapActionWithErrorHandler(string name, Action action)
+        private Action WrapAction(HotkeyDefinition def, string name, Action action)
         {
             return () =>
             {
                 try
                 {
+                    Logger.Info($"Hotkey pressed: {name} -> {def.KeyModifierName} + {def.KeyName}");
+
                     action();
                 }
                 catch (Exception e)
