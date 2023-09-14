@@ -4,6 +4,7 @@ namespace BackgroundService.Source.Services.Configs.Models
 {
     internal class Config
     {
+        public HotkeysConfig Hotkeys { get; set; }
         public EnvironmentConfig PC { get; set; }
         public EnvironmentConfig TV { get; set; }
         public ThirdPartyConfig ThirdParty { get; set; }
@@ -15,6 +16,15 @@ namespace BackgroundService.Source.Services.Configs.Models
         public string Name { get; set; }
         public string Path { get; set; }
         public int? Amount { get; set; } = null;
+    }
+
+    internal class HotkeysConfig
+    {
+        public List<string> SwitchEnvironment { get; set; }
+        public List<string> ResetEnvironment { get; set; }
+        public List<string> ResetDisplay { get; set; }
+        public List<string> ToggleCursorVisibility { get; set; }
+        public List<string> ToggleConsoleVisibility { get; set; }
     }
 
     internal class DisplayResolutionConfig

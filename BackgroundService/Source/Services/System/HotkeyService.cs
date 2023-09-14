@@ -81,9 +81,9 @@ namespace BackgroundService.Source.Services.System
 
                     action();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Logger.Error($"Failed to execute hotkey action {name}, exception:{e}");
+                    Logger.Error($"Failed to execute hotkey action {name}, exception: {ex}");
                 }
             };
         }

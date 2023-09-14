@@ -22,6 +22,10 @@ namespace BackgroundService.Source.Services.ThirdParty
             ds4WindowsConfig = Services.Config.GetConfig().ThirdParty.DS4Windows;
             enabled = ds4WindowsConfig != null;
 
+            if (!enabled) {
+                return;
+            }
+
             watcher = new ProcessWatcher(ds4WindowsConfig.ProcessName, new ProcessWatcher.Events
             {
                 OnProcessClosed = () => ReopenOnUnexpectedExit()

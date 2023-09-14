@@ -5,6 +5,7 @@ using BackgroundService.Source.Controllers.EnvironmentControllers;
 using Core.Components.System;
 using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using System.Reflection;
+using BackgroundService.Source.Services.System.Models;
 
 namespace BackgroundService.Source.Controllers
 {
@@ -57,11 +58,13 @@ namespace BackgroundService.Source.Controllers
 
         private void SetupHotkeys()
         {
-            Services.System.Hotkey.RegisterAction("SwitchEnvironment", InternalSettings.HOTKEY_SWITCH_ENVIRONMENT, SwitchEnvironment);
-            Services.System.Hotkey.RegisterAction("ResetEnvironment", InternalSettings.HOTKEY_RESET_ENVIRONMENT, ResetEnvironment);
-            Services.System.Hotkey.RegisterAction("ResetDisplay", InternalSettings.HOTKEY_RESET_DISPLAY, ResetDisplay);
-            Services.System.Hotkey.RegisterAction("ToggleConsoleVisibility", InternalSettings.HOTKEY_TOGGLE_CONSOLE_VISIBILITY, ToggleConsoleVisibility);
-            Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", InternalSettings.HOTKEY_TOGGLE_CURSOR_VISIBILITY, ToggleCursorVisibility);
+            var Hotkeys = Services.Config.GetConfig().Hotkeys;
+
+            Services.System.Hotkey.RegisterAction("SwitchEnvironment", new HotkeyDefinition(Hotkeys.SwitchEnvironment), SwitchEnvironment);
+            Services.System.Hotkey.RegisterAction("ResetEnvironment", new HotkeyDefinition(Hotkeys.ResetEnvironment), ResetEnvironment);
+            Services.System.Hotkey.RegisterAction("ResetDisplay", new HotkeyDefinition(Hotkeys.ResetDisplay), ResetDisplay);
+            Services.System.Hotkey.RegisterAction("ToggleConsoleVisibility", new HotkeyDefinition(Hotkeys.ToggleConsoleVisibility), ToggleConsoleVisibility);
+            Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", new HotkeyDefinition(Hotkeys.ToggleCursorVisibility), ToggleCursorVisibility);
         }
 
         public void SwitchEnvironment()

@@ -9,6 +9,12 @@ namespace Core.Utils
         public static T GetValue<T>(string name)
             where T : Enum
         {
+            var validName = GetNames<T>().Exists(n => n == name);
+
+            if (!validName) {
+                throw new ArgumentOutOfRangeException("name", $"Unknown name for {typeof(T).Name}: {name}");
+            }
+
             return (T)Enum.Parse(typeof(T), name);
         }
 

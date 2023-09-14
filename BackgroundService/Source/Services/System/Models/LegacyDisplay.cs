@@ -25,13 +25,24 @@ namespace BackgroundService.Source.Services.System.Models
         private string GetModelNumber()
         {
             string[] deviceIdParts = MonitorDevice.DeviceID.Split('\\');
-            return deviceIdParts[1];
+
+            if (deviceIdParts.Length >= 2) {
+                return deviceIdParts[1];
+            }
+
+            return MonitorDevice.DeviceID;
         }
 
         private string GetGUID()
         {
             string[] deviceIdParts = MonitorDevice.DeviceID.Split('\\');
-            return deviceIdParts[2].Replace("{", "").Replace("}", "");
+
+            if (deviceIdParts.Length >= 3)
+            {
+                return deviceIdParts[2].Replace("{", "").Replace("}", "");
+            }
+
+            return "";
         }
     }
 }

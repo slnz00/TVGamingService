@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Core.Utils;
+using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace BackgroundService.Source.Services.System.Models
@@ -18,8 +20,18 @@ namespace BackgroundService.Source.Services.System.Models
 
         public HotkeyDefinition(KeyModifiers keyModifier, Keys key)
         {
-            this.key = key;
             this.keyModifier = keyModifier;
+            this.key = key;
+        }
+
+        public HotkeyDefinition(List<string> listDefinition)
+        {
+            if (listDefinition.Count != 2) {
+                throw new ArgumentOutOfRangeException("listDefinition", "Must have exactly 2 elements, a modifier and a key.");
+            }
+
+            keyModifier = EnumUtils.GetValue<KeyModifiers>(listDefinition[0]);
+            key = EnumUtils.GetValue<Keys>(listDefinition[1]);
         }
     }
 }

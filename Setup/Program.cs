@@ -15,7 +15,7 @@ namespace Setup
         private static readonly string PATH_EXAMPLE_CONFIG = FSUtils.GetAbsolutePath("config.example.json");
         private static readonly string PATH_GAME_CONFIGS = FSUtils.GetAbsolutePath("game-configs.json");
         private static readonly string PATH_EXAMPLE_GAME_CONFIGS = FSUtils.GetAbsolutePath("game-configs.example.json");
-        private static readonly string PATH_JOBS_CONFIG = FSUtils.GetAbsolutePath("job.config.json");
+        private static readonly string PATH_JOBS_CONFIG = FSUtils.GetAbsolutePath("jobs.config.json");
         private static readonly string PATH_EXAMPLE_JOBS_CONFIG = FSUtils.GetAbsolutePath("jobs.config.example.json");
         private static readonly string PATH_STARTUP_SHORTCUT = Path.Combine(PATH_APPDATA, @"Microsoft\Windows\Start Menu\Programs\Startup\BackgroundService.lnk");
 

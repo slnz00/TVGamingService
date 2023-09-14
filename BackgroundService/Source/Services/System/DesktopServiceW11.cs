@@ -39,7 +39,7 @@ namespace BackgroundService.Source.Services.System
 
             var allDesktops = GetAllDesktops();
 
-            var selectedDesktop = allDesktops.First((d) => d.GetName() == desktopName);
+            var selectedDesktop = allDesktops.FirstOrDefault((d) => d.GetName() == desktopName);
             if (selectedDesktop == null)
             {
                 Logger.Debug($"Desktop does not exist: {desktopName}");
@@ -66,7 +66,11 @@ namespace BackgroundService.Source.Services.System
             string desktopName = GetCurrentDesktopName();
             string fullWallpaperPath = FSUtils.GetAbsolutePath(wallpaperPath);
 
-            var desktop = GetAllDesktops().First((d) => d.GetName() == desktopName);
+            var desktop = GetAllDesktops().FirstOrDefault((d) => d.GetName() == desktopName);
+            if (desktop == null)
+            {
+                return;
+            }
 
             VirtualDesktopManagerInternal.SetDesktopWallpaper(desktop, fullWallpaperPath);
         }
@@ -124,8 +128,10 @@ namespace BackgroundService.Source.Services.System
             return CastAndReleaseObjectArray<IApplicationView>(viewsObj);
         }
 
-        private List<T> CastAndReleaseObjectArray<T>(IObjectArray array) {
-            try {
+        private List<T> CastAndReleaseObjectArray<T>(IObjectArray array)
+        {
+            try
+            {
                 array.GetCount(out int count);
                 var list = new List<T>(count);
 

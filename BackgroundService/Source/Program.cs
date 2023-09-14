@@ -1,4 +1,6 @@
 ﻿using BackgroundService.Source.Controllers;
+using BackgroundService.Source.Providers;
+using System;
 
 namespace BackgroundService.Source
 {
@@ -6,9 +8,15 @@ namespace BackgroundService.Source
     {
         static void Main()
         {
-            MainController mainController = new MainController();
+            try
+            {
+                MainController mainController = new MainController();
 
-            mainController.Run();
+                mainController.Run();
+            }
+            catch (Exception ex) {
+                LoggerProvider.Global.Error($"Unhandled exception: {ex}");
+            }
         }
     }
 }
