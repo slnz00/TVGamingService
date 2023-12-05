@@ -1,7 +1,7 @@
 ﻿using BackgroundService.Source.Controllers.BackupController.Components;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.Configs.Models;
 using Core.Components;
+using Core.Configs;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +12,9 @@ namespace BackgroundService.Source.Controllers.BackupController
     {
         private const int EVENT_LOOP_DELAY = 1000;
 
-        private ManagedTask eventLoopTask = null;
+        private readonly object threadLock = new object();
+
+        private ManagedTask eventLoop = null;
         private List<BackupManager> managers = null;
 
         private ServiceProvider Services { get; set; }
@@ -26,6 +28,28 @@ namespace BackgroundService.Source.Controllers.BackupController
 
         public void Initialize()
         {
+            LoadManagers();
+            StartEventLoop();
+
+            Services.Config.ConfigWatcher.OnChanged(() =>
+            {
+                lock (threadLock) {
+                    StopEventLoop();
+                    ClearState();
+                    LoadManagers();
+                    StartEventLoop();
+                }
+            });
+        }
+
+        private void ClearState()
+        {
+            eventLoop = null;
+            managers = null;
+        }
+
+        private void LoadManagers()
+        {
             var backupConfigs = GetBackupConfigs();
 
             if (backupConfigs?.Count == 0)
@@ -36,25 +60,33 @@ namespace BackgroundService.Source.Controllers.BackupController
             }
 
             SetupManagers();
-            StartEventLoop();
         }
 
         private void StartEventLoop()
         {
-            if (eventLoopTask != null)
+            if (eventLoop != null)
             {
                 Logger.Error("StartEventLoop method called multiple times, event loop is already started...");
 
                 return;
             }
 
-            eventLoopTask = ManagedTask.Run(async (ctx) => {
-                while (true) {
+            eventLoop = ManagedTask.Run(async (ctx) =>
+            {
+                while (true)
+                {
                     RunBackups();
 
                     await ctx.Delay(EVENT_LOOP_DELAY);
                 }
             });
+        }
+
+        private void StopEventLoop()
+        {
+            if (eventLoop != null) {
+                eventLoop.Cancel();
+            }
         }
 
         private void SetupManagers()
@@ -71,10 +103,12 @@ namespace BackgroundService.Source.Controllers.BackupController
                 .ToList();
         }
 
-        private void RunBackups() {
+        private void RunBackups()
+        {
             managers.ForEach(manager =>
             {
-                if (manager.ShouldRunBackup()) {
+                if (manager.ShouldRunBackup())
+                {
                     manager.RunBackup();
                 }
             });

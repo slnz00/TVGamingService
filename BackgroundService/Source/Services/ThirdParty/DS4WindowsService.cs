@@ -1,34 +1,30 @@
 ﻿using System.Diagnostics;
-using System.IO;
 using BackgroundService.Source.Common;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.Configs.Models;
+using Core.Configs;
 using Core.Utils;
 
 namespace BackgroundService.Source.Services.ThirdParty
 {
     internal class DS4WindowsService : Service
     {
-        private ProcessWatcher watcher;
+        public bool Enabled => DS4WindowsConfig != null;
 
-        private AppConfig ds4WindowsConfig;
+        private ProcessWatcher Watcher { get; set; } = null;
 
-        private bool enabled;
+        private AppConfig DS4WindowsConfig => Services.Config.GetConfig().ThirdParty.DS4Windows;
+
+        private readonly object threadLock = new object();
 
         public DS4WindowsService(ServiceProvider services) : base(services) { }
 
         protected override void OnInitialize()
         {
-            ds4WindowsConfig = Services.Config.GetConfig().ThirdParty.DS4Windows;
-            enabled = ds4WindowsConfig != null;
+            UpdateProcessWatcher();
 
-            if (!enabled) {
-                return;
-            }
-
-            watcher = new ProcessWatcher(ds4WindowsConfig.ProcessName, new ProcessWatcher.Events
+            Services.Config.ConfigWatcher.OnChanged(() =>
             {
-                OnProcessClosed = () => ReopenOnUnexpectedExit()
+                UpdateProcessWatcher();
             });
         }
 
@@ -36,13 +32,13 @@ namespace BackgroundService.Source.Services.ThirdParty
         {
             Logger.Info("Opening DS4Windows");
 
-            if (!enabled)
+            if (!Enabled)
             {
                 Logger.Debug("DS4Windows is disabled, skipping...");
                 return;
             }
 
-            var fullPath = FSUtils.GetAbsolutePath(ds4WindowsConfig.Path);
+            var fullPath = FSUtils.GetAbsolutePath(DS4WindowsConfig.Path);
 
             ProcessUtils.StartProcess(fullPath);
 
@@ -51,7 +47,7 @@ namespace BackgroundService.Source.Services.ThirdParty
 
         public void CloseDS4Windows(bool forceClose = false)
         {
-            if (!enabled)
+            if (!Enabled)
             {
                 Logger.Debug("DS4Windows is disabled, skipping...");
                 return;
@@ -63,14 +59,33 @@ namespace BackgroundService.Source.Services.ThirdParty
 
             if (forceClose)
             {
-                ProcessUtils.CloseProcess(ds4WindowsConfig.ProcessName, true);
+                ProcessUtils.CloseProcess(DS4WindowsConfig.ProcessName, true);
                 Logger.Debug("DS4Windows is forcefully closed");
 
                 return;
             }
 
-            ProcessUtils.StartProcess(FSUtils.GetAbsolutePath(ds4WindowsConfig.Path), "-command shutdown", ProcessWindowStyle.Hidden, true);
+            ProcessUtils.StartProcess(FSUtils.GetAbsolutePath(DS4WindowsConfig.Path), "-command shutdown", ProcessWindowStyle.Hidden, true);
             Logger.Debug("DS4Windows is gracefully stopped");
+        }
+
+        private void UpdateProcessWatcher()
+        {
+            lock (threadLock)
+            {
+                if (Enabled && Watcher == null)
+                {
+                    Watcher = new ProcessWatcher(DS4WindowsConfig.ProcessName, new ProcessWatcher.Events
+                    {
+                        OnProcessClosed = () => ReopenOnUnexpectedExit()
+                    });
+                }
+                else if (!Enabled && Watcher != null)
+                {
+                    Watcher.Stop();
+                    Watcher = null;
+                }
+            }
         }
 
         private void ReopenOnUnexpectedExit()
@@ -82,30 +97,30 @@ namespace BackgroundService.Source.Services.ThirdParty
 
         private void StartWatcher()
         {
-            if (watcher.IsWatcherRunning)
+            if (Watcher.IsWatcherRunning)
             {
                 return;
             }
 
             // Should only start watcher when DS4Windows is already running:
-            bool alreadyRunning = Process.GetProcessesByName(ds4WindowsConfig.ProcessName).Length != 0;
+            bool alreadyRunning = Process.GetProcessesByName(DS4WindowsConfig.ProcessName).Length != 0;
             if (!alreadyRunning)
             {
                 Logger.Error("Failed to start DS4Windows process watcher, DS4Windows is not running");
                 return;
             }
 
-            watcher.Start();
+            Watcher.Start();
         }
 
         private void StopWatcher()
         {
-            if (!watcher.IsWatcherRunning)
+            if (!Watcher.IsWatcherRunning)
             {
                 return;
             }
 
-            watcher.Stop();
+            Watcher.Stop();
         }
     }
 }

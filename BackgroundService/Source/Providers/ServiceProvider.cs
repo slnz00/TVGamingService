@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using BackgroundService.Source.Services;
 using BackgroundService.Source.Services.Configs;
 using BackgroundService.Source.Services.Jobs;
 using BackgroundService.Source.Services.System;
 using BackgroundService.Source.Services.ThirdParty;
 using BackgroundService.Source.Services.ThirdParty.Playnite;
+using Core.Components.System;
 using Core.Utils;
 
 namespace BackgroundService.Source.Providers
@@ -40,9 +42,12 @@ namespace BackgroundService.Source.Providers
         public readonly GameConfigService GameConfig;
         public readonly JobService Jobs;
 
+        public readonly MessageLoop MessageLoop;
+
         // Initialization order is based on service registration order:
-        public ServiceProvider()
+        public ServiceProvider(MessageLoop messageLoop)
         {
+            MessageLoop = messageLoop;
             Logger = new LoggerProvider(GetType().Name);
 
             Config = RegisterService(new ConfigService(this));

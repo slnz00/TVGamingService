@@ -1,21 +1,36 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
-namespace BackgroundService.Source.Services.Configs.Models
+namespace Core.Configs
 {
-    internal class JobsConfig
+    public class JobsConfig
     {
+        public static JobsConfig ReadFromFile(string filePath)
+        {
+            string configJson = File.ReadAllText(filePath, Encoding.Default);
+            return JsonConvert.DeserializeObject<JobsConfig>(configJson);
+        }
+
+        public static JobsConfig WriteToFile(string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
         public EnvironmentJobsConfig PC { get; set; } = new EnvironmentJobsConfig();
         public EnvironmentJobsConfig TV { get; set; } = new EnvironmentJobsConfig();
     }
 
-    internal class EnvironmentJobsConfig {
+    public class EnvironmentJobsConfig {
         public List<JobConfig> Setup { get; set; } = new List<JobConfig>();
         public List<JobConfig> Reset { get; set; } = new List<JobConfig>();
         public List<JobConfig> Teardown { get; set; } = new List<JobConfig>();
     }
 
-    internal class JobConfig
+    public class JobConfig
     {
         public string Id { get; set; }
 
@@ -30,13 +45,13 @@ namespace BackgroundService.Source.Services.Configs.Models
         public int TimeBetweenExecutions { get; set; } = 500;
     }
 
-    internal class JobActionConfig
+    public class JobActionConfig
     {
         public string Type { get; set; }
         public JObject Options { get; set; } = new JObject();
     }
 
-    internal class JobTriggerConfig
+    public class JobTriggerConfig
     {
         public string Type { get; set; }
         public JObject Options { get; set; } = new JObject();

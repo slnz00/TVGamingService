@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Controllers.EnvironmentControllers;
-using Core.Components.System;
 using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
+using Core.Components.System;
 using System.Reflection;
 using BackgroundService.Source.Services.System.Models;
 
@@ -18,6 +18,7 @@ namespace BackgroundService.Source.Controllers
             public BackupController.BackupController Backup;
         }
 
+        private readonly MessageLoop MessageLoop;
         private readonly ServiceProvider Services;
         private readonly LoggerProvider Logger;
         private readonly SubControllers Controllers;
@@ -26,8 +27,9 @@ namespace BackgroundService.Source.Controllers
 
         public MainController()
         {
+            MessageLoop = new MessageLoop();
             Logger = new LoggerProvider(GetType().Name);
-            Services = new ServiceProvider();
+            Services = new ServiceProvider(MessageLoop);
 
             Controllers = new SubControllers
             {
@@ -58,13 +60,27 @@ namespace BackgroundService.Source.Controllers
 
         private void SetupHotkeys()
         {
-            var Hotkeys = Services.Config.GetConfig().Hotkeys;
+            UpdateHotkeys();
 
-            Services.System.Hotkey.RegisterAction("SwitchEnvironment", new HotkeyDefinition(Hotkeys.SwitchEnvironment), SwitchEnvironment);
-            Services.System.Hotkey.RegisterAction("ResetEnvironment", new HotkeyDefinition(Hotkeys.ResetEnvironment), ResetEnvironment);
-            Services.System.Hotkey.RegisterAction("ResetDisplay", new HotkeyDefinition(Hotkeys.ResetDisplay), ResetDisplay);
-            Services.System.Hotkey.RegisterAction("ToggleConsoleVisibility", new HotkeyDefinition(Hotkeys.ToggleConsoleVisibility), ToggleConsoleVisibility);
-            Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", new HotkeyDefinition(Hotkeys.ToggleCursorVisibility), ToggleCursorVisibility);
+            Services.Config.ConfigWatcher.OnChanged(() =>
+            {
+                UpdateHotkeys();
+            });
+        }
+
+        private void UpdateHotkeys()
+        {
+            lock (threadLock) {
+                Services.System.Hotkey.UnregisterAllActions();
+
+                var Hotkeys = Services.Config.GetConfig().Hotkeys;
+
+                Services.System.Hotkey.RegisterAction("SwitchEnvironment", new HotkeyDefinition(Hotkeys.SwitchEnvironment), SwitchEnvironment);
+                Services.System.Hotkey.RegisterAction("ResetEnvironment", new HotkeyDefinition(Hotkeys.ResetEnvironment), ResetEnvironment);
+                Services.System.Hotkey.RegisterAction("ResetDisplay", new HotkeyDefinition(Hotkeys.ResetDisplay), ResetDisplay);
+                Services.System.Hotkey.RegisterAction("ToggleConsoleVisibility", new HotkeyDefinition(Hotkeys.ToggleConsoleVisibility), ToggleConsoleVisibility);
+                Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", new HotkeyDefinition(Hotkeys.ToggleCursorVisibility), ToggleCursorVisibility);
+            }
         }
 
         public void SwitchEnvironment()

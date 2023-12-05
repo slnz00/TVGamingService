@@ -32,6 +32,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -45,7 +48,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\EventListenerRegistry.cs" />
-    <Compile Include="Components\ManagedTask.cs" />
+    <Compile Include="Components\FileChangeWatcher.cs" />
+    <Compile Include="Components\Async\ManagedTask.cs" />
+    <Compile Include="Configs\Config.cs" />
+    <Compile Include="Configs\JobsConfig.cs" />
+    <Compile Include="Models\ILogger.cs" />
     <Compile Include="Playnite\Communication\Models\AsyncPlayniteTask.cs" />
     <Compile Include="Playnite\Communication\Models\PlayniteGameInfo.cs" />
     <Compile Include="Playnite\Communication\PlayniteCommunicationSettings.cs" />
@@ -71,6 +78,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

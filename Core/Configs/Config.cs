@@ -1,9 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
-namespace BackgroundService.Source.Services.Configs.Models
+namespace Core.Configs
 {
-    internal class Config
+    public class BackgroundServiceConfig
     {
+        public static BackgroundServiceConfig ReadFromFile(string filePath)
+        {
+            string configJson = File.ReadAllText(filePath, Encoding.Default);
+            return JsonConvert.DeserializeObject<BackgroundServiceConfig>(configJson);
+        }
+
+        public static BackgroundServiceConfig WriteToFile(string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
         public HotkeysConfig Hotkeys { get; set; }
         public EnvironmentConfig PC { get; set; }
         public EnvironmentConfig TV { get; set; }
@@ -11,14 +26,14 @@ namespace BackgroundService.Source.Services.Configs.Models
         public List<BackupConfig> Backups { get; set; }
     }
 
-    internal class BackupConfig
+    public class BackupConfig
     {
         public string Name { get; set; }
         public string Path { get; set; }
         public int? Amount { get; set; } = null;
     }
 
-    internal class HotkeysConfig
+    public class HotkeysConfig
     {
         public List<string> SwitchEnvironment { get; set; }
         public List<string> ResetEnvironment { get; set; }
@@ -27,32 +42,32 @@ namespace BackgroundService.Source.Services.Configs.Models
         public List<string> ToggleConsoleVisibility { get; set; }
     }
 
-    internal class DisplayResolutionConfig
+    public class DisplayResolutionConfig
     {
         public short Width { get; set; }
         public short Height { get; set; }
     }
 
-    internal class EnvironmentConfig
+    public class EnvironmentConfig
     {
         public SoundConfig Sound { get; set; }
         public DisplayConfig Display { get; set; }
         public string WallpaperPath { get; set; }
     }
 
-    internal class SoundConfig
+    public class SoundConfig
     {
         public string DeviceName { get; set; }
     }
 
-    internal class DisplayConfig
+    public class DisplayConfig
     {
         public string DeviceName { get; set; }
         public DisplayResolutionConfig Resolution { get; set; }
         public int RefreshRate { get; set; }
     }
 
-    internal class ThirdPartyConfig
+    public class ThirdPartyConfig
     {
         public AppConfig PlayniteFullscreen { get; set; }
         public AppConfig PlayniteDesktop { get; set; }
@@ -62,7 +77,7 @@ namespace BackgroundService.Source.Services.Configs.Models
         public AppConfig BattleNet { get; set; }
     }
 
-    internal class AppConfig
+    public class AppConfig
     {
         public string ProcessName { get; set; }
 

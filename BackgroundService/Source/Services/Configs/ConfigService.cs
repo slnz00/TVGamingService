@@ -1,19 +1,18 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.IO;
+﻿using System;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.Configs.Models;
-using System.Text;
+using Core.Configs;
 using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
+using Core.Components;
 
 namespace BackgroundService.Source.Services.Configs
 {
     internal class ConfigService : Service
     {
-        private readonly string CONFIG_PATH = InternalSettings.PATH_CONFIG;
-        private readonly string JOB_CONFIG_PATH = InternalSettings.PATH_JOBS_CONFIG;
+        public FileChangeWatcher ConfigWatcher { get; private set; }
 
-        private Config config;
+        private readonly object threadLock = new object();
+
+        private BackgroundServiceConfig config;
         private JobsConfig jobsConfig;
 
         public ConfigService(ServiceProvider services) : base(services) { }
@@ -21,16 +20,21 @@ namespace BackgroundService.Source.Services.Configs
         protected override void OnInitialize()
         {
             LoadConfigFromFile();
+            LoadJobConfigFromFile();
+            SetupWatcher();
         }
 
-        public Config GetConfig()
+        public BackgroundServiceConfig GetConfig()
         {
-            if (config == null || !IsInitialized)
+            lock (threadLock)
             {
-                throw new InvalidOperationException("Cannot get config, config service is not initialized");
-            }
+                if (config == null || !IsInitialized)
+                {
+                    throw new InvalidOperationException("Cannot get config, config service is not initialized");
+                }
 
-            return config;
+                return config;
+            }
         }
 
         public EnvironmentConfig GetConfigForEnvironment(Environments environment)
@@ -58,7 +62,6 @@ namespace BackgroundService.Source.Services.Configs
 
         public EnvironmentJobsConfig GetJobsConfigForEnvironment(Environments environment)
         {
-
             switch (environment)
             {
                 case Environments.PC:
@@ -70,17 +73,35 @@ namespace BackgroundService.Source.Services.Configs
             }
         }
 
-        public void LoadConfigFromFile()
+        private void LoadConfigFromFile()
         {
-            Logger.Debug($"Loading config from JSON file: {CONFIG_PATH}");
+            lock (threadLock)
+            {
+                Logger.Debug($"Loading config from JSON file: {InternalSettings.PATH_CONFIG}");
 
-            string configJson = File.ReadAllText(CONFIG_PATH, Encoding.Default);
-            config = JsonConvert.DeserializeObject<Config>(configJson);
+                config = BackgroundServiceConfig.ReadFromFile(InternalSettings.PATH_CONFIG);
+            }
+        }
 
-            Logger.Debug($"Loading jobs config from JSON file: {JOB_CONFIG_PATH}");
+        private void LoadJobConfigFromFile()
+        {
+            lock (threadLock)
+            {
+                Logger.Debug($"Loading jobs config from JSON file: {InternalSettings.PATH_JOBS_CONFIG}");
 
-            string jobsConfigJson = File.ReadAllText(JOB_CONFIG_PATH, Encoding.Default);
-            jobsConfig = JsonConvert.DeserializeObject<JobsConfig>(jobsConfigJson);
+                jobsConfig = JobsConfig.ReadFromFile(InternalSettings.PATH_JOBS_CONFIG);
+            }
+        }
+
+        private void SetupWatcher()
+        {
+            ConfigWatcher = new FileChangeWatcher(InternalSettings.PATH_CONFIG);
+
+            ConfigWatcher.OnChanged(() =>
+            {
+                LoadConfigFromFile();
+                Logger.Info("Configuration file changed, reloading...");
+            });
         }
     }
 }

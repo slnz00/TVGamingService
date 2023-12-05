@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.Configs.Models;
+using Core.Configs;
 using Core.Utils;
 
 namespace BackgroundService.Source.Services.ThirdParty
 {
     internal class GameStoreService : Service
     {
+        private readonly object threadLock = new object();
+
         public enum GameStoreTypes
         {
             Steam,
@@ -21,14 +23,12 @@ namespace BackgroundService.Source.Services.ThirdParty
 
         protected override void OnInitialize()
         {
-            var config = Services.Config.GetConfig();
+            UpdateStoreConfigs();
 
-            storeConfigs = new Dictionary<GameStoreTypes, AppConfig>
+            Services.Config.ConfigWatcher.OnChanged(() =>
             {
-               { GameStoreTypes.Steam, config.ThirdParty.Steam },
-               { GameStoreTypes.EpicGames, config.ThirdParty.EpicGames },
-               { GameStoreTypes.BattleNet, config.ThirdParty.BattleNet },
-            };
+                UpdateStoreConfigs();
+            });
         }
 
         public void CloseAllGameStores()
@@ -48,13 +48,29 @@ namespace BackgroundService.Source.Services.ThirdParty
             }
 
             var store = storeConfigs[type];
-            if (store == null) {
+            if (store == null)
+            {
                 return;
             }
 
             Logger.Info($"Closing game store: {type}");
 
             ProcessUtils.CloseProcess(store.ProcessName, true);
+        }
+
+        private void UpdateStoreConfigs()
+        {
+            lock (threadLock)
+            {
+                var config = Services.Config.GetConfig();
+
+                storeConfigs = new Dictionary<GameStoreTypes, AppConfig>
+                {
+                   { GameStoreTypes.Steam, config.ThirdParty.Steam },
+                   { GameStoreTypes.EpicGames, config.ThirdParty.EpicGames },
+                   { GameStoreTypes.BattleNet, config.ThirdParty.BattleNet },
+                };
+            }
         }
     }
 }

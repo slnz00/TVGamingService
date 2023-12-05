@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Core.Models;
+using System;
 
 namespace BackgroundService.Source.Providers
 {
-    internal class LoggerProvider
+    internal class LoggerProvider : ILogger
     {
         private static readonly NLog.Logger NLogger = NLog.LogManager.GetLogger("");
         public readonly static LoggerProvider Global = new LoggerProvider("Global");

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.Configs.Models;
 using BackgroundService.Source.Services.System.Models;
+using Core.Configs;
 
-using static BackgroundService.Source.Services.System.API.DisplayWinAPI;
+using static BackgroundService.Source.Services.System.API.DisplayAPI;
 
 namespace BackgroundService.Source.Services.System
 {

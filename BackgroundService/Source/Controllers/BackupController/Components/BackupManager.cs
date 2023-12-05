@@ -3,7 +3,7 @@ using System;
 
 namespace BackgroundService.Source.Controllers.BackupController.Components
 {
-    internal class BackupManager
+    internal class BackupManager : IDisposable
     {
         private const long SCHEDULE_DELAY = 4000;
 
@@ -31,6 +31,11 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
             BackupBasePath = FSUtils.JoinPaths(InternalSettings.PATH_DATA_BACKUPS, backupName);
             Watcher = new BackupWatcher(BackupName, OriginalPath, () => ScheduleBackup());
             Handler = new BackupHandler(BackupName, BackupAmount, BackupBasePath, OriginalPath);
+        }
+
+        public void Dispose()
+        {
+            Watcher.Dispose();
         }
 
         public void RunBackup() {

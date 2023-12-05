@@ -83,18 +83,18 @@ namespace BackgroundService.Source.Services.System
         {
             var sessionKey = Guid.NewGuid().ToString();
 
-            RestartManagerApi.RmStartSession(out IntPtr session, 0, sessionKey);
+            RestartManagerAPI.RmStartSession(out IntPtr session, 0, sessionKey);
             try
             {
                 var explorerPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
 
-                RestartManagerApi.RmRegisterResources(session, 1, new[] { explorerPath }, 0, null, 0, null);
-                RestartManagerApi.RmShutdown(session, 0, null);
-                RestartManagerApi.RmRestart(session, 0, null);
+                RestartManagerAPI.RmRegisterResources(session, 1, new[] { explorerPath }, 0, null, 0, null);
+                RestartManagerAPI.RmShutdown(session, 0, null);
+                RestartManagerAPI.RmRestart(session, 0, null);
             }
             finally
             {
-                RestartManagerApi.RmEndSession(session);
+                RestartManagerAPI.RmEndSession(session);
             }
         }
     }

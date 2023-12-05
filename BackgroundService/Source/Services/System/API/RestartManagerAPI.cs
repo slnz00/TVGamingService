@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace BackgroundService.Source.Services.System.API
 {
-    public static class RestartManagerApi
+    public static class RestartManagerAPI
     {
         [StructLayout(LayoutKind.Sequential)]
         public struct RM_UNIQUE_PROCESS

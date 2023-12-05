@@ -4,7 +4,7 @@ using System.IO;
 
 namespace BackgroundService.Source.Controllers.BackupController.Components
 {
-    internal class BackupWatcher
+    internal class BackupWatcher : IDisposable
     {
         private readonly string originalPath;
         private readonly Action backupScheduler;
@@ -21,6 +21,11 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
             Logger = new LoggerProvider($"{GetType().Name}:{backupName}");
 
             SetupDirectoryWatcher();
+        }
+
+        public void Dispose()
+        {
+            directoryWatcher.Dispose();
         }
 
         private void SetupDirectoryWatcher()
