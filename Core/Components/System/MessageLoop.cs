@@ -53,8 +53,6 @@ namespace Core.Components.System
 
         public bool IsRunning => running;
 
-        public IntPtr HWND => Process.GetCurrentProcess().MainWindowHandle;
-
         public MessageLoop()
         {
             ThreadId = GetCurrentThreadId();
@@ -71,7 +69,7 @@ namespace Core.Components.System
 
             MSG msg = new MSG();
 
-            while (GetMessage(ref msg, HWND, 0, 0))
+            while (GetMessage(ref msg, IntPtr.Zero, 0, 0))
             {
                 if (msg.message == WM_CUSTOM_EXIT)
                 {
