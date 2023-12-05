@@ -104,6 +104,7 @@ namespace PlaynitePlugin
                 Name = game.Name,
                 Path = GetGamePath(game),
                 Library = GetGameLibraryName(game),
+                Platform = GetGamePlatformName(game),
             };
         }
 
@@ -121,6 +122,15 @@ namespace PlaynitePlugin
             }
 
             return (string)library.GetType().GetProperty("Name")?.GetValue(library, null);
+        }
+
+        private string GetGamePlatformName(Game game)
+        {
+            if (game.Platforms == null || game.Platforms.Count == 0) {
+                return null;
+            }
+
+            return game.Platforms[0].Name;
         }
 
         private string GetGamePath(Game game)

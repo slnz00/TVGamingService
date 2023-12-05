@@ -48,6 +48,9 @@ namespace BackgroundService.Source.Services.System.Models
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        [DllImport("user32.dll")]
+        internal static extern IntPtr SetForegroundWindow(IntPtr hWnd);
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         static extern int GetWindowTextLength(IntPtr hWnd);
 
@@ -108,6 +111,11 @@ namespace BackgroundService.Source.Services.System.Models
         public void Maximize()
         {
             ShowWindow(Handle, (int)ShowWindowCommands.SW_MAXIMIZE);
+        }
+
+        public void Focus()
+        {
+            SetForegroundWindow(Handle);
         }
 
         private string GetName()

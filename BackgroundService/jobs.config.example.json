@@ -7,6 +7,31 @@
   "TV": {
     "Setup": [
       {
+        "Id": "FocusPlayniteOnGameStopped",
+        "Mode": "Triggered",
+        "TimeBetweenExecutions": 2000,
+        "Actions": [
+          {
+            "Type": "WindowInteraction",
+            "Options": {
+              "Interaction": "Focus",
+              "WindowName": "Playnite"
+            }
+          }
+        ],
+        "TriggerWhen": {
+          "Type": "GameStopped",
+          "Options": {}
+        },
+        "RepeatUntil": {
+          "Type": "Timer",
+          "Options": {
+            "Time": 6000
+          }
+        }
+      },
+
+      {
         "Id": "MinimizeSteam",
         "Mode": "Triggered",
         "TimeBetweenExecutions": 500,

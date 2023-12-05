@@ -16,7 +16,8 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
             Show,
             Click,
             StopProcess,
-            ForceStopProcess
+            ForceStopProcess,
+            Focus
         }
 
         public class WindowInteractionOptions
@@ -69,6 +70,9 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
                     break;
                 case Interactions.ForceStopProcess:
                     StopComponentParentProcess(component, true);
+                    break;
+                case Interactions.Focus:
+                    component.Focus();
                     break;
                 default:
                     throw new NotImplementedException();
