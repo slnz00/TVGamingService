@@ -9,7 +9,7 @@
       {
         "Id": "FocusPlayniteOnGameStopped",
         "Mode": "Triggered",
-        "TimeBetweenExecutions": 2000,
+        "TimeBetweenExecutions": 1000,
         "Actions": [
           {
             "Type": "WindowInteraction",
@@ -26,7 +26,7 @@
         "RepeatUntil": {
           "Type": "Timer",
           "Options": {
-            "Time": 6000
+            "Time": 2500
           }
         }
       },

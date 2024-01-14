@@ -6,7 +6,6 @@ using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.System.API;
 using BackgroundService.Source.Services.System.Models;
 using Core.Utils;
-using Microsoft.Win32;
 
 namespace BackgroundService.Source.Services.System
 {
@@ -15,8 +14,6 @@ namespace BackgroundService.Source.Services.System
         protected const int SPI_SETDESKWALLPAPER = 20;
         protected const int SPIF_UPDATEINIFILE = 0x01;
         protected const int SPIF_SENDWININICHANGE = 0x02;
-
-        protected const uint WM_ICONS_VISIBILITY_COMMAND = 0x111;
 
         protected static readonly string DESKTOP_REGISTRY = @"Control Panel\Desktop";
 
@@ -51,7 +48,8 @@ namespace BackgroundService.Source.Services.System
             string windowsVersion = OSUtils.GetCurrentWindowsVersion();
             bool isWindows11 = OSUtils.IsWindows11(windowsVersion);
 
-            if (isWindows11) {
+            if (isWindows11)
+            {
                 return new DesktopServiceW11(services);
             }
 
@@ -70,13 +68,32 @@ namespace BackgroundService.Source.Services.System
 
         public abstract List<WindowComponent> GetWindowsOnDesktop(string desktopName);
 
-        public void ToggleIconsVisiblity(bool visible = false)
+        public void ToggleIconsVisiblity(bool visible)
         {
-            Logger.Info("Toggling desktop icons visibility");
+            Logger.Info($"Toggling desktop icons visibility to: {visible}");
 
-            var toggleDesktopCommand = new IntPtr(0x7402);
-            IntPtr hWnd = GetWindow(FindWindow("Progman", "Program Manager"), GetWindowCommand.GW_CHILD);
-            SendMessage(hWnd, WM_ICONS_VISIBILITY_COMMAND, toggleDesktopCommand, IntPtr.Zero);
+            var shellWindows = (ShellAPI.IShellWindows)new ShellAPI.ShellWindows();
+
+            var serviceProvider = (ShellAPI.IServiceProvider)shellWindows.FindWindowSW(
+                ShellAPI.CSIDL_DESKTOP,
+                new object(),
+                ShellAPI.ShellWindowTypeConstants.SWC_DESKTOP,
+                out int _hwnd,
+                ShellAPI.ShellWindowFindWindowOptions.SWFO_NEEDDISPATCH
+            );
+
+            var desktopBrowser = (ShellAPI.IShellBrowser)serviceProvider.QueryService(
+                ShellAPI.SID_STopLevelBrowser,
+                typeof(ShellAPI.IShellBrowser).GUID
+            );
+
+            var folderView = (ShellAPI.IFolderView2)desktopBrowser.QueryActiveShellView();
+
+            folderView.GetCurrentFolderFlags(out uint flags);
+
+            BitUtils.SetBit(ref flags, ShellAPI.FWF_NOICONS, !visible);
+
+            folderView.SetCurrentFolderFlags(ShellAPI.FWF_NOICONS, flags);
         }
 
         public void RestartExplorer()
