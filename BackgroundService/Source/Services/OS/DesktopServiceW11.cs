@@ -63,16 +63,10 @@ namespace BackgroundService.Source.Services.OS
 
             Logger.Info($"Changing desktop wallpaper to: {wallpaperPath}");
 
-            string desktopName = GetCurrentDesktopName();
-            string fullWallpaperPath = FSUtils.GetAbsolutePath(wallpaperPath);
+            var fullWallpaperPath = FSUtils.GetAbsolutePath(wallpaperPath);
+            var currentDesktop = VirtualDesktopManagerInternal.GetCurrentDesktop();
 
-            var desktop = GetAllDesktops().FirstOrDefault((d) => d.GetName() == desktopName);
-            if (desktop == null)
-            {
-                return;
-            }
-
-            VirtualDesktopManagerInternal.SetDesktopWallpaper(desktop, fullWallpaperPath);
+            VirtualDesktopManagerInternal.SetDesktopWallpaper(currentDesktop, fullWallpaperPath);
         }
 
         public override string GetCurrentDesktopName()
