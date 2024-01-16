@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace BackgroundService.Source.Services.OS.API
+namespace Core.WinAPI
 {
-    public static class DisplayAPI
+    public static class LegacyDisplayAPI
     {
         [DllImport("user32.dll")]
         public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);

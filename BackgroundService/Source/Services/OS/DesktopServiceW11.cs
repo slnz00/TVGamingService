@@ -6,7 +6,7 @@ using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
 using Core.Utils;
 
-using static BackgroundService.Source.Services.OS.API.VirtualDesktop.VirtualDesktopAPIW11;
+using static Core.WinAPI.VirtualDesktop.VirtualDesktopAPIW11;
 
 namespace BackgroundService.Source.Services.OS
 {

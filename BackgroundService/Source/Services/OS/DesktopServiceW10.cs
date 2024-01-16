@@ -6,7 +6,8 @@ using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
 using Core.Utils;
 using Microsoft.Win32;
-using static BackgroundService.Source.Services.OS.API.VirtualDesktop.VirtualDesktopAPIW10;
+using static Core.WinAPI.VirtualDesktop.VirtualDesktopAPIW10;
+using static Core.WinAPI.DesktopAPI;
 
 namespace BackgroundService.Source.Services.OS
 {
@@ -145,7 +146,7 @@ namespace BackgroundService.Source.Services.OS
             {
                 string registryKey = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VirtualDesktops\Desktops\{" + desktopId.ToString() + "}";
 
-                object registryValue = Microsoft.Win32.Registry.GetValue(registryKey, "Name", null);
+                object registryValue = Registry.GetValue(registryKey, "Name", null);
                 return registryValue != null ? (string)registryValue : "";
             }
             catch (Exception ex)

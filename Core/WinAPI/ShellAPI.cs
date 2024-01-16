@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using System;
 
-namespace BackgroundService.Source.Services.OS.API
+namespace Core.WinAPI
 {
-    internal static class ShellAPI
+    public static class ShellAPI
     {
         [ComImport]
         [Guid("00020400-0000-0000-C000-000000000046")]
@@ -21,7 +21,7 @@ namespace BackgroundService.Source.Services.OS.API
             object QueryService(ref Guid guidService, ref Guid riid);
         }
 
-        internal enum ShellWindowTypeConstants
+        public enum ShellWindowTypeConstants
         {
             SWC_EXPLORER = 0,
             SWC_BROWSER = 1,
@@ -30,7 +30,7 @@ namespace BackgroundService.Source.Services.OS.API
             SWC_DESKTOP = 8,
         }
 
-        internal enum ShellWindowFindWindowOptions
+        public enum ShellWindowFindWindowOptions
         {
             SWFO_NEEDDISPATCH = 1,
             SWFO_INCLUDEPENDING = 2,
@@ -40,7 +40,7 @@ namespace BackgroundService.Source.Services.OS.API
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsDual)]
         [Guid("85CB6900-4D95-11CF-960C-0080C7F4EE85")]
-        internal interface IShellWindows
+        public interface IShellWindows
         {
             int Count
             {
@@ -73,7 +73,7 @@ namespace BackgroundService.Source.Services.OS.API
 
         [ComImport]
         [Guid("9BA05972-F6A8-11CF-A442-00A0C90A8F39")]
-        internal partial class ShellWindows
+        public partial class ShellWindows
         {
         }
 

@@ -6,7 +6,7 @@ using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
 using Core.Configs;
 
-using static BackgroundService.Source.Services.OS.API.DisplayAPI;
+using static Core.WinAPI.LegacyDisplayAPI;
 
 namespace BackgroundService.Source.Services.OS
 {

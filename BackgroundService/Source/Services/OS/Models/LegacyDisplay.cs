@@ -1,4 +1,4 @@
-﻿using static BackgroundService.Source.Services.OS.API.DisplayAPI;
+﻿using static Core.WinAPI.LegacyDisplayAPI;
 
 namespace BackgroundService.Source.Services.OS.Models
 {
