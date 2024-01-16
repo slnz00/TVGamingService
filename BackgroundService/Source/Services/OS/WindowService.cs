@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.System.Models;
+using BackgroundService.Source.Services.OS.Models;
 
-namespace BackgroundService.Source.Services.System
+namespace BackgroundService.Source.Services.OS
 {
     internal class WindowService : Service
     {

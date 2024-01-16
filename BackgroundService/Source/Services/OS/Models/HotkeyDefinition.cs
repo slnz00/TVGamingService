@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace BackgroundService.Source.Services.System.Models
+namespace BackgroundService.Source.Services.OS.Models
 {
     internal class HotkeyDefinition
     {

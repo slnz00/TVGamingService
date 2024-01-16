@@ -5,7 +5,7 @@ using BackgroundService.Source.Controllers.EnvironmentControllers;
 using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using Core.Components.System;
 using System.Reflection;
-using BackgroundService.Source.Services.System.Models;
+using BackgroundService.Source.Services.OS.Models;
 
 namespace BackgroundService.Source.Controllers
 {
@@ -71,15 +71,15 @@ namespace BackgroundService.Source.Controllers
         private void UpdateHotkeys()
         {
             lock (threadLock) {
-                Services.System.Hotkey.UnregisterAllActions();
+                Services.OS.Hotkey.UnregisterAllActions();
 
                 var Hotkeys = Services.Config.GetConfig().Hotkeys;
 
-                Services.System.Hotkey.RegisterAction("SwitchEnvironment", new HotkeyDefinition(Hotkeys.SwitchEnvironment), SwitchEnvironment);
-                Services.System.Hotkey.RegisterAction("ResetEnvironment", new HotkeyDefinition(Hotkeys.ResetEnvironment), ResetEnvironment);
-                Services.System.Hotkey.RegisterAction("ResetDisplay", new HotkeyDefinition(Hotkeys.ResetDisplay), ResetDisplay);
-                Services.System.Hotkey.RegisterAction("ToggleConsoleVisibility", new HotkeyDefinition(Hotkeys.ToggleConsoleVisibility), ToggleConsoleVisibility);
-                Services.System.Hotkey.RegisterAction("ToggleCursorVisibility", new HotkeyDefinition(Hotkeys.ToggleCursorVisibility), ToggleCursorVisibility);
+                Services.OS.Hotkey.RegisterAction("SwitchEnvironment", new HotkeyDefinition(Hotkeys.SwitchEnvironment), SwitchEnvironment);
+                Services.OS.Hotkey.RegisterAction("ResetEnvironment", new HotkeyDefinition(Hotkeys.ResetEnvironment), ResetEnvironment);
+                Services.OS.Hotkey.RegisterAction("ResetDisplay", new HotkeyDefinition(Hotkeys.ResetDisplay), ResetDisplay);
+                Services.OS.Hotkey.RegisterAction("ToggleConsoleVisibility", new HotkeyDefinition(Hotkeys.ToggleConsoleVisibility), ToggleConsoleVisibility);
+                Services.OS.Hotkey.RegisterAction("ToggleCursorVisibility", new HotkeyDefinition(Hotkeys.ToggleCursorVisibility), ToggleCursorVisibility);
             }
         }
 
@@ -140,7 +140,7 @@ namespace BackgroundService.Source.Controllers
             {
                 LogControllerEvent("Toggling console visibility");
 
-                Services.System.Console.ToggleConsoleVisibility();
+                Services.OS.Console.ToggleConsoleVisibility();
             }
         }
 
@@ -150,8 +150,8 @@ namespace BackgroundService.Source.Controllers
             {
                 LogControllerEvent("Toggling cursor visibility");
 
-                var currentVisibility = Services.System.Cursor.CursorVisibility;
-                Services.System.Cursor.SetCursorVisibility(!currentVisibility);
+                var currentVisibility = Services.OS.Cursor.CursorVisibility;
+                Services.OS.Cursor.SetCursorVisibility(!currentVisibility);
             }
         }
 
@@ -165,7 +165,7 @@ namespace BackgroundService.Source.Controllers
                 var config = Services.Config.GetConfig();
                 var environmentConfig = environment == Environments.PC ? config.PC : config.TV;
 
-                Services.System.LegacyDisplay.SwitchToDisplay_Old(environmentConfig.Display);
+                Services.OS.LegacyDisplay.SwitchToDisplay_Old(environmentConfig.Display);
             }
         }
 

@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System;
 
-namespace BackgroundService.Source.Services.System.API
+namespace BackgroundService.Source.Services.OS.API
 {
     internal static class ShellAPI
     {

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
 
-namespace BackgroundService.Source.Services.System
+namespace BackgroundService.Source.Services.OS
 {
     internal class ConsoleService : Service
     {

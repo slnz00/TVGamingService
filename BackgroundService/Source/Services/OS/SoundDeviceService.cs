@@ -5,7 +5,7 @@ using System.Threading;
 using BackgroundService.Source.Providers;
 using Core.Utils;
 
-namespace BackgroundService.Source.Services.System
+namespace BackgroundService.Source.Services.OS
 {
     internal class SoundDeviceService : Service
     {

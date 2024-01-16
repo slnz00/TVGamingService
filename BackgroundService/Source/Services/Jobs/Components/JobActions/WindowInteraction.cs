@@ -1,5 +1,5 @@
 ﻿using BackgroundService.Source.Services.Jobs.Components.Common;
-using BackgroundService.Source.Services.System.Models;
+using BackgroundService.Source.Services.OS.Models;
 using Core.Utils;
 using System;
 using System.Text.RegularExpressions;
@@ -94,7 +94,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
                 return window;
             }
 
-            var components = Services.System.Window.GetChildComponent(window, Options.ComponentType);
+            var components = Services.OS.Window.GetChildComponent(window, Options.ComponentType);
             if (components.Count == 0)
             {
                 return null;
@@ -110,8 +110,8 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 
         protected WindowComponent GetWindow()
         {
-            var currentDesktopName = Services.System.Desktop.GetCurrentDesktopName();
-            var allWindows = Services.System.Desktop.GetWindowsOnDesktop(currentDesktopName);
+            var currentDesktopName = Services.OS.Desktop.GetCurrentDesktopName();
+            var allWindows = Services.OS.Desktop.GetWindowsOnDesktop(currentDesktopName);
 
             var window = allWindows.Find(win => {
                 var windowNameMatching = Regex.IsMatch(win.Name, Options.WindowName);

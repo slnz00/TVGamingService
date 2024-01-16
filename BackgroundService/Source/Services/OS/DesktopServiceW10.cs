@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.System.Models;
+using BackgroundService.Source.Services.OS.Models;
 using Core.Utils;
 using Microsoft.Win32;
-using static BackgroundService.Source.Services.System.API.VirtualDesktop.VirtualDesktopAPIW10;
+using static BackgroundService.Source.Services.OS.API.VirtualDesktop.VirtualDesktopAPIW10;
 
-namespace BackgroundService.Source.Services.System
+namespace BackgroundService.Source.Services.OS
 {
     internal class DesktopServiceW10 : DesktopService
     {

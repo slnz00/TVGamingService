@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BackgroundService.Source.Services.System.Models
+namespace BackgroundService.Source.Services.OS.Models
 {
     [Flags]
     internal enum KeyModifiers : uint

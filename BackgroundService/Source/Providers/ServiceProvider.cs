@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using BackgroundService.Source.Services;
 using BackgroundService.Source.Services.Configs;
 using BackgroundService.Source.Services.Jobs;
-using BackgroundService.Source.Services.System;
+using BackgroundService.Source.Services.OS;
 using BackgroundService.Source.Services.ThirdParty;
 using BackgroundService.Source.Services.ThirdParty.Playnite;
 using Core.Components.System;
@@ -23,7 +22,7 @@ namespace BackgroundService.Source.Providers
             public PlayniteService Playnite;
         }
 
-        public class SystemServices
+        public class OSServices
         {
             public ConsoleService Console;
             public DesktopService Desktop;
@@ -35,7 +34,7 @@ namespace BackgroundService.Source.Providers
         }
 
         public readonly ThirdPartyServices ThirdParty;
-        public readonly SystemServices System;
+        public readonly OSServices OS;
 
         // Common services should be defined without grouping:
         public readonly ConfigService Config;
@@ -54,7 +53,7 @@ namespace BackgroundService.Source.Providers
             GameConfig = RegisterService(new GameConfigService(this));
             Jobs = RegisterService(new JobService(this));
 
-            System = new SystemServices
+            OS = new OSServices
             {
                 Console = RegisterService(new ConsoleService(this)),
                 Desktop = RegisterService(DesktopService.Create(this)),

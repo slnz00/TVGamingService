@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.System.Models;
+using BackgroundService.Source.Services.OS.Models;
 using Core.Configs;
 
-using static BackgroundService.Source.Services.System.API.DisplayAPI;
+using static BackgroundService.Source.Services.OS.API.DisplayAPI;
 
-namespace BackgroundService.Source.Services.System
+namespace BackgroundService.Source.Services.OS
 {
     class LegacyDisplayService : Service
     {
@@ -47,7 +47,7 @@ namespace BackgroundService.Source.Services.System
             var displays = GetDisplays();
             DisableDisplay(displays[0]);
 
-            displays = Services.System.LegacyDisplay.GetDisplays();
+            displays = Services.OS.LegacyDisplay.GetDisplays();
             SetDisplayAsPrimary(displays[1], displayCfg.RefreshRate, displayCfg.Resolution);
 
             SaveDisplaySettings();

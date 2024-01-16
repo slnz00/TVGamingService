@@ -14,16 +14,16 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnSetup()
         {
-            Services.System.Cursor.SetCursorVisibility(false);
+            Services.OS.Cursor.SetCursorVisibility(false);
 
             // Change display and sound device:
-            Services.System.LegacyDisplay.SwitchToDisplay_Old(Config.Display);
-            Services.System.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
+            Services.OS.LegacyDisplay.SwitchToDisplay_Old(Config.Display);
+            Services.OS.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
 
             // Change windows desktop, hide desktop icons:
-            Services.System.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
-            Services.System.Desktop.ChangeWallpaper(Config.WallpaperPath);
-            Services.System.Desktop.ToggleIconsVisiblity(false);
+            Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
+            Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);
+            Services.OS.Desktop.ToggleIconsVisiblity(false);
 
             CloseThirdPartyApps();
             OpenThirdPartyApps();
@@ -76,7 +76,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         private void ForceCloseAppsOnTVDesktop()
         {
-            var windows = Services.System.Desktop.GetWindowsOnDesktop(InternalSettings.DESKTOP_TV_NAME);
+            var windows = Services.OS.Desktop.GetWindowsOnDesktop(InternalSettings.DESKTOP_TV_NAME);
 
             windows.ForEach(win => ProcessUtils.CloseProcess(win.ProcessID, true));
         }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace BackgroundService.Source.Services.System.API.VirtualDesktop
+namespace BackgroundService.Source.Services.OS.API.VirtualDesktop
 {
     internal class VirtualDesktopAPIW10
     {

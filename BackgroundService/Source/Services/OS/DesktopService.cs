@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.System.API;
-using BackgroundService.Source.Services.System.Models;
+using BackgroundService.Source.Services.OS.API;
+using BackgroundService.Source.Services.OS.Models;
 using Core.Utils;
 
-namespace BackgroundService.Source.Services.System
+namespace BackgroundService.Source.Services.OS
 {
     internal abstract class DesktopService : Service
     {

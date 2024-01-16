@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace BackgroundService.Source.Services.System.Models
+namespace BackgroundService.Source.Services.OS.Models
 {
     internal class WindowComponent
     {

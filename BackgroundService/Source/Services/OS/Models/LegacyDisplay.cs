@@ -1,6 +1,6 @@
-﻿using static BackgroundService.Source.Services.System.API.DisplayAPI;
+﻿using static BackgroundService.Source.Services.OS.API.DisplayAPI;
 
-namespace BackgroundService.Source.Services.System.Models
+namespace BackgroundService.Source.Services.OS.Models
 {
     internal class LegacyDisplay
     {

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.System.API.VirtualDesktop;
-using BackgroundService.Source.Services.System.Models;
+using BackgroundService.Source.Services.OS.Models;
 using Core.Utils;
-using static BackgroundService.Source.Services.System.API.VirtualDesktop.VirtualDesktopAPIW11;
 
-namespace BackgroundService.Source.Services.System
+using static BackgroundService.Source.Services.OS.API.VirtualDesktop.VirtualDesktopAPIW11;
+
+namespace BackgroundService.Source.Services.OS
 {
     internal class DesktopServiceW11 : DesktopService
     {
