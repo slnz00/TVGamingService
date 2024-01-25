@@ -3,6 +3,7 @@ using BackgroundService.Source.Services;
 using BackgroundService.Source.Services.Configs;
 using BackgroundService.Source.Services.Jobs;
 using BackgroundService.Source.Services.OS;
+using BackgroundService.Source.Services.State;
 using BackgroundService.Source.Services.ThirdParty;
 using BackgroundService.Source.Services.ThirdParty.Playnite;
 using Core.Components.System;
@@ -40,6 +41,7 @@ namespace BackgroundService.Source.Providers
         public readonly ConfigService Config;
         public readonly GameConfigService GameConfig;
         public readonly JobService Jobs;
+        public readonly StateService State;
 
         public readonly MessageLoop MessageLoop;
 
@@ -52,6 +54,7 @@ namespace BackgroundService.Source.Providers
             Config = RegisterService(new ConfigService(this));
             GameConfig = RegisterService(new GameConfigService(this));
             Jobs = RegisterService(new JobService(this));
+            State = RegisterService(new StateService(this));
 
             OS = new OSServices
             {
@@ -63,7 +66,6 @@ namespace BackgroundService.Source.Providers
                 Cursor = RegisterService(new CursorService(this)),
                 Window = RegisterService(new WindowService(this)),
             };
-
 
             ThirdParty = new ThirdPartyServices
             {

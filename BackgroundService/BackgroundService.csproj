@@ -182,6 +182,9 @@
     <Compile Include="Source\Services\OS\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
     <Compile Include="Source\Services\OS\Models\WindowComponent.cs" />
+    <Compile Include="Source\Services\State\Components\StateEntry.cs" />
+    <Compile Include="Source\Services\State\StateService.cs" />
+    <Compile Include="Source\Services\State\Components\States.cs" />
     <Compile Include="Source\Services\ThirdParty\DS4WindowsService.cs" />
     <Compile Include="Source\Services\ThirdParty\Playnite\Communication\AppCommunicationHost.cs" />
     <Compile Include="Source\Services\ThirdParty\Playnite\Communication\Services\PlayniteAppService.cs" />

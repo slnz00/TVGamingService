@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.State.Components;
 
 namespace BackgroundService.Source.Services.OS
 {
@@ -40,7 +41,18 @@ namespace BackgroundService.Source.Services.OS
             "Person"
         };
 
-        private List<CursorRegistryValue> visibleCursorRegistrySnapshot;
+        private List<CursorRegistryValue> CursorRegistrySnapshot
+        {
+            get
+            {
+                return Services.State.Get<List<CursorRegistryValue>>(States.CursorRegistrySnapshot);
+            }
+            set
+            {
+                Services.State.Set(States.CursorRegistrySnapshot, value);
+            }
+        }
+
         private bool cursorVisibility = true;
 
         public bool CursorVisibility => cursorVisibility;
@@ -68,7 +80,7 @@ namespace BackgroundService.Source.Services.OS
         {
             Logger.Info($"Setting cursor visibility to: {visible}");
 
-            var cursorValues = visible ? visibleCursorRegistrySnapshot : GetHiddenCursorRegistryValues();
+            var cursorValues = visible ? CursorRegistrySnapshot : GetHiddenCursorRegistryValues();
 
             SetCursorRegistry(cursorValues);
             cursorVisibility = visible;
@@ -83,13 +95,13 @@ namespace BackgroundService.Source.Services.OS
             // Make sure registry snapshot is not in an empty state to prevent permanently hidden cursors:
             if (IsHiddenCursorRegistry(currentValues))
             {
-                visibleCursorRegistrySnapshot = GetDefaultCursorRegistryValues();
+                CursorRegistrySnapshot = GetDefaultCursorRegistryValues();
                 Logger.Debug($"Failed to take cursor registry snapshot since hidden cursor style is used, reverting to default cursor style");
                 SetCursorVisibility(true);
                 return;
             }
 
-            visibleCursorRegistrySnapshot = currentValues;
+            CursorRegistrySnapshot = currentValues;
         }
 
         private List<CursorRegistryValue> GetCurrentRegistryValues()

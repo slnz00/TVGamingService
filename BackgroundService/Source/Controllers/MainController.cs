@@ -48,7 +48,7 @@ namespace BackgroundService.Source.Controllers
             DisplayStartupTitle();
             InitializeComponents();
             SetupHotkeys();
-
+            
             MessageLoop.Run();
         }
 

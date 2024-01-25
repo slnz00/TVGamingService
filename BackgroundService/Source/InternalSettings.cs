@@ -15,6 +15,7 @@ namespace BackgroundService.Source
         public static readonly string PATH_VIRTUAL_DESKTOP_W11 = FSUtils.GetAbsolutePath("Binaries", "vd_win11.exe");
         public static readonly string PATH_NIRCMD = FSUtils.GetAbsolutePath("Binaries", "nircmd.exe");
         public static readonly string PATH_EMPTY_CURSOR = FSUtils.GetAbsolutePath("Resources", CURSOR_EMPTY_FILE_NAME);
+        public static readonly string PATH_DATA_STATES = FSUtils.GetAbsolutePath("Data", "State.json");
         public static readonly string PATH_DATA_GAME_CONFIGS = FSUtils.GetAbsolutePath("Data", "GameConfigs");
         public static readonly string PATH_DATA_BACKUPS = FSUtils.GetAbsolutePath("Data", "Backups");
 

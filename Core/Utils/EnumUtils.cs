@@ -24,13 +24,12 @@ namespace Core.Utils
             return Enum.GetName(typeof(T), value);
         }
 
-        public static List<int> GetValues<T>()
+        public static List<T> GetValues<T>()
             where T : Enum
         {
             return Enum
                 .GetValues(typeof(T))
                 .OfType<T>()
-                .Select(x => (int)(object)x)
                 .ToList();
         }
 
