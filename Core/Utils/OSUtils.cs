@@ -1,16 +1,38 @@
 ﻿using IWshRuntimeLibrary;
+using Microsoft.Win32;
+using System.Globalization;
 using System.Management;
 
 namespace Core.Utils
 {
     public static class OSUtils
     {
+        public class WindowsVersion {
+            public readonly string version;
+            public readonly double buildNumber;
+
+            public WindowsVersion(string version, double buildNumber) {
+                this.version = version;
+                this.buildNumber = buildNumber;
+            }
+        }
+
         public static bool IsWindows11(string windowsVersion)
         {
             return windowsVersion.ToLower().Contains("windows 11");
         }
 
-        public static string GetCurrentWindowsVersion()
+        public static double GetCurrentWindowsBuildNumber()
+        {
+            RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+
+            var mainBuild = registryKey.GetValue("CurrentBuildNumber").ToString();
+            var subBuild = registryKey.GetValue("UBR").ToString();
+
+            return double.Parse($"{mainBuild}.{subBuild}", CultureInfo.InvariantCulture.NumberFormat);
+        }
+
+        public static string GetCurrentWindowsVersionName()
         {
             string result = "";
 

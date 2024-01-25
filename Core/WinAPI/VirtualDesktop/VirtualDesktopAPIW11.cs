@@ -156,8 +156,37 @@ namespace Core.WinAPI.VirtualDesktop
 
         [ComImport]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        [Guid("A3175F2D-239C-4BD2-8AA0-EEBA8B0B138E")]
+        [Guid("53F5CA0B-158F-4124-900C-057158060B27")]
         public interface IVirtualDesktopManagerInternal
+        {
+            int GetCount();
+            void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);
+            bool CanViewMoveDesktops(IApplicationView view);
+            IVirtualDesktop GetCurrentDesktop();
+            void GetDesktops(out IObjectArray desktops);
+            [PreserveSig]
+            int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
+            void SwitchDesktop(IVirtualDesktop desktop);
+            IVirtualDesktop CreateDesktop();
+            void MoveDesktop(IVirtualDesktop desktop, int nIndex);
+            void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
+            IVirtualDesktop FindDesktop(ref Guid desktopid);
+            void GetDesktopSwitchIncludeExcludeViews(IVirtualDesktop desktop, out IObjectArray unknown1, out IObjectArray unknown2);
+            void SetDesktopName(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string name);
+            void SetDesktopWallpaper(IVirtualDesktop desktop, [MarshalAs(UnmanagedType.HString)] string path);
+            void UpdateWallpaperPathForAllDesktops([MarshalAs(UnmanagedType.HString)] string path);
+            void CopyDesktopState(IApplicationView pView0, IApplicationView pView1);
+            void CreateRemoteDesktop([MarshalAs(UnmanagedType.HString)] string path, out IVirtualDesktop desktop);
+            void SwitchRemoteDesktop(IVirtualDesktop desktop);
+            void SwitchDesktopWithAnimation(IVirtualDesktop desktop);
+            void GetLastActiveDesktop(out IVirtualDesktop desktop);
+            void WaitForAnimationToComplete();
+        }
+
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("A3175F2D-239C-4BD2-8AA0-EEBA8B0B138E")]
+        public interface IVirtualDesktopManagerInternalOld
         {
             int GetCount();
             void MoveViewToDesktop(IApplicationView view, IVirtualDesktop desktop);

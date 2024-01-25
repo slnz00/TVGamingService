@@ -12,7 +12,7 @@ namespace BackgroundService.Source.Services.OS
     {
         public static DesktopService Create(ServiceProvider services)
         {
-            string windowsVersion = OSUtils.GetCurrentWindowsVersion();
+            string windowsVersion = OSUtils.GetCurrentWindowsVersionName();
             bool isWindows11 = OSUtils.IsWindows11(windowsVersion);
 
             if (isWindows11)

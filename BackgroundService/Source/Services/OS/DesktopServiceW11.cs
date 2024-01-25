@@ -13,24 +13,54 @@ namespace BackgroundService.Source.Services.OS
     internal class DesktopServiceW11 : DesktopService
     {
         private IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
+        private IVirtualDesktopManagerInternalOld VirtualDesktopManagerInternal_Old;
         private IApplicationViewCollection ApplicationViewCollection;
+
+        private double buildNumber = OSUtils.GetCurrentWindowsBuildNumber();
+
+        private bool OutdatedVersion => buildNumber < 22631.3085;
 
         public DesktopServiceW11(ServiceProvider services) : base(services)
         {
             var shell = (IServiceProvider10)Activator.CreateInstance(Type.GetTypeFromCLSID(Guids.CLSID_ImmersiveShell));
 
-            VirtualDesktopManagerInternal = (IVirtualDesktopManagerInternal)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal, typeof(IVirtualDesktopManagerInternal).GUID);
             ApplicationViewCollection = (IApplicationViewCollection)shell.QueryService(typeof(IApplicationViewCollection).GUID, typeof(IApplicationViewCollection).GUID);
+
+
+            if (OutdatedVersion)
+            {
+                VirtualDesktopManagerInternal_Old = (IVirtualDesktopManagerInternalOld)shell.QueryService(
+                    Guids.CLSID_VirtualDesktopManagerInternal,
+                    typeof(IVirtualDesktopManagerInternalOld).GUID
+                );
+            }
+            else
+            {
+                VirtualDesktopManagerInternal = (IVirtualDesktopManagerInternal)shell.QueryService(
+                    Guids.CLSID_VirtualDesktopManagerInternal,
+                    typeof(IVirtualDesktopManagerInternal).GUID
+                );
+            }
         }
 
         public override void CreateAndSwitchToDesktop(string desktopName)
         {
             Logger.Info($"Switching desktop to: {desktopName}");
 
-            var desktop = VirtualDesktopManagerInternal.CreateDesktop();
+            if (OutdatedVersion)
+            {
+                var desktop = VirtualDesktopManagerInternal_Old.CreateDesktop();
 
-            VirtualDesktopManagerInternal.SetDesktopName(desktop, desktopName);
-            VirtualDesktopManagerInternal.SwitchDesktop(desktop);
+                VirtualDesktopManagerInternal_Old.SetDesktopName(desktop, desktopName);
+                VirtualDesktopManagerInternal_Old.SwitchDesktop(desktop);
+            }
+            else
+            {
+                var desktop = VirtualDesktopManagerInternal.CreateDesktop();
+
+                VirtualDesktopManagerInternal.SetDesktopName(desktop, desktopName);
+                VirtualDesktopManagerInternal.SwitchDesktop(desktop);
+            }
         }
 
         public override void RemoveDesktop(string desktopName)
@@ -49,7 +79,14 @@ namespace BackgroundService.Source.Services.OS
 
             var fallbackDesktop = allDesktops[0];
 
-            VirtualDesktopManagerInternal.RemoveDesktop(selectedDesktop, fallbackDesktop);
+            if (OutdatedVersion)
+            {
+                VirtualDesktopManagerInternal_Old.RemoveDesktop(selectedDesktop, fallbackDesktop);
+            }
+            else
+            {
+                VirtualDesktopManagerInternal.RemoveDesktop(selectedDesktop, fallbackDesktop);
+            }
         }
 
         public override void ChangeWallpaper(string wallpaperPath)
@@ -64,13 +101,28 @@ namespace BackgroundService.Source.Services.OS
             Logger.Info($"Changing desktop wallpaper to: {wallpaperPath}");
 
             var fullWallpaperPath = FSUtils.GetAbsolutePath(wallpaperPath);
-            var currentDesktop = VirtualDesktopManagerInternal.GetCurrentDesktop();
 
-            VirtualDesktopManagerInternal.SetDesktopWallpaper(currentDesktop, fullWallpaperPath);
+            if (OutdatedVersion)
+            {
+                var currentDesktop = VirtualDesktopManagerInternal_Old.GetCurrentDesktop();
+
+                VirtualDesktopManagerInternal_Old.SetDesktopWallpaper(currentDesktop, fullWallpaperPath);
+            }
+            else
+            {
+                var currentDesktop = VirtualDesktopManagerInternal.GetCurrentDesktop();
+
+                VirtualDesktopManagerInternal.SetDesktopWallpaper(currentDesktop, fullWallpaperPath);
+            }
         }
 
         public override string GetCurrentDesktopName()
         {
+            if (OutdatedVersion)
+            {
+                return VirtualDesktopManagerInternal_Old.GetCurrentDesktop().GetName();
+            }
+
             return VirtualDesktopManagerInternal.GetCurrentDesktop().GetName();
         }
 
@@ -110,7 +162,16 @@ namespace BackgroundService.Source.Services.OS
 
         private List<IVirtualDesktop> GetAllDesktops()
         {
-            VirtualDesktopManagerInternal.GetDesktops(out IObjectArray desktopsObj);
+            IObjectArray desktopsObj;
+
+            if (OutdatedVersion)
+            {
+                VirtualDesktopManagerInternal_Old.GetDesktops(out desktopsObj);
+            }
+            else
+            {
+                VirtualDesktopManagerInternal.GetDesktops(out desktopsObj);
+            }
 
             return CastAndReleaseObjectArray<IVirtualDesktop>(desktopsObj);
         }
