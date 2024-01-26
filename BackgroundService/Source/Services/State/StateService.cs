@@ -44,6 +44,7 @@ namespace BackgroundService.Source.Services.State
                 ValidateStateType<T>(state);
 
                 var entry = GetStateEntry(state);
+                var field = EnumUtils.GetName(state);
                 var exists = storage.TryGetValue(entry.Key, out var value);
 
                 if (!exists)
@@ -51,12 +52,21 @@ namespace BackgroundService.Source.Services.State
                     return default;
                 }
 
-                if (value is JToken)
+                try
                 {
-                    return ((JToken)value).ToObject<T>();
-                }
+                    if (value is JToken)
+                    {
+                        return ((JToken)value).ToObject<T>();
+                    }
 
-                return (T)value;
+                    return (T)value;
+                }
+                catch (Exception ex) when (ex is ArgumentException || ex is InvalidCastException)
+                {
+                    Logger.Error($"Stored value is invalid for state: {field}");
+
+                    return default;
+                }
             }
         }
 
@@ -152,7 +162,8 @@ namespace BackgroundService.Source.Services.State
                 .Where(key => !availableKeys.Contains(key))
                 .ToArray();
 
-            foreach (var key in unusedKeys) {
+            foreach (var key in unusedKeys)
+            {
                 storage.Remove(key);
             }
         }
@@ -170,16 +181,24 @@ namespace BackgroundService.Source.Services.State
         {
             FSUtils.EnsureFileDirectory(InternalSettings.PATH_DATA_STATES);
 
+            storage = new Dictionary<string, object>();
+
             var statesJsonExists = File.Exists(InternalSettings.PATH_DATA_STATES);
             if (!statesJsonExists)
             {
-                storage = new Dictionary<string, object>();
                 return;
             }
 
             string statesJson = File.ReadAllText(InternalSettings.PATH_DATA_STATES, Encoding.Default);
 
-            storage = JsonConvert.DeserializeObject<Dictionary<string, object>>(statesJson);
+            try
+            {
+                storage = JsonConvert.DeserializeObject<Dictionary<string, object>>(statesJson);
+            }
+            catch (JsonReaderException)
+            {
+                Logger.Error("Failed to load state from JSON file, invalid JSON content");
+            }
         }
     }
 }
