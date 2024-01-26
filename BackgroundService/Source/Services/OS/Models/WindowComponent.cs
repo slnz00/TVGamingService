@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Text;
+
+using static Core.WinAPI.WindowAPI;
 
 namespace BackgroundService.Source.Services.OS.Models
 {
@@ -14,54 +14,6 @@ namespace BackgroundService.Source.Services.OS.Models
             Minimized,
             Maximized
         }
-
-        private enum ShowWindowCommands
-        {
-            SW_HIDE,
-            SW_NORMAL,
-            SW_SHOWMINIMIZED,
-            SW_MAXIMIZE,
-            SW_SHOWNOACTIVATE,
-            SW_SHOW,
-            SW_MINIMIZE,
-            SW_SHOWMINNOACTIVE,
-            SW_SHOWNA,
-            SW_RESTORE,
-            SW_SHOWDEFAULT,
-            SW_FORCEMINIMIZE,
-        }
-
-        private struct WindowPlacement
-        {
-            public int length;
-            public int flags;
-            public int showCmd;
-            public Point ptMinPosition;
-            public Point ptMaxPosition;
-            public Rectangle rcNormalPosition;
-        }
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement lpwndpl);
-
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        [DllImport("user32.dll")]
-        internal static extern IntPtr SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        static extern int GetWindowTextLength(IntPtr hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
-
-        [DllImport("user32.dll")]
-        private static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         public string Type { get; private set; }
         public IntPtr Handle { get; private set; }
