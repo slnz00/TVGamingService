@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +38,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
@@ -69,11 +71,13 @@
     <Compile Include="Utils\ProcessUtils.cs" />
     <Compile Include="Utils\TimerUtils.cs" />
     <Compile Include="WinAPI\DesktopAPI.cs" />
+    <Compile Include="WinAPI\DisplayAPI.cs" />
     <Compile Include="WinAPI\LegacyDisplayAPI.cs" />
     <Compile Include="WinAPI\RestartManagerAPI.cs" />
     <Compile Include="WinAPI\ShellAPI.cs" />
     <Compile Include="WinAPI\VirtualDesktop\VirtualDesktopAPIW10.cs" />
     <Compile Include="WinAPI\VirtualDesktop\VirtualDesktopAPIW11.cs" />
+    <Compile Include="WinAPI\WindowAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="IWshRuntimeLibrary">
