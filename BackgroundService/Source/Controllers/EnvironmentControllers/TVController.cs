@@ -1,6 +1,7 @@
 ﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
 using Core.Utils;
+using System.Windows.Forms;
 
 namespace BackgroundService.Source.Controllers.EnvironmentControllers
 {
@@ -16,11 +17,10 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         {
             Services.OS.Cursor.SetCursorVisibility(false);
 
-            // Change display and sound device:
-            Services.OS.LegacyDisplay.SwitchToDisplay_Old(Config.Display);
+            SwitchToTVDisplay();
+
             Services.OS.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
 
-            // Change windows desktop, hide desktop icons:
             Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
             Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);
             Services.OS.Desktop.ToggleIconsVisiblity(false);
@@ -44,6 +44,19 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
             CloseThirdPartyApps();
 
             Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
+        }
+
+        private void SwitchToTVDisplay()
+        {
+            var result = Services.OS.Display.SwitchToDisplay(Config.Display.DevicePath, Config.Display.DeviceName);
+
+            if (!result)
+            {
+                Services.OS.Window.ShowMessageBox(
+                    MessageBoxIcon.Error,
+                    "Failed to switch displays. TV environment's display device is unavailable. Please reconfigure it using the Configurator app."
+                );
+            }
         }
 
         private void OpenThirdPartyApps()

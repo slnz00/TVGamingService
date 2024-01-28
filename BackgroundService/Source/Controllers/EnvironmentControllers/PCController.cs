@@ -1,5 +1,6 @@
 ﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
+using System.Windows.Forms;
 
 namespace BackgroundService.Source.Controllers.EnvironmentControllers
 {
@@ -13,11 +14,10 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         {
             Services.OS.Cursor.SetCursorVisibility(true);
 
-            // Change display and sound device:
-            Services.OS.LegacyDisplay.SwitchToDisplay_Old(Config.Display);
+            RestoreDisplaySettings();
+            
             Services.OS.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
 
-            // Change windows desktop, show desktop icons:
             Services.OS.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
             Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);
             Services.OS.Desktop.ToggleIconsVisiblity(true);
@@ -36,8 +36,28 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnTeardown()
         {
+            BackupDisplaySettings();
+
             Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
             Services.ThirdParty.Playnite.CloseDesktopPlaynite();
+        }
+
+        private void BackupDisplaySettings()
+        {
+            Services.OS.Display.BackupDisplaySettings();
+        }
+
+        private void RestoreDisplaySettings()
+        {
+            var result = Services.OS.Display.RestoreDisplaySettings();
+
+            if (!result)
+            {
+                Services.OS.Window.ShowMessageBox(
+                    MessageBoxIcon.Error,
+                    "Failed to restore PC environment's display settings. Please reset your display settings manually."
+                );
+            }
         }
     }
 }

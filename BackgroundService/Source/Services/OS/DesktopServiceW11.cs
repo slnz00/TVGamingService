@@ -52,14 +52,14 @@ namespace BackgroundService.Source.Services.OS
                 var desktop = VirtualDesktopManagerInternal_Old.CreateDesktop();
 
                 VirtualDesktopManagerInternal_Old.SetDesktopName(desktop, desktopName);
-                VirtualDesktopManagerInternal_Old.SwitchDesktop(desktop);
+                VirtualDesktopManagerInternal_Old.SwitchDesktopWithAnimation(desktop);
             }
             else
             {
                 var desktop = VirtualDesktopManagerInternal.CreateDesktop();
 
                 VirtualDesktopManagerInternal.SetDesktopName(desktop, desktopName);
-                VirtualDesktopManagerInternal.SwitchDesktop(desktop);
+                VirtualDesktopManagerInternal.SwitchDesktopWithAnimation(desktop);
             }
         }
 

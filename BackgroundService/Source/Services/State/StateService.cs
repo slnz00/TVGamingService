@@ -26,6 +26,11 @@ namespace BackgroundService.Source.Services.State
             this.readOnly = readOnly;
         }
 
+        // TODO: Remove after testing
+        public void Init() {
+            OnInitialize();
+        }
+
         protected override void OnInitialize()
         {
             lock (threadLock)
@@ -40,7 +45,7 @@ namespace BackgroundService.Source.Services.State
         {
             lock (threadLock)
             {
-                ValidateInitialized();
+                RequireInitialization();
                 ValidateStateType<T>(state);
 
                 var entry = GetStateEntry(state);
@@ -74,7 +79,7 @@ namespace BackgroundService.Source.Services.State
         {
             lock (threadLock)
             {
-                ValidateInitialized();
+                RequireInitialization();
                 ValidateStateType<T>(state);
 
                 if (ReadOnly)
@@ -87,14 +92,6 @@ namespace BackgroundService.Source.Services.State
                 storage[entry.Key] = value;
 
                 SaveStorageToFile();
-            }
-        }
-
-        private void ValidateInitialized()
-        {
-            if (storage == null)
-            {
-                throw new InvalidOperationException("Uninitialized storage, call 'Initialize' method first");
             }
         }
 

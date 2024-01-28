@@ -407,7 +407,7 @@ namespace Core.WinAPI
             }
         }
 
-        const uint DISPLAYCONFIG_PATH_MODE_IDX_INVALID = 0xffffffff;
+        public const uint DISPLAYCONFIG_PATH_MODE_IDX_INVALID = 0xffffffff;
 
         public static class PInvoke
         {
@@ -533,7 +533,17 @@ namespace Core.WinAPI
                 }
             }
         }
-       
+
+        public static void DisplayConfigGetDeviceInfo<T>(ref T deviceInfo) where T : IDisplayDeviceInfo
+        {
+            var result = MarshalStructureAndCall(ref deviceInfo, PInvoke.DisplayConfigGetDeviceInfo);
+
+            if (result != StatusCode.SUCCESS)
+            {
+                throw new DisplayAPIException(nameof(PInvoke.DisplayConfigGetDeviceInfo), result);
+            }
+        }
+
         public static void DisplayConfigSetDeviceInfo<T>(ref T deviceInfo) where T : IDisplayDeviceInfo
         {
             var result = MarshalStructureAndCall(ref deviceInfo, PInvoke.DisplayConfigSetDeviceInfo);
@@ -541,16 +551,6 @@ namespace Core.WinAPI
             if (result != StatusCode.SUCCESS)
             {
                 throw new DisplayAPIException(nameof(PInvoke.DisplayConfigSetDeviceInfo), result);
-            }
-        }
-     
-        private static void DisplayConfigGetDeviceInfo<T>(ref T deviceInfo) where T : IDisplayDeviceInfo
-        {
-            var result = MarshalStructureAndCall(ref deviceInfo, PInvoke.DisplayConfigGetDeviceInfo);
-
-            if (result != StatusCode.SUCCESS)
-            {
-                throw new DisplayAPIException(nameof(PInvoke.DisplayConfigGetDeviceInfo), result);
             }
         }
 

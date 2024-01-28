@@ -1,26 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
+
+using static Core.WinAPI.WindowAPI;
 
 namespace BackgroundService.Source.Services.OS
 {
     internal class WindowService : Service
     {
-        private delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr FindWindowEx(IntPtr hWndParent, IntPtr hWndChildAfter, string lpszClass, string lpszWindow);
-
-        [DllImport("user32.dll")]
-        private static extern bool EnumThreadWindows(int dwThreadId, EnumThreadDelegate lpfn, IntPtr lParam);
-
-
         public WindowService(ServiceProvider services) : base(services) { }
 
         public List<WindowComponent> GetProcessWindows(int processId)
@@ -65,6 +56,14 @@ namespace BackgroundService.Source.Services.OS
             }
 
             return components;
+        }
+
+        public void ShowMessageBox(MessageBoxIcon icon, string message)
+        {
+            Task.Run(() =>
+            {
+                MessageBox.Show(message, InternalSettings.WINDOW_TITLE, MessageBoxButtons.OK, icon);
+            });
         }
     }
 }

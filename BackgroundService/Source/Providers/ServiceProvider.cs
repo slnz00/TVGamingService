@@ -28,7 +28,7 @@ namespace BackgroundService.Source.Providers
             public ConsoleService Console;
             public DesktopService Desktop;
             public HotkeyService Hotkey;
-            public LegacyDisplayService LegacyDisplay;
+            public DisplayService Display;
             public SoundDeviceService SoundDevice;
             public CursorService Cursor;
             public WindowService Window;
@@ -37,7 +37,6 @@ namespace BackgroundService.Source.Providers
         public readonly ThirdPartyServices ThirdParty;
         public readonly OSServices OS;
 
-        // Common services should be defined without grouping:
         public readonly ConfigService Config;
         public readonly GameConfigService GameConfig;
         public readonly JobService Jobs;
@@ -61,7 +60,7 @@ namespace BackgroundService.Source.Providers
                 Console = RegisterService(new ConsoleService(this)),
                 Desktop = RegisterService(DesktopService.Create(this)),
                 Hotkey = RegisterService(new HotkeyService(this)),
-                LegacyDisplay = RegisterService(new LegacyDisplayService(this)),
+                Display = RegisterService(new DisplayService(this)),
                 SoundDevice = RegisterService(new SoundDeviceService(this)),
                 Cursor = RegisterService(new CursorService(this)),
                 Window = RegisterService(new WindowService(this)),

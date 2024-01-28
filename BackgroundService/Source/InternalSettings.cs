@@ -4,6 +4,8 @@ namespace BackgroundService.Source
 {
     internal static class InternalSettings
     {
+        public static readonly string WINDOW_TITLE = "TVGamingService";
+
         public static readonly string DESKTOP_TV_NAME = "TVGaming";
 
         public static readonly string CURSOR_EMPTY_FILE_NAME = "tv-gaming-empty-cursor.cur";

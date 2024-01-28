@@ -179,6 +179,10 @@
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\Timer.cs" />
     <Compile Include="Source\Services\OS\DesktopServiceW10.cs" />
     <Compile Include="Source\Services\OS\DesktopServiceW11.cs" />
+    <Compile Include="Source\Services\OS\DisplayService.cs" />
+    <Compile Include="Source\Services\OS\Models\DisplayDevice.cs" />
+    <Compile Include="Source\Services\OS\Models\DisplaySettings.cs" />
+    <Compile Include="Source\Services\OS\Models\DisplaySettingsSnapshot.cs" />
     <Compile Include="Source\Services\OS\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
     <Compile Include="Source\Services\OS\Models\WindowComponent.cs" />
@@ -203,7 +207,6 @@
     <Compile Include="Source\Services\OS\ConsoleService.cs" />
     <Compile Include="Source\Services\OS\DesktopService.cs" />
     <Compile Include="Source\Services\OS\HotkeyService.cs" />
-    <Compile Include="Source\Services\OS\LegacyDisplayService.cs" />
     <Compile Include="Source\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Services\OS\SoundDeviceService.cs" />

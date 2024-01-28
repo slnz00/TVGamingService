@@ -77,7 +77,6 @@ namespace BackgroundService.Source.Controllers
 
                 Services.OS.Hotkey.RegisterAction("SwitchEnvironment", new HotkeyDefinition(Hotkeys.SwitchEnvironment), SwitchEnvironment);
                 Services.OS.Hotkey.RegisterAction("ResetEnvironment", new HotkeyDefinition(Hotkeys.ResetEnvironment), ResetEnvironment);
-                Services.OS.Hotkey.RegisterAction("ResetDisplay", new HotkeyDefinition(Hotkeys.ResetDisplay), ResetDisplay);
                 Services.OS.Hotkey.RegisterAction("ToggleConsoleVisibility", new HotkeyDefinition(Hotkeys.ToggleConsoleVisibility), ToggleConsoleVisibility);
                 Services.OS.Hotkey.RegisterAction("ToggleCursorVisibility", new HotkeyDefinition(Hotkeys.ToggleCursorVisibility), ToggleCursorVisibility);
             }
@@ -152,20 +151,6 @@ namespace BackgroundService.Source.Controllers
 
                 var currentVisibility = Services.OS.Cursor.CursorVisibility;
                 Services.OS.Cursor.SetCursorVisibility(!currentVisibility);
-            }
-        }
-
-        private void ResetDisplay()
-        {
-            lock (threadLock)
-            {
-                LogControllerEvent("Resetting display");
-
-                var environment = Controllers.Environment.EnvironmentType;
-                var config = Services.Config.GetConfig();
-                var environmentConfig = environment == Environments.PC ? config.PC : config.TV;
-
-                Services.OS.LegacyDisplay.SwitchToDisplay_Old(environmentConfig.Display);
             }
         }
 

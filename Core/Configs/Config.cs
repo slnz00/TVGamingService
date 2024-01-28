@@ -37,7 +37,6 @@ namespace Core.Configs
     {
         public List<string> SwitchEnvironment { get; set; }
         public List<string> ResetEnvironment { get; set; }
-        public List<string> ResetDisplay { get; set; }
         public List<string> ToggleCursorVisibility { get; set; }
         public List<string> ToggleConsoleVisibility { get; set; }
     }
@@ -62,9 +61,8 @@ namespace Core.Configs
 
     public class DisplayConfig
     {
+        public string DevicePath { get; set; }
         public string DeviceName { get; set; }
-        public DisplayResolutionConfig Resolution { get; set; }
-        public int RefreshRate { get; set; }
     }
 
     public class ThirdPartyConfig

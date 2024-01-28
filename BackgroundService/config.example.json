@@ -2,7 +2,6 @@
   "Hotkeys": {
     "SwitchEnvironment": [ "Alt", "NumPad0" ],
     "ResetEnvironment": [ "Alt", "NumPad1" ],
-    "ResetDisplay": [ "Alt", "NumPad2" ],
     "ToggleCursorVisibility": [ "Alt", "NumPad8" ],
     "ToggleConsoleVisibility": [ "Alt", "NumPad9" ]
   },
@@ -11,11 +10,8 @@
       "DeviceName": ""
     },
     "Display": {
-      "Resolution": {
-        "Width": 2560,
-        "Height": 1440
-      },
-      "RefreshRate": 144
+      "DevicePath": "",
+      "DeviceName": ""
     },
     "WallpaperPath": ""
   },
@@ -24,11 +20,8 @@
       "DeviceName": ""
     },
     "Display": {
-      "Resolution": {
-        "Width": 3840,
-        "Height": 2160
-      },
-      "RefreshRate": 60
+      "DevicePath": "",
+      "DeviceName": ""
     },
     "WallpaperPath": ""
   },

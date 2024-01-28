@@ -42,6 +42,14 @@ namespace BackgroundService.Source.Services
             Logger.Debug($"Disposed, took: {time}ms");
         }
 
+        protected void RequireInitialization()
+        {
+            if (!IsInitialized)
+            {
+                throw new InvalidOperationException("Uninitialized service, call 'Initialize' method first");
+            }
+        }
+
         protected virtual void OnInitialize() { }
         protected virtual void OnDispose() { }
     }
