@@ -21,7 +21,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         public MainController MainController { get; private set; }
 
         public Environments EnvironmentType { get; private set; }
-        public string EnvironmentName => Enum.GetName(typeof(Environments), EnvironmentType);
+        public string EnvironmentName => EnumUtils.GetName(EnvironmentType);
 
         private List<string> environmentJobIds = new List<string>();
 
@@ -46,16 +46,16 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         public void Reset()
         {
-            CreateEnvironmentJobsForEvent("Reset", new List<JobMode> { JobMode.Sync });
-
             OnReset();
+
+            CreateEnvironmentJobsForEvent("Reset", new List<JobMode> { JobMode.Sync });
         }
 
         public void Teardown()
         {
-            CreateEnvironmentJobsForEvent("Teardown", new List<JobMode> { JobMode.Sync });
-
             OnTeardown();
+
+            CreateEnvironmentJobsForEvent("Teardown", new List<JobMode> { JobMode.Sync });
 
             RemoveAllEnvironmentJobs();
         }

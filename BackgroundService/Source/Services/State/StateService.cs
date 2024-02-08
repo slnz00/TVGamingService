@@ -26,11 +26,6 @@ namespace BackgroundService.Source.Services.State
             this.readOnly = readOnly;
         }
 
-        // TODO: Remove after testing
-        public void Init() {
-            OnInitialize();
-        }
-
         protected override void OnInitialize()
         {
             lock (threadLock)

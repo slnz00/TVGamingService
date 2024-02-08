@@ -18,6 +18,12 @@ namespace Core.Utils
             return (T)Enum.Parse(typeof(T), name);
         }
 
+        public static bool IsValidName<T>(string name)
+            where T : Enum
+        {
+            return Enum.GetNames(typeof(T)).Contains(name);
+        }
+
         public static string GetName<T>(T value)
             where T : Enum
         {

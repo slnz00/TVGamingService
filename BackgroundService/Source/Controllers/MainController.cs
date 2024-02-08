@@ -6,22 +6,48 @@ using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using Core.Components.System;
 using System.Reflection;
 using BackgroundService.Source.Services.OS.Models;
+using BackgroundService.Source.Services.State.Components;
+using Core.Utils;
 
 namespace BackgroundService.Source.Controllers
 {
     internal class MainController
     {
-        private class SubControllers
+        private Environments EnvironmentState
         {
-            public Dictionary<Environments, Func<EnvironmentController>> EnvironmentFactory;
-            public EnvironmentController Environment;
-            public BackupController.BackupController Backup;
-        }
+            get
+            {
+                var defaultName = EnumUtils.GetName(Environments.PC);
+                var name = Services.State.Get<string>(States.CurrentEnvironment) ?? defaultName;
 
+                if (!EnumUtils.IsValidName<Environments>(name))
+                {
+                    name = defaultName;
+
+                    Logger.Error($"Current environment state is invalid reverting to default value: {name}");
+
+                    Services.State.Set(States.CurrentEnvironment, name);
+                }
+
+                return EnumUtils.GetValue<Environments>(name);
+            }
+
+            set
+            {
+                var name = EnumUtils.GetName(value);
+
+                Services.State.Set(States.CurrentEnvironment, name);
+            }
+        }
+        
         private readonly MessageLoop MessageLoop;
         private readonly ServiceProvider Services;
         private readonly LoggerProvider Logger;
-        private readonly SubControllers Controllers;
+
+        private readonly BackupController.BackupController BackupController;
+        private readonly Dictionary<Environments, Func<EnvironmentController>> EnvironmentFactory;
+
+        private EnvironmentController CurrentEnvironment;
 
         private object threadLock = new object();
 
@@ -31,16 +57,14 @@ namespace BackgroundService.Source.Controllers
             Logger = new LoggerProvider(GetType().Name);
             Services = new ServiceProvider(MessageLoop);
 
-            Controllers = new SubControllers
+            BackupController = new BackupController.BackupController(Services);
+
+            EnvironmentFactory = new Dictionary<Environments, Func<EnvironmentController>>
             {
-                EnvironmentFactory = new Dictionary<Environments, Func<EnvironmentController>>
-                {
-                    { Environments.PC, () => new PCController(this, Services) },
-                    { Environments.TV, () => new TVController(this, Services) }
-                },
-                Backup = new BackupController.BackupController(Services)
+                { Environments.PC, () => new PCController(this, Services) },
+                { Environments.TV, () => new TVController(this, Services) }
             };
-            Controllers.Environment = Controllers.EnvironmentFactory[Environments.PC]();
+
         }
 
         public void Run()
@@ -55,7 +79,11 @@ namespace BackgroundService.Source.Controllers
         private void InitializeComponents()
         {
             Services.Initialize();
-            Controllers.Backup.Initialize();
+            BackupController.Initialize();
+
+            CurrentEnvironment = EnvironmentFactory[EnvironmentState]();
+
+            Logger.Info($"Startup environment: {CurrentEnvironment.EnvironmentName}");
         }
 
         private void SetupHotkeys()
@@ -70,7 +98,8 @@ namespace BackgroundService.Source.Controllers
 
         private void UpdateHotkeys()
         {
-            lock (threadLock) {
+            lock (threadLock)
+            {
                 Services.OS.Hotkey.UnregisterAllActions();
 
                 var Hotkeys = Services.Config.GetConfig().Hotkeys;
@@ -86,10 +115,8 @@ namespace BackgroundService.Source.Controllers
         {
             lock (threadLock)
             {
-                // Default, startup environment is PC:
-                var isStartupEnvironment = Controllers.Environment == null;
-                var isPcEnvironment = isStartupEnvironment || Controllers.Environment.EnvironmentType == Environments.PC;
-                if (isPcEnvironment)
+                var isPC = CurrentEnvironment.EnvironmentType == Environments.PC;
+                if (isPC)
                 {
                     ChangeEnvironmentTo(Environments.TV);
                 }
@@ -104,22 +131,24 @@ namespace BackgroundService.Source.Controllers
         {
             lock (threadLock)
             {
-                LogControllerEvent($"Switching environment to: {GetEnvironmentName(environment)}");
+                var environmentName = EnumUtils.GetName(environment);
 
-                bool controllerExists = Controllers.EnvironmentFactory.TryGetValue(environment, out var createEnvironmentController);
-                if (!controllerExists)
+                LogControllerEvent($"Switching environment to: {environmentName}");
+
+                bool factoryExists = EnvironmentFactory.TryGetValue(environment, out var createEnvironmentController);
+                if (!factoryExists)
                 {
-                    Logger.Error($"Failed to change environment, controller instance does not exist for environment: {GetEnvironmentName(environment)}");
-                    return;
+                    throw new KeyNotFoundException($"Environment does not have a factory method: {environmentName}");
                 }
 
                 var newController = createEnvironmentController();
-                var currentController = Controllers.Environment;
+                var currentController = CurrentEnvironment;
 
                 currentController?.Teardown();
                 newController.Setup();
 
-                Controllers.Environment = newController;
+                CurrentEnvironment = newController;
+                EnvironmentState = environment;
             }
         }
 
@@ -127,9 +156,9 @@ namespace BackgroundService.Source.Controllers
         {
             lock (threadLock)
             {
-                LogControllerEvent($"Resetting environment: {Controllers.Environment.EnvironmentName}");
+                LogControllerEvent($"Resetting environment: {CurrentEnvironment.EnvironmentName}");
 
-                Controllers.Environment.Reset();
+                CurrentEnvironment.Reset();
             }
         }
 
@@ -152,11 +181,6 @@ namespace BackgroundService.Source.Controllers
                 var currentVisibility = Services.OS.Cursor.CursorVisibility;
                 Services.OS.Cursor.SetCursorVisibility(!currentVisibility);
             }
-        }
-
-        private string GetEnvironmentName(Environments environment)
-        {
-            return Enum.GetName(typeof(Environments), environment);
         }
 
         private void LogControllerEvent(string message)
