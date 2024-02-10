@@ -9,6 +9,9 @@ using BackgroundService.Source.Services.OS.Models;
 using BackgroundService.Source.Services.State.Components;
 using Core.Utils;
 using BackgroundService.Source.Services.OS;
+using System.Threading;
+using Core;
+using System.Windows.Forms;
 
 namespace BackgroundService.Source.Controllers
 {
@@ -41,6 +44,7 @@ namespace BackgroundService.Source.Controllers
             }
         }
 
+        private readonly Mutex ProcessMutex;
         private readonly MessageLoop MessageLoop;
         private readonly ServiceProvider Services;
         private readonly LoggerProvider Logger;
@@ -54,6 +58,7 @@ namespace BackgroundService.Source.Controllers
 
         public MainController()
         {
+            ProcessMutex = new Mutex(true, SharedSettings.ProcessGuids.BACKGROUND_SERVICE.ToString());
             MessageLoop = new MessageLoop();
             Logger = new LoggerProvider(GetType().Name);
             Services = new ServiceProvider(MessageLoop);
@@ -85,6 +90,7 @@ namespace BackgroundService.Source.Controllers
         {
             lock (threadLock)
             {
+                AcquireProcessMutex();
                 DisplayStartupTitle();
                 InitializeComponents();
                 InitializeEnvironment();
@@ -97,6 +103,19 @@ namespace BackgroundService.Source.Controllers
             lock (threadLock)
             {
                 CursorService.EnsureCursorIsVisible();
+                ProcessMutex.ReleaseMutex();
+            }
+        }
+
+        private void AcquireProcessMutex()
+        {
+            var alreadyRunning = !ProcessMutex.WaitOne(TimeSpan.Zero, true);
+
+            if (alreadyRunning)
+            {
+                Services.OS.Window.ShowMessageBoxSync(MessageBoxIcon.Error, "A background service instance is already running.");
+
+                Environment.Exit(-1);
             }
         }
 

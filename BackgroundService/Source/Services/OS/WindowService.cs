@@ -58,12 +58,17 @@ namespace BackgroundService.Source.Services.OS
             return components;
         }
 
-        public void ShowMessageBox(MessageBoxIcon icon, string message)
+        public Task ShowMessageBoxAsync(MessageBoxIcon icon, string message)
         {
-            Task.Run(() =>
+            return Task.Run(() =>
             {
-                MessageBox.Show(message, InternalSettings.WINDOW_TITLE, MessageBoxButtons.OK, icon);
+                ShowMessageBoxSync(icon, message);
             });
+        }
+
+        public void ShowMessageBoxSync(MessageBoxIcon icon, string message)
+        {
+            MessageBox.Show(message, InternalSettings.WINDOW_TITLE, MessageBoxButtons.OK, icon);
         }
     }
 }

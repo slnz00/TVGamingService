@@ -53,7 +53,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             if (!result)
             {
-                Services.OS.Window.ShowMessageBox(
+                Services.OS.Window.ShowMessageBoxAsync(
                     MessageBoxIcon.Error,
                     "Failed to restore PC environment's display settings. Please reset your display settings manually."
                 );

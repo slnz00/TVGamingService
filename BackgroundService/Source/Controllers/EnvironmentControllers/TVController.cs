@@ -52,7 +52,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             if (!result)
             {
-                Services.OS.Window.ShowMessageBox(
+                Services.OS.Window.ShowMessageBoxAsync(
                     MessageBoxIcon.Error,
                     "Failed to switch displays. TV environment's display device is unavailable. Please reconfigure it using the Configurator app."
                 );

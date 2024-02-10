@@ -1,20 +1,20 @@
-﻿using Core.Playnite.Communication;
+﻿using Core;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 
 namespace PlaynitePlugin.Communication
 {
-    internal class ServiceClient<TServiceInterface> : ClientBase<TServiceInterface> where TServiceInterface : class
+    internal class ServiceClient<TService> : ClientBase<TService> where TService : class
     {
-        public TServiceInterface Service => Channel;
+        public TService Service => Channel;
 
         public ServiceClient() : base
         (
             new ServiceEndpoint
             (
-                ContractDescription.GetContract(typeof(TServiceInterface)),
+                ContractDescription.GetContract(typeof(TService)),
                 new NetNamedPipeBinding(),
-                new EndpointAddress(PlayniteCommunicationSettings.GetServiceAddress<TServiceInterface>()))
+                new EndpointAddress(SharedSettings.Playnite.GetServiceAddress<TService>()))
             )
         { }
     }

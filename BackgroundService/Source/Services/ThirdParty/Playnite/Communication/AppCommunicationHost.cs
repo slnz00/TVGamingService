@@ -1,5 +1,5 @@
 ﻿using BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Services;
-using Core.Playnite.Communication;
+using Core;
 using Core.Playnite.Communication.Services;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication
         private ServiceHost CreateServiceHost<TServiceInterface>(TServiceInterface service)
             where TServiceInterface : class
         {
-            var pipeUri = new Uri(PlayniteCommunicationSettings.PIPE_BASE_URL);
+            var pipeUri = new Uri(SharedSettings.Playnite.PIPE_BASE_URL);
             var host = new ServiceHost(service, new Uri[] { pipeUri });
 
             host.AddServiceEndpoint(typeof(TServiceInterface), new NetNamedPipeBinding(), typeof(TServiceInterface).Name);
