@@ -247,7 +247,7 @@ namespace BackgroundService.Source.Controllers
         private void DisplayStartupTitle()
         {
             var ver = Assembly.GetEntryAssembly().GetName().Version;
-            var versionString = $"{ver.Major}.{ver.Minor}:{ver.Build}";
+            var versionString = $"{ver.Major}.{ver.Minor}.{ver.Build}";
             var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             Logger.Plain($"[TV Gaming Service] [Version: {versionString}] [Startup: {now}]");
