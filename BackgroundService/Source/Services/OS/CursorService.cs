@@ -4,6 +4,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.State.Components;
+using BackgroundService.Source.Services.State;
+using System;
 
 namespace BackgroundService.Source.Services.OS
 {
@@ -53,10 +55,6 @@ namespace BackgroundService.Source.Services.OS
             }
         }
 
-        private bool cursorVisibility = true;
-
-        public bool CursorVisibility => cursorVisibility;
-
         public class CursorRegistryValue
         {
             public string Name { get; set; }
@@ -76,35 +74,77 @@ namespace BackgroundService.Source.Services.OS
             LoadRegistrySnapshot();
         }
 
-        public void SetCursorVisibility(bool visible)
+        public static void EnsureCursorIsVisible()
         {
-            Logger.Info($"Setting cursor visibility to: {visible}");
+            Func<List<CursorRegistryValue>> GetRegistryValuesFromState = () =>
+            {
+                try
+                {
+                    var state = new StateService(null, true);
 
-            var cursorValues = visible ? CursorRegistrySnapshot : GetHiddenCursorRegistryValues();
+                    state.Initialize();
 
-            SetCursorRegistry(cursorValues);
-            cursorVisibility = visible;
+                    return state.Get<List<CursorRegistryValue>>(States.CursorRegistrySnapshot);
+                }
+                catch (Exception ex)
+                {
+                    LoggerProvider.Global.Error($"EnsureCursorIsVisible: Failed to get cursor registry values from state: {ex}");
 
+                    return null;
+                }
+            };
+
+            var currentRegistry = GetCurrentRegistryValues();
+            var stateRegistry = GetRegistryValuesFromState();
+            var defaultRegistry = GetDefaultRegistryValues();
+
+            if (IsHiddenCursorRegistry(currentRegistry))
+            {
+                SetCursorRegistry(stateRegistry ?? defaultRegistry);
+                ApplyCursorSettings();
+            }
+        }
+
+        public void SetCursorVisibility(bool visibility)
+        {
+            Logger.Info($"Setting cursor visibility to: {visibility}");
+
+            var currentVisibility = GetCursorVisibility();
+            if (currentVisibility == visibility)
+            {
+                return;
+            }
+
+            var registry = visibility ? CursorRegistrySnapshot : GetHiddenCursorRegistryValues();
+
+            SetCursorRegistry(registry);
             ApplyCursorSettings();
+        }
+
+        public bool GetCursorVisibility()
+        {
+            var registry = GetCurrentRegistryValues();
+
+            return !IsHiddenCursorRegistry(registry);
         }
 
         private void LoadRegistrySnapshot()
         {
-            var currentValues = GetCurrentRegistryValues();
+            var registry = GetCurrentRegistryValues();
 
             // Make sure registry snapshot is not in an empty state to prevent permanently hidden cursors:
-            if (IsHiddenCursorRegistry(currentValues))
+            if (IsHiddenCursorRegistry(registry))
             {
-                CursorRegistrySnapshot = GetDefaultCursorRegistryValues();
+                CursorRegistrySnapshot = GetDefaultRegistryValues();
                 Logger.Debug($"Failed to take cursor registry snapshot since hidden cursor style is used, reverting to default cursor style");
                 SetCursorVisibility(true);
                 return;
             }
 
-            CursorRegistrySnapshot = currentValues;
+            CursorRegistrySnapshot = registry;
         }
 
-        private List<CursorRegistryValue> GetCurrentRegistryValues()
+        private static List<CursorRegistryValue> GetCurrentRegistryValues()
         {
             using (var cursorKey = Registry.CurrentUser.OpenSubKey(CURSORS_REGISTRY_SUB_KEY))
             {
@@ -121,7 +161,7 @@ namespace BackgroundService.Source.Services.OS
             }
         }
 
-        private void SetCursorRegistry(List<CursorRegistryValue> registryValues)
+        private static void SetCursorRegistry(List<CursorRegistryValue> registryValues)
         {
             using (var cursorKey = Registry.CurrentUser.OpenSubKey(CURSORS_REGISTRY_SUB_KEY, true))
             {
@@ -129,26 +169,26 @@ namespace BackgroundService.Source.Services.OS
             }
         }
 
-        private void ApplyCursorSettings()
+        private static void ApplyCursorSettings()
         {
             SystemParametersInfo(SPI_SETCURSORS, 0, 0, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
         }
 
-        private List<CursorRegistryValue> GetDefaultCursorRegistryValues()
+        private static List<CursorRegistryValue> GetDefaultRegistryValues()
         {
             return CURSOR_REGISTRY_NAMES
                 .Select(name => new CursorRegistryValue(name, ""))
                 .ToList();
         }
 
-        private List<CursorRegistryValue> GetHiddenCursorRegistryValues()
+        private static List<CursorRegistryValue> GetHiddenCursorRegistryValues()
         {
             return CURSOR_REGISTRY_NAMES
                 .Select(name => new CursorRegistryValue(name, EMPTY_CURSOR_FILE_PATH))
                 .ToList();
         }
 
-        private bool IsHiddenCursorRegistry(IEnumerable<CursorRegistryValue> registryValues)
+        private static bool IsHiddenCursorRegistry(IEnumerable<CursorRegistryValue> registryValues)
         {
             return registryValues.Any(value => value.Path.Contains(EMPTY_CURSOR_FILE_NAME));
         }

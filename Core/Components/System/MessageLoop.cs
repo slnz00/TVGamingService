@@ -88,6 +88,11 @@ namespace Core.Components.System
             }
         }
 
+        public void Stop()
+        {
+            PostThreadMessage(ThreadId, WM_CUSTOM_EXIT, IntPtr.Zero, IntPtr.Zero);
+        }
+
         public void ExecuteOnMainThread(Action action)
         {
             actionQueue.Enqueue(action);
@@ -104,7 +109,8 @@ namespace Core.Components.System
 
         private void ProcessActionQueue()
         {
-            while (actionQueue.TryDequeue(out Action action)) {
+            while (actionQueue.TryDequeue(out Action action))
+            {
                 action();
             }
         }

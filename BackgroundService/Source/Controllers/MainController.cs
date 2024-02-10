@@ -8,6 +8,7 @@ using System.Reflection;
 using BackgroundService.Source.Services.OS.Models;
 using BackgroundService.Source.Services.State.Components;
 using Core.Utils;
+using BackgroundService.Source.Services.OS;
 
 namespace BackgroundService.Source.Controllers
 {
@@ -39,7 +40,7 @@ namespace BackgroundService.Source.Controllers
                 Services.State.Set(States.CurrentEnvironment, name);
             }
         }
-        
+
         private readonly MessageLoop MessageLoop;
         private readonly ServiceProvider Services;
         private readonly LoggerProvider Logger;
@@ -64,16 +65,39 @@ namespace BackgroundService.Source.Controllers
                 { Environments.PC, () => new PCController(this, Services) },
                 { Environments.TV, () => new TVController(this, Services) }
             };
-
         }
 
         public void Run()
         {
-            DisplayStartupTitle();
-            InitializeComponents();
-            SetupHotkeys();
+            Setup();
 
             MessageLoop.Run();
+        }
+
+        public void Stop()
+        {
+            MessageLoop.Stop();
+
+            Teardown();
+        }
+
+        private void Setup()
+        {
+            lock (threadLock)
+            {
+                DisplayStartupTitle();
+                InitializeComponents();
+                InitializeEnvironment();
+                SetupHotkeys();
+            }
+        }
+
+        private void Teardown()
+        {
+            lock (threadLock)
+            {
+                CursorService.EnsureCursorIsVisible();
+            }
         }
 
         private void InitializeComponents()
@@ -81,9 +105,20 @@ namespace BackgroundService.Source.Controllers
             Services.Initialize();
             BackupController.Initialize();
 
+            ConsoleWindowHandler.OnExit = Stop;
+            ConsoleWindowHandler.Initialize();
+        }
+
+        private void InitializeEnvironment()
+        {
             CurrentEnvironment = EnvironmentFactory[EnvironmentState]();
 
             Logger.Info($"Startup environment: {CurrentEnvironment.EnvironmentName}");
+
+            if (CurrentEnvironment.EnvironmentType != Environments.PC)
+            {
+                ChangeEnvironmentTo(Environments.PC);
+            }
         }
 
         private void SetupHotkeys()
@@ -178,7 +213,7 @@ namespace BackgroundService.Source.Controllers
             {
                 LogControllerEvent("Toggling cursor visibility");
 
-                var currentVisibility = Services.OS.Cursor.CursorVisibility;
+                var currentVisibility = Services.OS.Cursor.GetCursorVisibility();
                 Services.OS.Cursor.SetCursorVisibility(!currentVisibility);
             }
         }

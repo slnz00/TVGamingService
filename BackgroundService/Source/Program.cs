@@ -1,5 +1,6 @@
 ﻿using BackgroundService.Source.Controllers;
 using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.OS;
 using System;
 
 namespace BackgroundService.Source
@@ -10,12 +11,18 @@ namespace BackgroundService.Source
         {
             try
             {
+                CursorService.EnsureCursorIsVisible();
+
                 MainController mainController = new MainController();
 
                 mainController.Run();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 LoggerProvider.Global.Error($"Unhandled exception: {ex}");
+
+                CursorService.EnsureCursorIsVisible();
+                Environment.Exit(1);
             }
         }
     }

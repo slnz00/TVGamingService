@@ -52,6 +52,7 @@
     <Compile Include="Components\EventListenerRegistry.cs" />
     <Compile Include="Components\FileChangeWatcher.cs" />
     <Compile Include="Components\Async\ManagedTask.cs" />
+    <Compile Include="Components\System\ConsoleWindowHandler.cs" />
     <Compile Include="Configs\Config.cs" />
     <Compile Include="Configs\JobsConfig.cs" />
     <Compile Include="Models\ILogger.cs" />
