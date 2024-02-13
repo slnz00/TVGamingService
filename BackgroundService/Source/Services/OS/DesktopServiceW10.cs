@@ -6,6 +6,8 @@ using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
 using Core.Utils;
 using Microsoft.Win32;
+using BackgroundService.Source.Services.State.Components;
+
 using static Core.WinAPI.VirtualDesktop.VirtualDesktopAPIW10;
 using static Core.WinAPI.DesktopAPI;
 
@@ -57,8 +59,73 @@ namespace BackgroundService.Source.Services.OS
                 key.SetValue("WallpaperStyle", "10");
                 key.SetValue("TileWallpaper", "0");
 
-                SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, FSUtils.GetAbsolutePath(wallpaperPath), SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+                SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, wallpaperPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
             }
+        }
+
+        public override void ChangeWallpaperOnCurrentDesktop(string wallpaperPath)
+        {
+            throw new NotSupportedException($"Not supported on Windows 10, use {nameof(ChangeWallpaper)} method instead");
+        }
+
+        public override bool BackupWallpaperSettings()
+        {
+            try
+            {
+                Logger.Info("Creating backup snapshot from current wallpaper settings");
+
+                var snapshot = new WallpaperSettingsSnapshot();
+
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(DESKTOP_REGISTRY, false))
+                {
+                    snapshot.WallpaperStyle = (string)key.GetValue("WallpaperStyle");
+                    snapshot.TileWallpaper = (string)key.GetValue("TileWallpaper");
+                    snapshot.WallpaperPath = (string)key.GetValue("WallPaper");
+                }
+
+                Services.State.Set(States.WallpaperSettingsSnapshot, snapshot);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to backup wallpaper settings: {ex}");
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public override bool RestoreWallpaperSettings()
+        {
+            try
+            {
+                Logger.Info("Restoring wallpaper settings from snapshot");
+
+                var snapshot = Services.State.Get<WallpaperSettingsSnapshot>(States.WallpaperSettingsSnapshot);
+
+                if (snapshot == null)
+                {
+                    Logger.Error("Failed to restore wallpaper settings: Snapshot not found in state");
+
+                    return false;
+                }
+
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(DESKTOP_REGISTRY, true))
+                {
+                    key.SetValue("WallpaperStyle", snapshot.WallpaperStyle);
+                    key.SetValue("TileWallpaper", snapshot.TileWallpaper);
+                }
+
+                SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, snapshot.WallpaperPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to restore wallpaper settings: {ex}");
+
+                return false;
+            }
+
+            return true;
         }
 
         public override string GetCurrentDesktopName()

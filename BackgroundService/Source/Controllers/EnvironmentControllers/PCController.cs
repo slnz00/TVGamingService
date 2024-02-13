@@ -1,5 +1,6 @@
 ﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
+using Core.Utils;
 using System.Windows.Forms;
 
 namespace BackgroundService.Source.Controllers.EnvironmentControllers
@@ -12,53 +13,79 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnSetup()
         {
-            Services.OS.Cursor.SetCursorVisibility(true);
-
-            RestoreDisplaySettings();
-            
-            Services.OS.Audio.RestoreAudioSettings();
-
-            Services.OS.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
-            Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);
-            Services.OS.Desktop.ToggleIconsVisiblity(true);
-
-            Services.GameConfig.LoadGameConfigsForEnvironment(EnvironmentType);
+            RestoreSettings();
+            ResetDesktop();
+            ResetCursor();
         }
 
         protected override void OnReset()
         {
-            Services.OS.Cursor.SetCursorVisibility(true);
-
-            Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);
-            Services.OS.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
-            Services.OS.Desktop.ToggleIconsVisiblity(true);
+            ResetDesktop();
+            ResetCursor();
         }
 
         protected override void OnTeardown()
         {
-            BackupDisplaySettings();
+            BackupSettings();
+            CloseDesktopPlaynite();
+        }
 
-            Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
+        private void ResetDesktop()
+        {
+            Services.OS.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
+            Services.OS.Desktop.ToggleIconsVisiblity(true);
+        }
+
+        private void ResetCursor()
+        {
+            Services.OS.Cursor.SetCursorVisibility(true);
+        }
+
+        private void CloseDesktopPlaynite()
+        {
             Services.ThirdParty.Playnite.CloseDesktopPlaynite();
-            Services.OS.Audio.BackupAudioSettings();
         }
 
-        private void BackupDisplaySettings()
+        private void BackupSettings()
         {
+            if (!OSUtils.IsWindows11())
+            {
+                Services.OS.Desktop.BackupWallpaperSettings();
+            }
+
             Services.OS.Display.BackupDisplaySettings();
+            Services.OS.Audio.BackupAudioSettings();
+            Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
         }
 
-        private void RestoreDisplaySettings()
+        private void RestoreSettings()
         {
-            var result = Services.OS.Display.RestoreDisplaySettings();
+            bool result;
 
+            if (!OSUtils.IsWindows11())
+            {
+                Services.OS.Desktop.RestoreWallpaperSettings();
+            }
+
+            result = Services.OS.Display.RestoreDisplaySettings();
             if (!result)
             {
                 Services.OS.Window.ShowMessageBoxAsync(
                     MessageBoxIcon.Error,
-                    "Failed to restore PC environment's display settings. Please reset your display settings manually."
+                    "Failed to restore PC environment's display settings. Please set your display settings manually."
                 );
             }
+
+            result = Services.OS.Audio.RestoreAudioSettings();
+            if (!result)
+            {
+                Services.OS.Window.ShowMessageBoxAsync(
+                    MessageBoxIcon.Error,
+                    "Failed to restore PC environment's audio settings. Please set your audio settings manually."
+                );
+            }
+
+            Services.GameConfig.LoadGameConfigsForEnvironment(EnvironmentType);
         }
     }
 }

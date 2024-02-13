@@ -17,6 +17,13 @@ namespace BackgroundService.Source.Services.OS
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(devicePath))
+                {
+                    Logger.Info("No display device path has been provided for switching to display, skipping...");
+
+                    return true;
+                }
+
                 Logger.Info($"Switching to display: {fullName}");
 
                 var settings = GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ALL_PATHS);

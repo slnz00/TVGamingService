@@ -91,6 +91,11 @@ namespace BackgroundService.Source.Services.OS
 
         public override void ChangeWallpaper(string wallpaperPath)
         {
+            throw new NotSupportedException($"Not supported on Windows 11, use {nameof(ChangeWallpaperOnCurrentDesktop)} method instead");
+        }
+
+        public override void ChangeWallpaperOnCurrentDesktop(string wallpaperPath)
+        {
             if (string.IsNullOrEmpty(wallpaperPath))
             {
                 Logger.Debug("Provided wallpaper path is empty, skipping...");
@@ -114,6 +119,16 @@ namespace BackgroundService.Source.Services.OS
 
                 VirtualDesktopManagerInternal.SetDesktopWallpaper(currentDesktop, fullWallpaperPath);
             }
+        }
+
+        public override bool BackupWallpaperSettings()
+        {
+            throw new NotSupportedException($"Not supported on Windows 11");
+        }
+
+        public override bool RestoreWallpaperSettings()
+        {
+            throw new NotSupportedException($"Not supported on Windows 11");
         }
 
         public override string GetCurrentDesktopName()

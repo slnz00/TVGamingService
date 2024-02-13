@@ -17,6 +17,11 @@ namespace Core.Utils
             }
         }
 
+        public static bool IsWindows11()
+        {
+            return GetCurrentWindowsVersionName().ToLower().Contains("windows 11");
+        }
+
         public static bool IsWindows11(string windowsVersion)
         {
             return windowsVersion.ToLower().Contains("windows 11");

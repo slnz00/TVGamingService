@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Jobs.Components;

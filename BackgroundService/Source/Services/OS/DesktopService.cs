@@ -33,6 +33,12 @@ namespace BackgroundService.Source.Services.OS
 
         public abstract void ChangeWallpaper(string wallpaperPath);
 
+        public abstract void ChangeWallpaperOnCurrentDesktop(string wallpaperPath);
+
+        public abstract bool BackupWallpaperSettings();
+
+        public abstract bool RestoreWallpaperSettings();
+
         public abstract List<WindowComponent> GetWindowsOnDesktop(string desktopName);
 
         public void ToggleIconsVisiblity(bool visible)

@@ -15,21 +15,16 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         protected override void OnSetup()
         {
-            Services.OS.Cursor.SetCursorVisibility(false);
+            HideCursor();
 
-            SwitchToTVDisplay();
-
-            Services.OS.Audio.SetDefaultAudioDevices(Config.Audio.InputDeviceName, Config.Audio.OutputDeviceName);
-            Services.OS.Audio.StopMedia();
-
-            Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
-            Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);
-            Services.OS.Desktop.ToggleIconsVisiblity(false);
+            SetupDisplay();
+            SetupAudio();
+            SetupDesktop();
 
             CloseThirdPartyApps();
             OpenThirdPartyApps();
 
-            Services.GameConfig.LoadGameConfigsForEnvironment(EnvironmentType);
+            LoadGameConfigs();
         }
 
         protected override void OnReset()
@@ -44,10 +39,47 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         {
             CloseThirdPartyApps();
 
+            SaveGameConfigs();
+        }
+
+        private void LoadGameConfigs()
+        {
+            Services.GameConfig.LoadGameConfigsForEnvironment(EnvironmentType);
+        }
+
+        private void SaveGameConfigs()
+        {
             Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
         }
 
-        private void SwitchToTVDisplay()
+        private void HideCursor()
+        {
+            Services.OS.Cursor.SetCursorVisibility(false);
+        }
+
+        private void SetupDesktop()
+        {
+            Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
+            Services.OS.Desktop.ToggleIconsVisiblity(false);
+
+            if (OSUtils.IsWindows11())
+            {
+                Services.OS.Desktop.ChangeWallpaperOnCurrentDesktop(Config.WallpaperPath);
+            }
+            else
+            {
+                Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);
+            }
+        }
+
+        private void SetupAudio()
+        {
+            Services.OS.Audio.StopMedia();
+
+            Services.OS.Audio.SetDefaultAudioDevices(Config.Audio.InputDeviceName, Config.Audio.OutputDeviceName);
+        }
+
+        private void SetupDisplay()
         {
             var result = Services.OS.Display.SwitchToDisplay(Config.Display.DevicePath, Config.Display.DeviceName);
 

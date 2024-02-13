@@ -191,6 +191,7 @@
     <Compile Include="Source\Services\OS\Models\DisplaySettingsSnapshot.cs" />
     <Compile Include="Source\Services\OS\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
+    <Compile Include="Source\Services\OS\Models\WallpaperSettingsSnapshot.cs" />
     <Compile Include="Source\Services\OS\Models\WindowComponent.cs" />
     <Compile Include="Source\Services\State\Components\StateEntry.cs" />
     <Compile Include="Source\Services\State\StateService.cs" />
