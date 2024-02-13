@@ -19,7 +19,8 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             SwitchToTVDisplay();
 
-            Services.OS.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
+            Services.OS.Audio.SetDefaultAudioDevices(Config.Audio.InputDeviceName, Config.Audio.OutputDeviceName);
+            Services.OS.Audio.StopMedia();
 
             Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
             Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);

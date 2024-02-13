@@ -42,9 +42,9 @@ namespace BackgroundService.Source.Services.OS
 
         public override void ChangeWallpaper(string wallpaperPath)
         {
-            if (string.IsNullOrEmpty(wallpaperPath))
+            if (string.IsNullOrWhiteSpace(wallpaperPath))
             {
-                Logger.Debug("Provided wallpaper path is empty, skipping...");
+                Logger.Debug("Change wallpaper: No wallpaper path has been specified, skipping...");
 
                 return;
             }

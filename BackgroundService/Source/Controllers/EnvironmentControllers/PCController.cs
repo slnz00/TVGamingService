@@ -16,7 +16,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             RestoreDisplaySettings();
             
-            Services.OS.SoundDevice.SetDefaultSoundDevice(Config.Sound.DeviceName);
+            Services.OS.Audio.RestoreAudioSettings();
 
             Services.OS.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
             Services.OS.Desktop.ChangeWallpaper(Config.WallpaperPath);
@@ -40,6 +40,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
             Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
             Services.ThirdParty.Playnite.CloseDesktopPlaynite();
+            Services.OS.Audio.BackupAudioSettings();
         }
 
         private void BackupDisplaySettings()

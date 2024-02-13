@@ -6,8 +6,9 @@
     "ToggleConsoleVisibility": [ "Alt", "NumPad9" ]
   },
   "PC": {
-    "Sound": {
-      "DeviceName": ""
+    "Audio": {
+      "InputDeviceName": "",
+      "OutputDeviceName": ""
     },
     "Display": {
       "DevicePath": "",
@@ -16,8 +17,9 @@
     "WallpaperPath": ""
   },
   "TV": {
-    "Sound": {
-      "DeviceName": ""
+    "Audio": {
+      "InputDeviceName": "",
+      "OutputDeviceName": ""
     },
     "Display": {
       "DevicePath": "",

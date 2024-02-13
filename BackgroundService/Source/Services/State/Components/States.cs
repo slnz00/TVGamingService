@@ -13,6 +13,9 @@ namespace BackgroundService.Source.Services.State.Components
         [StateEntry("DisplaySettingsSnapshot", typeof(DisplaySettingsSnapshot))]
         DisplaySettingsSnapshot,
 
+        [StateEntry("AudioSettingsSnapshot", typeof(AudioSettingsSnapshot))]
+        AudioSettingsSnapshot,
+
         [StateEntry("CurrentEnvironment", typeof(string))]
         CurrentEnvironment,
     }

@@ -24,7 +24,7 @@ namespace BackgroundService.Source
         public static readonly int BACKUP_DEFAULT_AMOUNT = 5;
 
         public static readonly uint TIMEOUT_HOTKEY_ACTION = 1000;
-        public static readonly uint TIMEOUT_DEFAULT_SOUND_DEVICE_SET = 25_000;
+        public static readonly uint TIMEOUT_SET_DEFAULT_AUDIO_DEVICE = 10_000;
 
         public static readonly bool CONSOLE_DEFAULT_VISIBILITY = false;
 

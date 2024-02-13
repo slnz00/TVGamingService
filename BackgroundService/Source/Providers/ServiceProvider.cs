@@ -29,7 +29,7 @@ namespace BackgroundService.Source.Providers
             public DesktopService Desktop;
             public HotkeyService Hotkey;
             public DisplayService Display;
-            public SoundDeviceService SoundDevice;
+            public AudioService Audio;
             public CursorService Cursor;
             public WindowService Window;
         }
@@ -61,7 +61,7 @@ namespace BackgroundService.Source.Providers
                 Desktop = RegisterService(DesktopService.Create(this)),
                 Hotkey = RegisterService(new HotkeyService(this)),
                 Display = RegisterService(new DisplayService(this)),
-                SoundDevice = RegisterService(new SoundDeviceService(this)),
+                Audio = RegisterService(new AudioService(this)),
                 Cursor = RegisterService(new CursorService(this)),
                 Window = RegisterService(new WindowService(this)),
             };

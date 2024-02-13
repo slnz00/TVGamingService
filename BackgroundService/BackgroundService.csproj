@@ -45,12 +45,14 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>BackgroundService.Source.Program</StartupObject>
@@ -180,6 +182,7 @@
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStarting.cs" />
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStopped.cs" />
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\Timer.cs" />
+    <Compile Include="Source\Services\OS\Models\AudioSettingsSnapshot.cs" />
     <Compile Include="Source\Services\OS\DesktopServiceW10.cs" />
     <Compile Include="Source\Services\OS\DesktopServiceW11.cs" />
     <Compile Include="Source\Services\OS\DisplayService.cs" />
@@ -212,7 +215,7 @@
     <Compile Include="Source\Services\OS\HotkeyService.cs" />
     <Compile Include="Source\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source\Services\OS\SoundDeviceService.cs" />
+    <Compile Include="Source\Services\OS\AudioService.cs" />
     <Compile Include="Source\Providers\LoggerProvider.cs" />
     <Content Include="Resources\tv-gaming-empty-cursor.cur">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

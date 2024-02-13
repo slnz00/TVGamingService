@@ -49,14 +49,15 @@ namespace Core.Configs
 
     public class EnvironmentConfig
     {
-        public SoundConfig Sound { get; set; }
+        public AudioConfig Audio { get; set; }
         public DisplayConfig Display { get; set; }
         public string WallpaperPath { get; set; }
     }
 
-    public class SoundConfig
+    public class AudioConfig
     {
-        public string DeviceName { get; set; }
+        public string OutputDeviceName { get; set; }
+        public string InputDeviceName { get; set; }
     }
 
     public class DisplayConfig

@@ -11,12 +11,6 @@ namespace BackgroundService.Source.Services.OS
 {
     internal class DisplayService : Service
     {
-        private DisplaySettingsSnapshot DisplaySettingsSnapshot
-        {
-            get => Services.State.Get<DisplaySettingsSnapshot>(States.DisplaySettingsSnapshot);
-            set => Services.State.Set(States.DisplaySettingsSnapshot, value);
-        }
-
         public DisplayService(ServiceProvider services) : base(services) { }
 
         public bool SwitchToDisplay(string devicePath, string fullName)
@@ -69,7 +63,9 @@ namespace BackgroundService.Source.Services.OS
 
                 Logger.Debug($"Displays queried for snapshot: {string.Join(", ", displayPaths)}");
 
-                DisplaySettingsSnapshot = new DisplaySettingsSnapshot(settings, displays);
+                var snapshot = new DisplaySettingsSnapshot(settings, displays);
+
+                Services.State.Set(States.DisplaySettingsSnapshot, snapshot);
 
                 return true;
             }
@@ -87,7 +83,7 @@ namespace BackgroundService.Source.Services.OS
             {
                 Logger.Info("Restoring display settings from snapshot");
 
-                var snapshot = DisplaySettingsSnapshot;
+                var snapshot = Services.State.Get<DisplaySettingsSnapshot>(States.DisplaySettingsSnapshot);
                 var settings = GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ALL_PATHS);
                 var availableDisplays = GetAvailableDisplays(settings);
 
