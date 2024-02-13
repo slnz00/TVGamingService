@@ -54,7 +54,7 @@ namespace BackgroundService.Source.Services.OS
 
                     if (result)
                     {
-                        Logger.Info($"Hotkey unregistered: {hotkey.Name} -> {hotkey.KeyModifierName} + {hotkey.KeyName}");
+                        Logger.Debug($"Hotkey unregistered: {hotkey.Name} -> {hotkey.KeyModifierName} + {hotkey.KeyName}");
                     }
                     else
                     {

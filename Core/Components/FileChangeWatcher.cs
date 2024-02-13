@@ -88,11 +88,13 @@ namespace Core.Components
                     lock (threadLock)
                     {
                         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                        bool shouldDispatchEvent = eventDispatchAt != null && eventDispatchAt > now;
+                        bool shouldDispatchEvent = eventDispatchAt != null && eventDispatchAt <= now;
 
                         if (shouldDispatchEvent)
                         {
                             DispatchOnChangedEvent();
+
+                            eventDispatchAt = null;
                         }
                     }
 
