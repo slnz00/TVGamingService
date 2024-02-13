@@ -9,6 +9,8 @@ namespace Core.Components
     {
         public class Context
         {
+            private readonly TimeSpan LOCK_TIMEOUT = TimeSpan.FromMilliseconds(10);
+
             public CancellationTokenSource Cancellation { get; set; }
 
             public async Task Delay(int millisecondsDelay)
@@ -19,6 +21,58 @@ namespace Core.Components
             public async Task Delay(TimeSpan delay)
             {
                 await Task.Delay(delay, Cancellation.Token);
+            }
+
+            public void Lock(object lockObject, Action action)
+            {
+                var lockAcquired = false;
+
+                while (!lockAcquired)
+                {
+                    lockAcquired = TryToLockAndRun(lockObject, action);
+
+                    Cancellation.Token.ThrowIfCancellationRequested();
+                }
+            }
+
+            public bool Lock(object lockObject, TimeSpan timeout, Action action)
+            {
+                var lockAcquired = false;
+                var timeoutAt = NowMs() + timeout.TotalMilliseconds;
+
+                while (!lockAcquired && timeoutAt <= NowMs())
+                {
+                    lockAcquired = TryToLockAndRun(lockObject, action);
+
+                    Cancellation.Token.ThrowIfCancellationRequested();
+                }
+
+                return lockAcquired;
+            }
+
+            private bool TryToLockAndRun(object lockObject, Action action)
+            {
+                var lockAcquired = false;
+
+                if (Monitor.TryEnter(lockObject, LOCK_TIMEOUT))
+                {
+                    try
+                    {
+                        action();
+                    }
+                    finally
+                    {
+                        Monitor.Exit(lockObject);
+                        lockAcquired = true;
+                    }
+                }
+
+                return lockAcquired;
+            }
+
+            private long NowMs()
+            {
+                return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             }
         }
 
@@ -77,7 +131,7 @@ namespace Core.Components
 
             if (wait)
             {
-                bool timedOut = !Wait(TimeSpan.FromSeconds(900));
+                bool timedOut = !Wait(TimeSpan.FromSeconds(2));
                 if (timedOut)
                 {
                     throw new TimeoutException("ManagedTask cancellation timed out");

@@ -85,7 +85,7 @@ namespace Core.Components
             {
                 while (true)
                 {
-                    lock (threadLock)
+                    ctx.Lock(threadLock, () =>
                     {
                         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                         bool shouldDispatchEvent = eventDispatchAt != null && eventDispatchAt <= now;
@@ -96,7 +96,7 @@ namespace Core.Components
 
                             eventDispatchAt = null;
                         }
-                    }
+                    });
 
                     await ctx.Delay(EVENT_LOOP_SLEEP_TIME_MS);
                 }

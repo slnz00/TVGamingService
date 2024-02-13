@@ -5,7 +5,7 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
 {
     internal class BackupManager : IDisposable
     {
-        private const long SCHEDULE_DELAY = 4000;
+        private const long SCHEDULE_DELAY = 1500;
 
         private object threadLock = new object();
 

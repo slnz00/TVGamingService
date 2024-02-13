@@ -2,6 +2,7 @@
 using BackgroundService.Source.Providers;
 using Core.Components;
 using Core.Configs;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,10 @@ namespace BackgroundService.Source.Controllers.BackupController
         private ManagedTask eventLoop = null;
         private List<BackupManager> managers = null;
 
+        public bool Initialized { get; private set; } = false;
+
+        public bool Running => eventLoop != null ? eventLoop.IsAlive : false;
+
         private ServiceProvider Services { get; set; }
         private LoggerProvider Logger { get; set; }
 
@@ -28,45 +33,104 @@ namespace BackgroundService.Source.Controllers.BackupController
 
         public void Initialize()
         {
-            LoadManagers();
-            StartEventLoop();
-
-            Services.Config.ConfigWatcher.OnChanged(() =>
+            lock (threadLock)
             {
-                lock (threadLock) {
-                    StopEventLoop();
-                    ClearState();
-                    LoadManagers();
-                    StartEventLoop();
+                if (Initialized)
+                {
+                    return;
                 }
-            });
+
+                Services.Config.ConfigWatcher.OnChanged(() => Reload());
+
+                Initialized = true;
+            }
         }
 
-        private void ClearState()
+        public void Start()
         {
-            eventLoop = null;
-            managers = null;
+            lock (threadLock)
+            {
+                if (Running)
+                {
+                    return;
+                }
+
+                if (!Initialized)
+                {
+                    Initialize();
+                }
+
+                LoadManagers();
+                StartEventLoop();
+            }
+        }
+
+        public void Stop()
+        {
+            lock (threadLock)
+            {
+                if (!Running)
+                {
+                    return;
+                }
+
+                StopEventLoop();
+                DisposeManagers();
+            }
+        }
+
+        public void Reload()
+        {
+            lock (threadLock)
+            {
+                if (Running)
+                {
+                    Stop();
+                }
+
+                Start();
+            }
         }
 
         private void LoadManagers()
         {
-            var backupConfigs = GetBackupConfigs();
-
-            if (backupConfigs?.Count == 0)
+            if (managers != null)
             {
-                Logger.Info("No backups were configured, skipping initialization...");
+                DisposeManagers();
+            }
 
+            managers = GetBackupConfigs()
+                .Select(backupConfig => CreateManagerFromConfig(backupConfig))
+                .ToList();
+        }
+
+        private void DisposeManagers()
+        {
+            if (managers == null)
+            {
                 return;
             }
 
-            SetupManagers();
+            managers.ForEach(m =>
+            {
+                try
+                {
+                    m.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to dispose backup manager: {ex}");
+                }
+            });
+
+            managers = null;
         }
 
         private void StartEventLoop()
         {
-            if (eventLoop != null)
+            if (Running)
             {
-                Logger.Error("StartEventLoop method called multiple times, event loop is already started...");
+                Logger.Error($" Failed to start event loop for backup controller, event loop is already running");
 
                 return;
             }
@@ -75,7 +139,10 @@ namespace BackgroundService.Source.Controllers.BackupController
             {
                 while (true)
                 {
-                    RunBackups();
+                    ctx.Lock(threadLock, () =>
+                    {
+                        RunBackups();
+                    });
 
                     await ctx.Delay(EVENT_LOOP_DELAY);
                 }
@@ -84,23 +151,10 @@ namespace BackgroundService.Source.Controllers.BackupController
 
         private void StopEventLoop()
         {
-            if (eventLoop != null) {
+            if (eventLoop != null)
+            {
                 eventLoop.Cancel();
             }
-        }
-
-        private void SetupManagers()
-        {
-            if (managers != null)
-            {
-                Logger.Error("SetupManagers method called multiple times, backup managers are already created...");
-
-                return;
-            }
-
-            managers = GetBackupConfigs()
-                .Select(backupConfig => CreateManagerFromConfig(backupConfig))
-                .ToList();
         }
 
         private void RunBackups()

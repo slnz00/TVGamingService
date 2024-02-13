@@ -76,11 +76,13 @@ namespace BackgroundService.Source.Controllers
         {
             Setup();
 
+            BackupController.Start();
             MessageLoop.Run();
         }
 
         public void Stop()
         {
+            BackupController.Stop();
             MessageLoop.Stop();
 
             Teardown();
