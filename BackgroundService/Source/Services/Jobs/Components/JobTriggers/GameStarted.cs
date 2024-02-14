@@ -1,6 +1,5 @@
 ﻿using BackgroundService.Source.Services.Jobs.Components.Common;
 using Core.Playnite.Communication.Models;
-using System;
 
 namespace BackgroundService.Source.Services.Jobs.Components.JobTriggers
 {
@@ -19,7 +18,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobTriggers
 
         protected override void OnOpen()
         {
-            eventListenerId = Services.ThirdParty.Playnite.OnGameStarting(gameInfo =>
+            eventListenerId = Services.ThirdParty.Playnite.OnGameStarted(gameInfo =>
             {
                 if (!Filters.MatchesWithFilter(gameInfo, Options.Filter))
                 {
