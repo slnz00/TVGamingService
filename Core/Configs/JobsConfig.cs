@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -12,48 +11,54 @@ namespace Core.Configs
         public static JobsConfig ReadFromFile(string filePath)
         {
             string configJson = File.ReadAllText(filePath, Encoding.Default);
-            return JsonConvert.DeserializeObject<JobsConfig>(configJson);
+
+            return JsonConvert.DeserializeObject<JobsConfig>(configJson, new JsonSerializerSettings
+            {
+                ObjectCreationHandling = ObjectCreationHandling.Replace
+            });
         }
 
-        public static JobsConfig WriteToFile(string filePath)
+        public static void WriteToFile(JobsConfig config, string filePath)
         {
-            throw new NotImplementedException();
+            var configJson = JsonConvert.SerializeObject(config);
+
+            File.WriteAllText(filePath, configJson, Encoding.Default);
         }
 
-        public EnvironmentJobsConfig PC { get; set; } = new EnvironmentJobsConfig();
-        public EnvironmentJobsConfig TV { get; set; } = new EnvironmentJobsConfig();
+        public EnvironmentJobsConfig PCEnvironment = new EnvironmentJobsConfig();
+        public EnvironmentJobsConfig GameEnvironment = new EnvironmentJobsConfig();
     }
 
     public class EnvironmentJobsConfig {
-        public List<JobConfig> Setup { get; set; } = new List<JobConfig>();
-        public List<JobConfig> Reset { get; set; } = new List<JobConfig>();
-        public List<JobConfig> Teardown { get; set; } = new List<JobConfig>();
+        public List<JobConfig> Setup = new List<JobConfig>();
+        public List<JobConfig> Reset = new List<JobConfig>();
+        public List<JobConfig> Teardown = new List<JobConfig>();
     }
 
     public class JobConfig
     {
-        public string Id { get; set; }
+        public string Id;
 
-        public string Mode { get; set; }
+        public string Mode;
 
-        public JobTriggerConfig TriggerWhen { get; set; }
+        public JobTriggerConfig TriggerWhen;
 
-        public JobTriggerConfig RepeatUntil { get; set; }
+        public JobTriggerConfig RepeatUntil;
 
-        public List<JobActionConfig> Actions { get; set; }
+        public List<JobActionConfig> Actions;
 
-        public int TimeBetweenExecutions { get; set; } = 500;
+        public int TimeBetweenExecutions = 500;
     }
 
     public class JobActionConfig
     {
-        public string Type { get; set; }
-        public JObject Options { get; set; } = new JObject();
+        public string Type;
+        public JObject Options = new JObject();
     }
 
     public class JobTriggerConfig
     {
-        public string Type { get; set; }
-        public JObject Options { get; set; } = new JObject();
+        public string Type;
+        public JObject Options = new JObject();
     }
 }

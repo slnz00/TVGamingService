@@ -13,11 +13,9 @@ namespace BackgroundService.Source.Services.OS
 {
     internal class DesktopServiceW10 : DesktopService
     {
-        private static readonly string VIRTUAL_DESKTOP_PATH = InternalSettings.PATH_VIRTUAL_DESKTOP_W10;
-
-        private IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
-        private IVirtualDesktopManagerInternal2 VirtualDesktopManagerInternal2;
-        private IApplicationViewCollection ApplicationViewCollection;
+        private readonly IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
+        private readonly IVirtualDesktopManagerInternal2 VirtualDesktopManagerInternal2;
+        private readonly IApplicationViewCollection ApplicationViewCollection;
 
         public DesktopServiceW10(ServiceProvider services) : base(services)
         {

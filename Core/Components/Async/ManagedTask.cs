@@ -79,14 +79,14 @@ namespace Core.Components
         public Task Task => task;
         public bool IsAlive => AsyncUtils.IsTaskAlive(task);
 
-        private Func<Context, Task> action;
-        private Context context;
-        private Task task;
-        private CancellationTokenSource cancellation;
+        private readonly Func<Context, Task> action;
+        private readonly Context context;
+        private readonly CancellationTokenSource cancellation;
+        private readonly Task task;
 
         public static ManagedTask Run(Action<Context> action, TaskCreationOptions options = TaskCreationOptions.None)
         {
-            return Run(async (ctx) => action(ctx), options);
+            return Run(async (ctx) => await Task.Run(() => action(ctx)), options);
         }
 
         public static ManagedTask Run(Func<Context, Task> action, TaskCreationOptions options = TaskCreationOptions.None)
@@ -99,7 +99,7 @@ namespace Core.Components
         }
 
         public ManagedTask(Action<Context> action, TaskCreationOptions options = TaskCreationOptions.None)
-            : this(async (ctx) => action(ctx), options)
+            : this(async (ctx) => await Task.Run(() => action(ctx)), options)
         { }
 
         public ManagedTask(Func<Context, Task> action, TaskCreationOptions options = TaskCreationOptions.None)

@@ -8,7 +8,7 @@ namespace Setup
     internal class Program
     {
         private static readonly string PATH_APPDATA = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        private static readonly string PATH_STARTUP_SHORTCUT = Path.Combine(PATH_APPDATA, @"Microsoft\Windows\Start Menu\Programs\Startup\BackgroundService.lnk");
+        private static readonly string PATH_STARTUP_SHORTCUT = Path.Combine(PATH_APPDATA, @"Microsoft\Windows\Start Menu\Programs\Startup\GameEnvironmentService.lnk");
 
         // TODO: Move paths to SharedConfig, use paths from Core
 
@@ -42,7 +42,7 @@ namespace Setup
                 return;
             }
 
-            OSUtils.CreateShortcut(PATH_STARTUP_SHORTCUT, ""); // TODO: PATH_STARTUP_SCRIPT
+            OSUtils.CreateShortcut(PATH_STARTUP_SHORTCUT, ""); // TODO: PATH_SERVICE_STARTUP_SCRIPT
         }
 
         static void OpenConfigFile()

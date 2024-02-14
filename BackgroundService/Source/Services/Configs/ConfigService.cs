@@ -1,7 +1,7 @@
 ﻿using System;
 using BackgroundService.Source.Providers;
 using Core.Configs;
-using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
+using BackgroundService.Source.Controllers.Environment.Components;
 using Core.Components;
 
 namespace BackgroundService.Source.Services.Configs
@@ -12,7 +12,7 @@ namespace BackgroundService.Source.Services.Configs
 
         private readonly object threadLock = new object();
 
-        private BackgroundServiceConfig config;
+        private Config config;
         private JobsConfig jobsConfig;
 
         public ConfigService(ServiceProvider services) : base(services) { }
@@ -24,7 +24,7 @@ namespace BackgroundService.Source.Services.Configs
             SetupWatcher();
         }
 
-        public BackgroundServiceConfig GetConfig()
+        public Config GetConfig()
         {
             lock (threadLock)
             {
@@ -34,19 +34,6 @@ namespace BackgroundService.Source.Services.Configs
                 }
 
                 return config;
-            }
-        }
-
-        public EnvironmentConfig GetConfigForEnvironment(Environments environment)
-        {
-            switch (environment)
-            {
-                case Environments.PC:
-                    return GetConfig().PC;
-                case Environments.TV:
-                    return GetConfig().TV;
-                default:
-                    throw new InvalidOperationException("Unimplemented environment configuration");
             }
         }
 
@@ -65,9 +52,9 @@ namespace BackgroundService.Source.Services.Configs
             switch (environment)
             {
                 case Environments.PC:
-                    return GetJobsConfig().PC;
-                case Environments.TV:
-                    return GetJobsConfig().TV;
+                    return GetJobsConfig().PCEnvironment;
+                case Environments.Game:
+                    return GetJobsConfig().GameEnvironment;
                 default:
                     throw new InvalidOperationException("Unimplemented environment configuration");
             }
@@ -79,7 +66,7 @@ namespace BackgroundService.Source.Services.Configs
             {
                 Logger.Debug($"Loading config from JSON file: {InternalSettings.PATH_CONFIG}");
 
-                config = BackgroundServiceConfig.ReadFromFile(InternalSettings.PATH_CONFIG);
+                config = Config.ReadFromFile(InternalSettings.PATH_CONFIG);
             }
         }
 
@@ -87,9 +74,9 @@ namespace BackgroundService.Source.Services.Configs
         {
             lock (threadLock)
             {
-                Logger.Debug($"Loading jobs config from JSON file: {InternalSettings.PATH_JOBS_CONFIG}");
+                Logger.Debug($"Loading jobs config from JSON file: {InternalSettings.PATH_CONFIG_JOBS}");
 
-                jobsConfig = JobsConfig.ReadFromFile(InternalSettings.PATH_JOBS_CONFIG);
+                jobsConfig = JobsConfig.ReadFromFile(InternalSettings.PATH_CONFIG_JOBS);
             }
         }
 

@@ -1,13 +1,13 @@
-﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
+﻿using BackgroundService.Source.Controllers.Environment.Components;
 using BackgroundService.Source.Providers;
 using Core.Utils;
 using System.Windows.Forms;
 
-namespace BackgroundService.Source.Controllers.EnvironmentControllers
+namespace BackgroundService.Source.Controllers.Environment
 {
-    internal class PCController : EnvironmentController
+    internal class PCEnvironment : EnvironmentController
     {
-        public PCController(MainController mainController, ServiceProvider services) :
+        public PCEnvironment(MainController mainController, ServiceProvider services) :
             base(Environments.PC, mainController, services)
         { }
 
@@ -32,7 +32,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         private void ResetDesktop()
         {
-            Services.OS.Desktop.RemoveDesktop(InternalSettings.DESKTOP_TV_NAME);
+            Services.OS.Desktop.RemoveDesktop(InternalSettings.DESKTOP_GAME_ENVIRONMENT_NAME);
             Services.OS.Desktop.ToggleIconsVisiblity(true);
         }
 

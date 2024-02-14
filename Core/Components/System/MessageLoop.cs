@@ -30,8 +30,8 @@ namespace Core.Components.System
         [StructLayout(LayoutKind.Sequential)]
         public struct POINT
         {
-            long x;
-            long y;
+            public long x;
+            public long y;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -46,8 +46,8 @@ namespace Core.Components.System
         }
 
         private bool running = false;
-        private List<Action<MSG>> messageHandlers = new List<Action<MSG>>();
-        private ConcurrentQueue<Action> actionQueue = new ConcurrentQueue<Action>();
+        private readonly List<Action<MSG>> messageHandlers = new List<Action<MSG>>();
+        private readonly ConcurrentQueue<Action> actionQueue = new ConcurrentQueue<Action>();
 
         public readonly uint ThreadId;
 

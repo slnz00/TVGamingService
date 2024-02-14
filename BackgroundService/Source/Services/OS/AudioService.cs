@@ -15,8 +15,9 @@ namespace BackgroundService.Source.Services.OS
     {
         private readonly object threadLock = new object();
 
-        private PolicyConfigClient policyConfig = new PolicyConfigClient();
-        private MMDeviceEnumerator deviceEnumerator = new MMDeviceEnumerator();
+        private readonly PolicyConfigClient policyConfig = new PolicyConfigClient();
+        private readonly MMDeviceEnumerator deviceEnumerator = new MMDeviceEnumerator();
+
         private ManagedTask setDevicesTask = null;
 
         public AudioService(ServiceProvider services) : base(services) { }
@@ -27,10 +28,7 @@ namespace BackgroundService.Source.Services.OS
             {
                 Logger.Info("Creating backup snapshot from current audio settings");
 
-                if (setDevicesTask != null)
-                {
-                    setDevicesTask.Cancel();
-                }
+                setDevicesTask?.Cancel();
 
                 var inputIds = new AudioSettingsSnapshot.DeviceIDs()
                 {
@@ -67,10 +65,7 @@ namespace BackgroundService.Source.Services.OS
             {
                 Logger.Info("Restoring audio settings from snapshot");
 
-                if (setDevicesTask != null)
-                {
-                    setDevicesTask.Cancel();
-                }
+                setDevicesTask?.Cancel();
 
                 var snapshot = Services.State.Get<AudioSettingsSnapshot>(States.AudioSettingsSnapshot);
 
@@ -100,10 +95,7 @@ namespace BackgroundService.Source.Services.OS
         {
             lock (threadLock)
             {
-                if (setDevicesTask != null)
-                {
-                    setDevicesTask.Cancel();
-                }
+                setDevicesTask?.Cancel();
 
                 setDevicesTask = ManagedTask.Run(async (ctx) =>
                 {
@@ -119,7 +111,7 @@ namespace BackgroundService.Source.Services.OS
                         return;
                     }
 
-                    Func<string, EDataFlow, bool> SetDefaultDevice = (string deviceName, EDataFlow dataFlow) =>
+                    bool SetDefaultDevice(string deviceName, EDataFlow dataFlow)
                     {
                         var device = GetAudioDeviceByName(deviceName, dataFlow);
                         var type = dataFlow == EDataFlow.eCapture ? "input" : "output";
@@ -137,7 +129,7 @@ namespace BackgroundService.Source.Services.OS
                         Logger.Info($"Default {type} audio device has been successfully set to: {deviceName}");
 
                         return true;
-                    };
+                    }
 
                     while (tries > 0)
                     {

@@ -25,10 +25,9 @@ namespace BackgroundService.Source.Services.OS
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-
         private int hotkeyIdCounter = 0;
 
-        Dictionary<int, HotkeyAction> hotkeys = new Dictionary<int, HotkeyAction>();
+        private readonly Dictionary<int, HotkeyAction> hotkeys = new Dictionary<int, HotkeyAction>();
 
         public HotkeyService(ServiceProvider services) : base(services)
         {

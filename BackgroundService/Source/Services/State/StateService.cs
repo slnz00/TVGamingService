@@ -15,7 +15,7 @@ namespace BackgroundService.Source.Services.State
     {
         private readonly object threadLock = new object();
 
-        private bool readOnly;
+        private readonly bool readOnly;
 
         private Dictionary<string, object> storage;
 
@@ -54,9 +54,9 @@ namespace BackgroundService.Source.Services.State
 
                 try
                 {
-                    if (value is JToken)
+                    if (value is JToken token)
                     {
-                        return ((JToken)value).ToObject<T>();
+                        return token.ToObject<T>();
                     }
 
                     return (T)value;
@@ -79,7 +79,7 @@ namespace BackgroundService.Source.Services.State
 
                 if (ReadOnly)
                 {
-                    throw new InvalidOperationException("'Set' method cannot be called when the service is in read-only mode");
+                    throw new InvalidOperationException($"{nameof(Set)} method cannot be called when the service is in read-only mode");
                 }
 
                 var entry = GetStateEntry(state);
@@ -128,15 +128,12 @@ namespace BackgroundService.Source.Services.State
             foreach (var field in fields)
             {
                 var state = EnumUtils.GetValue<States>(field);
-                var entry = GetStateEntry(state);
-
-                if (entry == null)
-                {
-                    throw new InvalidOperationException($"'States' enum field: '{field}' does not have a 'StateEntry' attribute");
-                }
+                var entry = GetStateEntry(state)
+                    ?? throw new InvalidOperationException($"{nameof(States)} enum field: '{field}' does not have a {nameof(StateEntry)} attribute");
+               
                 if (usedKeys.Contains(entry.Key))
                 {
-                    throw new ArgumentException($"'States' enum field: '{field}', specified key is already in use: '{entry.Key}'");
+                    throw new ArgumentException($"{nameof(States)} enum field: '{field}', specified key is already in use: '{entry.Key}'");
                 }
 
                 usedKeys.Add(entry.Key);

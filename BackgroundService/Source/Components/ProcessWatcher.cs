@@ -19,11 +19,11 @@ namespace BackgroundService.Source.Common
         public bool IsWatcherRunning => watcherTask != null && watcherTask.IsAlive;
         public bool IsProcessOpen { get; private set; }
 
-        private LoggerProvider Logger;
+        private readonly LoggerProvider Logger;
 
-        private object threadLock = new object();
-        private int timeBetweenChecks;
-        private Events events;
+        private readonly object threadLock = new object();
+        private readonly int timeBetweenChecks;
+        private readonly Events events;
 
         private ManagedTask watcherTask = null;
 

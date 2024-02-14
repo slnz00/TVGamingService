@@ -27,7 +27,7 @@ namespace BackgroundService.Source.Services.OS.Models
         public HotkeyDefinition(List<string> listDefinition)
         {
             if (listDefinition.Count != 2) {
-                throw new ArgumentOutOfRangeException("listDefinition", "Must have exactly 2 elements, a modifier and a key.");
+                throw new ArgumentOutOfRangeException(nameof(listDefinition), "Must have exactly 2 elements, a modifier and a key.");
             }
 
             keyModifier = EnumUtils.GetValue<KeyModifiers>(listDefinition[0]);

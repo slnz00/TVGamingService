@@ -186,7 +186,7 @@ namespace BackgroundService.Source.Services.OS
         private static List<CursorRegistryValue> GetHiddenCursorRegistry()
         {
             return CURSOR_REGISTRY_NAMES
-                .Select(name => new CursorRegistryValue(name, InternalSettings.PATH_EMPTY_CURSOR))
+                .Select(name => new CursorRegistryValue(name, InternalSettings.PATH_RESOURCE_EMPTY_CURSOR))
                 .ToList();
         }
 

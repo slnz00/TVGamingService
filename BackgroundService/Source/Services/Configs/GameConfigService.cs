@@ -1,34 +1,23 @@
-﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
+﻿using BackgroundService.Source.Controllers.Environment.Components;
 using BackgroundService.Source.Providers;
 using Core.Utils;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace BackgroundService.Source.Services
 {
     internal class GameConfigService : Service
     {
-        private readonly string GAME_CONFIGS_PATH = InternalSettings.PATH_GAME_CONFIGS;
-        private readonly string GAME_CONFIGS_DATA_PATH = InternalSettings.PATH_DATA_GAME_CONFIGS;
-
         private readonly Dictionary<string, string> gameConfigPathHashCache = new Dictionary<string, string>();
 
-        private List<string> gameConfigPaths;
+        private List<string> GameConfigPaths => Services.Config.GetConfig().GameConfigPaths;
 
         public GameConfigService(ServiceProvider services) : base(services) { }
 
-        protected override void OnInitialize()
-        {
-            LoadGameConfigPaths();
-        }
-
         public void SaveGameConfigsForEnvironment(Environments env)
         {
-            gameConfigPaths.ForEach(configPath =>
+            GameConfigPaths.ForEach(configPath =>
             {
                 try
                 {
@@ -53,7 +42,7 @@ namespace BackgroundService.Source.Services
 
         public void LoadGameConfigsForEnvironment(Environments env)
         {
-            gameConfigPaths.ForEach(configPath =>
+            GameConfigPaths.ForEach(configPath =>
             {
                 try
                 {
@@ -77,22 +66,10 @@ namespace BackgroundService.Source.Services
             });
         }
 
-        private void LoadGameConfigPaths()
-        {
-            Logger.Debug($"Loading game config paths from JSON file: {GAME_CONFIGS_PATH}");
-
-            string pathsJson = File.ReadAllText(GAME_CONFIGS_PATH, Encoding.Default);
-            
-            gameConfigPaths = JsonConvert
-                .DeserializeObject<List<string>>(pathsJson)
-                .Select(path => Path.GetFullPath(path))
-                .ToList();
-        }
-
         private string GetGameConfigDataPath(string configPath, Environments env)
         {
             var pathHash = GetGameConfigPathHash(configPath);
-            var directory = Path.Combine(GAME_CONFIGS_DATA_PATH, pathHash);
+            var directory = Path.Combine(InternalSettings.PATH_DATA_GAME_CONFIGS, pathHash);
             var envName = EnumUtils.GetName(env);
 
             return Path.Combine(directory, envName);
@@ -100,7 +77,7 @@ namespace BackgroundService.Source.Services
 
         private string GetGameConfigPathHash(string configPath)
         {
-            var pathIndex = Path.GetFullPath(configPath).ToLower();
+            var pathIndex = Path.GetFullPath(configPath).ToLower().Replace(@"\", "/").Trim();
 
             if (gameConfigPathHashCache.ContainsKey(pathIndex))
             {

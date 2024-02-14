@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Jobs.Components;
 using Core.Configs;
@@ -7,14 +6,13 @@ using Core.Utils;
 
 using static BackgroundService.Source.Services.Jobs.Components.JobOptions;
 
-namespace BackgroundService.Source.Controllers.EnvironmentControllers
+namespace BackgroundService.Source.Controllers.Environment.Components
 {
     internal abstract class EnvironmentController
     {
         protected ServiceProvider Services { get; private set; }
         protected LoggerProvider Logger { get; private set; }
 
-        public EnvironmentConfig Config => Services.Config.GetConfigForEnvironment(EnvironmentType);
         public EnvironmentJobsConfig JobsConfig => Services.Config.GetJobsConfigForEnvironment(EnvironmentType);
 
         public MainController MainController { get; private set; }
@@ -22,7 +20,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
         public Environments EnvironmentType { get; private set; }
         public string EnvironmentName => EnumUtils.GetName(EnvironmentType);
 
-        private List<string> environmentJobIds = new List<string>();
+        private readonly List<string> environmentJobIds = new List<string>();
 
         public EnvironmentController(
             Environments environment,
@@ -92,7 +90,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         private void CreateEnvironmentJobsForEvent(string eventName, List<JobMode> allowedJobModes = null)
         {
-            var configs = (List<JobConfig>)JobsConfig.GetType().GetProperty(eventName).GetValue(JobsConfig, null);
+            var configs = (List<JobConfig>)JobsConfig.GetType().GetField(eventName).GetValue(JobsConfig);
 
             configs.ForEach(config =>
             {

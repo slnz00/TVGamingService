@@ -27,10 +27,7 @@ namespace Core.Components.System
 
         private static bool WindowHandler(CtrlType sig)
         {
-            if (OnExit != null)
-            {
-                OnExit();
-            }
+            OnExit?.Invoke();
 
             Environment.Exit(0);
 
@@ -39,9 +36,16 @@ namespace Core.Components.System
 
         public static void Initialize()
         {
+            if (initialized)
+            {
+                return;
+            }
+
             handler += new EventHandler(WindowHandler);
 
             SetConsoleCtrlHandler(handler, true);
+
+            initialized = true;
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using BackgroundService.Source.Providers;
-using BackgroundService.Source.Controllers.EnvironmentControllers;
-using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
+using BackgroundService.Source.Controllers.Environment;
+using BackgroundService.Source.Controllers.Environment.Components;
 using Core.Components.System;
 using System.Reflection;
 using BackgroundService.Source.Services.OS.Models;
@@ -54,7 +54,7 @@ namespace BackgroundService.Source.Controllers
 
         private EnvironmentController CurrentEnvironment;
 
-        private object threadLock = new object();
+        private readonly object threadLock = new object();
 
         public MainController()
         {
@@ -67,8 +67,8 @@ namespace BackgroundService.Source.Controllers
 
             EnvironmentFactory = new Dictionary<Environments, Func<EnvironmentController>>
             {
-                { Environments.PC, () => new PCController(this, Services) },
-                { Environments.TV, () => new TVController(this, Services) }
+                { Environments.PC, () => new PCEnvironment(this, Services) },
+                { Environments.Game, () => new GameEnvironment(this, Services) }
             };
         }
 
@@ -117,7 +117,7 @@ namespace BackgroundService.Source.Controllers
             {
                 Services.OS.Window.ShowMessageBoxSync(MessageBoxIcon.Error, "A background service instance is already running.");
 
-                Environment.Exit(-1);
+                System.Environment.Exit(-1);
             }
         }
 
@@ -174,7 +174,7 @@ namespace BackgroundService.Source.Controllers
                 var isPC = CurrentEnvironment.EnvironmentType == Environments.PC;
                 if (isPC)
                 {
-                    ChangeEnvironmentTo(Environments.TV);
+                    ChangeEnvironmentTo(Environments.Game);
                 }
                 else
                 {

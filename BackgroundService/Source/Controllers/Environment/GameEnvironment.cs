@@ -1,16 +1,19 @@
-﻿using BackgroundService.Source.Controllers.EnvironmentControllers.Models;
+﻿using BackgroundService.Source.Controllers.Environment.Components;
 using BackgroundService.Source.Providers;
+using Core.Configs;
 using Core.Utils;
 using System.Windows.Forms;
 
-namespace BackgroundService.Source.Controllers.EnvironmentControllers
+namespace BackgroundService.Source.Controllers.Environment
 {
-    internal class TVController : EnvironmentController
+    internal class GameEnvironment : EnvironmentController
     {
+        private GameEnvironmentConfig Config => Services.Config.GetConfig().GameEnvironment;
+
         private uint? playniteClosedListenerId = null;
 
-        public TVController(MainController mainController, ServiceProvider services) :
-            base(Environments.TV, mainController, services)
+        public GameEnvironment(MainController mainController, ServiceProvider services) :
+            base(Environments.Game, mainController, services)
         { }
 
         protected override void OnSetup()
@@ -59,7 +62,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         private void SetupDesktop()
         {
-            Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_TV_NAME);
+            Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_GAME_ENVIRONMENT_NAME);
             Services.OS.Desktop.ToggleIconsVisiblity(false);
 
             if (OSUtils.IsWindows11())
@@ -122,7 +125,7 @@ namespace BackgroundService.Source.Controllers.EnvironmentControllers
 
         private void ForceCloseAppsOnTVDesktop()
         {
-            var windows = Services.OS.Desktop.GetWindowsOnDesktop(InternalSettings.DESKTOP_TV_NAME);
+            var windows = Services.OS.Desktop.GetWindowsOnDesktop(InternalSettings.DESKTOP_GAME_ENVIRONMENT_NAME);
 
             windows.ForEach(win => ProcessUtils.CloseProcess(win.ProcessID, true));
         }

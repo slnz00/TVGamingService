@@ -12,11 +12,11 @@ namespace BackgroundService.Source.Services.OS
 {
     internal class DesktopServiceW11 : DesktopService
     {
-        private IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
-        private IVirtualDesktopManagerInternalOld VirtualDesktopManagerInternal_Old;
-        private IApplicationViewCollection ApplicationViewCollection;
+        private readonly IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
+        private readonly IVirtualDesktopManagerInternalOld VirtualDesktopManagerInternal_Old;
+        private readonly IApplicationViewCollection ApplicationViewCollection;
 
-        private double buildNumber = OSUtils.GetCurrentWindowsBuildNumber();
+        private readonly double buildNumber = OSUtils.GetCurrentWindowsBuildNumber();
 
         private bool OutdatedVersion => buildNumber < 22631.3085;
 
