@@ -84,16 +84,25 @@ namespace Core.Components
         private Task task;
         private CancellationTokenSource cancellation;
 
-        public static ManagedTask Run(Func<Context, Task> action)
+        public static ManagedTask Run(Action<Context> action, TaskCreationOptions options = TaskCreationOptions.None)
         {
-            var managedTask = new ManagedTask(action);
+            return Run(async (ctx) => action(ctx), options);
+        }
+
+        public static ManagedTask Run(Func<Context, Task> action, TaskCreationOptions options = TaskCreationOptions.None)
+        {
+            var managedTask = new ManagedTask(action, options);
 
             managedTask.Start();
 
             return managedTask;
         }
 
-        public ManagedTask(Func<Context, Task> action)
+        public ManagedTask(Action<Context> action, TaskCreationOptions options = TaskCreationOptions.None)
+            : this(async (ctx) => action(ctx), options)
+        { }
+
+        public ManagedTask(Func<Context, Task> action, TaskCreationOptions options = TaskCreationOptions.None)
         {
             cancellation = new CancellationTokenSource();
 
@@ -104,7 +113,7 @@ namespace Core.Components
 
             this.action = action;
 
-            task = new Task(() => RunAction().Wait(), cancellation.Token);
+            task = new Task(() => RunAction().Wait(), cancellation.Token, options);
         }
 
         public void Start()

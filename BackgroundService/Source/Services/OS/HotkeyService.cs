@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
+using Core.Components;
 using Core.Components.System;
 
 namespace BackgroundService.Source.Services.OS
@@ -15,6 +17,8 @@ namespace BackgroundService.Source.Services.OS
         private const int WM_HOTKEY = 0x0312;
 
         private readonly MessageLoop MessageLoop;
+
+        private ManagedTask CurrentAction;
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
@@ -116,6 +120,10 @@ namespace BackgroundService.Source.Services.OS
             bool isHotkeyMessage = msg.message == WM_HOTKEY;
             if (isHotkeyMessage)
             {
+                if (CurrentAction != null && CurrentAction.IsAlive) {
+                    return;
+                }
+
                 int hotkeyId = (int)msg.wParam.ToUInt32();
 
                 bool hotkeyRegistered = hotkeys.TryGetValue(hotkeyId, out HotkeyAction hotkey);
@@ -123,7 +131,10 @@ namespace BackgroundService.Source.Services.OS
                 {
                     Logger.Debug($"Hotkey triggered: {hotkey.Name} -> {hotkey.KeyModifierName} + {hotkey.KeyName}");
 
-                    hotkey.TriggerAction();
+                    CurrentAction = ManagedTask.Run(
+                        (ctx) => hotkey.TriggerAction(),
+                        TaskCreationOptions.LongRunning
+                    );
                 }
             }
         }
