@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TVGamingService")]
-[assembly: AssemblyDescription("Background service")]
+[assembly: AssemblyTitle("GameEnvironmentService")]
+[assembly: AssemblyDescription("Game environment controller service")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("slnz00")]
-[assembly: AssemblyProduct("TVGamingService")]
-[assembly: AssemblyCopyright("Copyright © 2022")]
+[assembly: AssemblyProduct("GameEnvironmentService")]
+[assembly: AssemblyCopyright("Copyright © 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

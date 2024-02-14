@@ -7,7 +7,7 @@
     <ProjectGuid>{4AF77459-5871-4568-AFBA-FC7AE04302AF}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>BackgroundService</RootNamespace>
-    <AssemblyName>BackgroundService</AssemblyName>
+    <AssemblyName>GameEnvironmentService</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -128,11 +128,11 @@
     <Compile Include="Source\Controllers\BackupController\Components\BackupHandler.cs" />
     <Compile Include="Source\Controllers\BackupController\Components\BackupManager.cs" />
     <Compile Include="Source\Controllers\BackupController\Components\BackupWatcher.cs" />
-    <Compile Include="Source\Controllers\EnvironmentControllers\EnvironmentController.cs" />
-    <Compile Include="Source\Controllers\EnvironmentControllers\PCController.cs" />
-    <Compile Include="Source\Controllers\EnvironmentControllers\TVController.cs" />
+    <Compile Include="Source\Controllers\Environment\Components\EnvironmentController.cs" />
+    <Compile Include="Source\Controllers\Environment\PCEnvironment.cs" />
+    <Compile Include="Source\Controllers\Environment\GameEnvironment.cs" />
     <Compile Include="Source\Controllers\MainController.cs" />
-    <Compile Include="Source\Controllers\EnvironmentControllers\Models\Environments.cs" />
+    <Compile Include="Source\Controllers\Environment\Components\Environments.cs" />
     <Compile Include="Source\Services\Configs\GameConfigService.cs" />
     <Compile Include="Source\Services\Jobs\Components\Common\Filters.cs" />
     <Compile Include="Source\Services\Jobs\Components\Common\Validations.cs" />
@@ -198,23 +198,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Content Include="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="jobs.config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="game-configs.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="app.config" />
-    <None Include="config.example.json">
+    <None Include="Configs\Config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="game-configs.example.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="jobs.config.example.json">
+    <None Include="Configs\Jobs.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
@@ -227,7 +215,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Startup.bat">
+    <None Include="GameEnvironmentService.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -249,6 +237,7 @@
       <Name>Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
