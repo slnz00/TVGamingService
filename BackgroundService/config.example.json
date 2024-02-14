@@ -5,6 +5,7 @@
     "ToggleCursorVisibility": [ "Alt", "NumPad8" ],
     "ToggleConsoleVisibility": [ "Alt", "NumPad9" ]
   },
+
   "PC": {
     "Audio": {
       "InputDeviceName": "",

@@ -1,8 +1,6 @@
 ﻿using Core.Utils;
-using NAudio.CoreAudioApi;
 using System;
 using System.IO;
-using System.Linq;
 using System.Diagnostics;
 
 namespace Setup
@@ -10,65 +8,27 @@ namespace Setup
     internal class Program
     {
         private static readonly string PATH_APPDATA = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        private static readonly string PATH_STARTUP_SCRIPT = FSUtils.GetAbsolutePath("Startup.bat");
-        private static readonly string PATH_CONFIG = FSUtils.GetAbsolutePath("config.json");
-        private static readonly string PATH_EXAMPLE_CONFIG = FSUtils.GetAbsolutePath("config.example.json");
-        private static readonly string PATH_GAME_CONFIGS = FSUtils.GetAbsolutePath("game-configs.json");
-        private static readonly string PATH_EXAMPLE_GAME_CONFIGS = FSUtils.GetAbsolutePath("game-configs.example.json");
-        private static readonly string PATH_JOBS_CONFIG = FSUtils.GetAbsolutePath("jobs.config.json");
-        private static readonly string PATH_EXAMPLE_JOBS_CONFIG = FSUtils.GetAbsolutePath("jobs.config.example.json");
         private static readonly string PATH_STARTUP_SHORTCUT = Path.Combine(PATH_APPDATA, @"Microsoft\Windows\Start Menu\Programs\Startup\BackgroundService.lnk");
+
+        // TODO: Move paths to SharedConfig, use paths from Core
 
         static void PrintSoundDeviceNames()
         {
-            Func<MMDevice, string> getDeviceName = (MMDevice device) =>
-            {
-                const int DEVICE_NAME_PROP_ID = 2;
-
-                for (int i = 0; i < device.Properties.Count; i++)
-                {
-                    var property = device.Properties[i];
-
-                    if (property.Key.propertyId == DEVICE_NAME_PROP_ID)
-                    {
-                        return property.Value as string;
-                    }
-                }
-
-                return null;
-            };
-
             Console.WriteLine("\nSetup config.json based on available these sound devices:\n");
 
-            new MMDeviceEnumerator()
-                .EnumerateAudioEndPoints(DataFlow.Render, DeviceState.All)
-                .Select(getDeviceName)
-                .Where(name => !string.IsNullOrEmpty(name))
-                .Distinct()
-                .OrderBy(name => name)
-                .ToList()
-                .ForEach(name => Console.WriteLine(name));
+            // TODO...
+        }
+
+        static void PrintDisplayDevicePaths()
+        {
+            Console.WriteLine("\nSetup config.json based on available these display devices:\n");
+
+            // TODO...
         }
 
         static void CreateConfigFiles()
         {
-            if (!System.IO.File.Exists(PATH_CONFIG))
-            {
-                Console.WriteLine("Creating default config file...");
-                System.IO.File.Copy(PATH_EXAMPLE_CONFIG, PATH_CONFIG);
-            }
-
-            if (!System.IO.File.Exists(PATH_GAME_CONFIGS))
-            {
-                Console.WriteLine("Creating default game configs file...");
-                System.IO.File.Copy(PATH_EXAMPLE_GAME_CONFIGS, PATH_GAME_CONFIGS);
-            }
-
-            if (!System.IO.File.Exists(PATH_JOBS_CONFIG))
-            {
-                Console.WriteLine("Creating default jobs config file...");
-                System.IO.File.Copy(PATH_EXAMPLE_JOBS_CONFIG, PATH_JOBS_CONFIG);
-            }
+            // TODO... Write defaults to json
 
             Console.WriteLine();
         }
@@ -82,12 +42,12 @@ namespace Setup
                 return;
             }
 
-            OSUtils.CreateShortcut(PATH_STARTUP_SHORTCUT, PATH_STARTUP_SCRIPT);
+            OSUtils.CreateShortcut(PATH_STARTUP_SHORTCUT, ""); // TODO: PATH_STARTUP_SCRIPT
         }
 
         static void OpenConfigFile()
         {
-            Process.Start("notepad.exe", PATH_CONFIG);
+            Process.Start("notepad.exe", ""); // TODO: PATH_CONFIG
         }
 
         static void Main(string[] args)
@@ -97,6 +57,7 @@ namespace Setup
                 CreateConfigFiles();
                 SetupStartupShortcut();
                 PrintSoundDeviceNames();
+                PrintDisplayDevicePaths();
                 OpenConfigFile();
             }
             catch (Exception ex)
