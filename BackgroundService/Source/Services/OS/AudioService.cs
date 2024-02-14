@@ -65,7 +65,7 @@ namespace BackgroundService.Source.Services.OS
         {
             try
             {
-                Logger.Info("Restoring display settings from snapshot");
+                Logger.Info("Restoring audio settings from snapshot");
 
                 if (setDevicesTask != null)
                 {
@@ -134,7 +134,7 @@ namespace BackgroundService.Source.Services.OS
                         SetDefaultAudioDevicePolicy(device, ERole.eCommunications);
                         SetDefaultAudioDevicePolicy(device, ERole.eMultimedia);
 
-                        Logger.Info($"Default {type} audio device successfully changed to: {deviceName}");
+                        Logger.Info($"Default {type} audio device has been successfully set to: {deviceName}");
 
                         return true;
                     };

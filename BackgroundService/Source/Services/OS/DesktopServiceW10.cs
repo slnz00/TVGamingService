@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
-using Core.Utils;
 using Microsoft.Win32;
 using BackgroundService.Source.Services.State.Components;
 
@@ -18,6 +16,7 @@ namespace BackgroundService.Source.Services.OS
         private static readonly string VIRTUAL_DESKTOP_PATH = InternalSettings.PATH_VIRTUAL_DESKTOP_W10;
 
         private IVirtualDesktopManagerInternal VirtualDesktopManagerInternal;
+        private IVirtualDesktopManagerInternal2 VirtualDesktopManagerInternal2;
         private IApplicationViewCollection ApplicationViewCollection;
 
         public DesktopServiceW10(ServiceProvider services) : base(services)
@@ -25,6 +24,7 @@ namespace BackgroundService.Source.Services.OS
             var shell = (IServiceProvider10)Activator.CreateInstance(Type.GetTypeFromCLSID(Guids.CLSID_ImmersiveShell));
 
             VirtualDesktopManagerInternal = (IVirtualDesktopManagerInternal)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal, typeof(IVirtualDesktopManagerInternal).GUID);
+            VirtualDesktopManagerInternal2 = (IVirtualDesktopManagerInternal2)shell.QueryService(Guids.CLSID_VirtualDesktopManagerInternal, typeof(IVirtualDesktopManagerInternal2).GUID);
             ApplicationViewCollection = (IApplicationViewCollection)shell.QueryService(typeof(IApplicationViewCollection).GUID, typeof(IApplicationViewCollection).GUID);
         }
 
@@ -32,14 +32,37 @@ namespace BackgroundService.Source.Services.OS
         {
             Logger.Info($"Switching desktop to: {desktopName}");
 
-            ExecVirtualDesktopBinary($"/New /Name:{desktopName} /Switch");
+            var desktop = VirtualDesktopManagerInternal.CreateDesktop();
+
+            VirtualDesktopManagerInternal2.SetName(desktop, desktopName);
+            VirtualDesktopManagerInternal.SwitchDesktop(desktop);
         }
 
         public override void RemoveDesktop(string desktopName)
         {
             Logger.Info($"Removing desktop: {desktopName}");
 
-            ExecVirtualDesktopBinary($"/Remove:{desktopName}");
+            var allDesktops = GetAllDesktops();
+
+            if (allDesktops.Count == 1)
+            {
+                Logger.Error($"Unable to remove desktop ({desktopName}), only one desktop exists.");
+
+                return;
+            }
+
+            var desktopIndex = allDesktops.FindIndex((d) => GetDesktopName(d) == desktopName);
+            var desktop = desktopIndex != -1 ? allDesktops[desktopIndex] : null;
+            if (desktop == null)
+            {
+                Logger.Debug($"Desktop does not exist: {desktopName}");
+
+                return;
+            }
+
+            var fallbackDesktop = desktopIndex == 0 ? allDesktops[1] : allDesktops[0];
+
+            VirtualDesktopManagerInternal.RemoveDesktop(desktop, fallbackDesktop);
         }
 
         public override void ChangeWallpaper(string wallpaperPath)
@@ -235,13 +258,6 @@ namespace BackgroundService.Source.Services.OS
                 Logger.Warn("Failed to get visibility for view");
                 return false;
             }
-        }
-
-        private void ExecVirtualDesktopBinary(string args)
-        {
-            Logger.Debug($"Exec virtual desktop, args: {args}");
-
-            ProcessUtils.StartProcess(VIRTUAL_DESKTOP_PATH, args, ProcessWindowStyle.Hidden, true);
         }
     }
 }

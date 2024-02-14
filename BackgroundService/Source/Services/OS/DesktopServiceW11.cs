@@ -69,23 +69,31 @@ namespace BackgroundService.Source.Services.OS
 
             var allDesktops = GetAllDesktops();
 
-            var selectedDesktop = allDesktops.FirstOrDefault((d) => d.GetName() == desktopName);
-            if (selectedDesktop == null)
+            if (allDesktops.Count == 1)
+            {
+                Logger.Error($"Unable to remove desktop ({desktopName}), only one desktop exists.");
+
+                return;
+            }
+
+            var desktopIndex = allDesktops.FindIndex((d) => d.GetName() == desktopName);
+            var desktop = desktopIndex != -1 ? allDesktops[desktopIndex] : null;
+            if (desktop == null)
             {
                 Logger.Debug($"Desktop does not exist: {desktopName}");
 
                 return;
             }
 
-            var fallbackDesktop = allDesktops[0];
+            var fallbackDesktop = desktopIndex == 0 ? allDesktops[1] : allDesktops[0];
 
             if (OutdatedVersion)
             {
-                VirtualDesktopManagerInternal_Old.RemoveDesktop(selectedDesktop, fallbackDesktop);
+                VirtualDesktopManagerInternal_Old.RemoveDesktop(desktop, fallbackDesktop);
             }
             else
             {
-                VirtualDesktopManagerInternal.RemoveDesktop(selectedDesktop, fallbackDesktop);
+                VirtualDesktopManagerInternal.RemoveDesktop(desktop, fallbackDesktop);
             }
         }
 
