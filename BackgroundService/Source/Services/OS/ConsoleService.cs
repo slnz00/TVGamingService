@@ -9,7 +9,7 @@ namespace BackgroundService.Source.Services.OS
         const int SW_HIDE = 0;
         const int SW_SHOW = 5;
 
-        private static readonly bool DEFAULT_VISIBILITY = InternalSettings.CONSOLE_DEFAULT_VISIBILITY;
+        private static readonly bool DEFAULT_VISIBILITY = InternalSettings.ConsoleDefaultVisibility;
 
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();

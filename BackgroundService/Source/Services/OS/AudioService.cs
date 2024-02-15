@@ -101,7 +101,7 @@ namespace BackgroundService.Source.Services.OS
                 {
                     var inputSet = string.IsNullOrWhiteSpace(inputDeviceName);
                     var outputSet = string.IsNullOrWhiteSpace(outputDeviceName);
-                    var timeout = InternalSettings.TIMEOUT_SET_DEFAULT_AUDIO_DEVICE;
+                    var timeout = InternalSettings.TimeoutSetDefaultAudio;
                     var tries = timeout / 1000 + 1;
 
                     if (inputSet && outputSet)

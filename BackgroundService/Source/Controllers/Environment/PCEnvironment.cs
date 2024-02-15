@@ -32,7 +32,7 @@ namespace BackgroundService.Source.Controllers.Environment
 
         private void ResetDesktop()
         {
-            Services.OS.Desktop.RemoveDesktop(InternalSettings.DESKTOP_GAME_ENVIRONMENT_NAME);
+            Services.OS.Desktop.RemoveDesktop(InternalSettings.DesktopNameGameEnvironment);
             Services.OS.Desktop.ToggleIconsVisiblity(true);
         }
 

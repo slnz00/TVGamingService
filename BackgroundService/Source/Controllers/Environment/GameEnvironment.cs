@@ -62,7 +62,7 @@ namespace BackgroundService.Source.Controllers.Environment
 
         private void SetupDesktop()
         {
-            Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DESKTOP_GAME_ENVIRONMENT_NAME);
+            Services.OS.Desktop.CreateAndSwitchToDesktop(InternalSettings.DesktopNameGameEnvironment);
             Services.OS.Desktop.ToggleIconsVisiblity(false);
 
             if (OSUtils.IsWindows11())
@@ -125,7 +125,7 @@ namespace BackgroundService.Source.Controllers.Environment
 
         private void ForceCloseAppsOnTVDesktop()
         {
-            var windows = Services.OS.Desktop.GetWindowsOnDesktop(InternalSettings.DESKTOP_GAME_ENVIRONMENT_NAME);
+            var windows = Services.OS.Desktop.GetWindowsOnDesktop(InternalSettings.DesktopNameGameEnvironment);
 
             windows.ForEach(win => ProcessUtils.CloseProcess(win.ProcessID, true));
         }

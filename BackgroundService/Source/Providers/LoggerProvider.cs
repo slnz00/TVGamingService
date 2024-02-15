@@ -63,10 +63,10 @@ namespace BackgroundService.Source.Providers
 
             var logfile = new NLog.Targets.FileTarget("logfile")
             {
-                ArchiveAboveSize = InternalSettings.LOG_FILE_MAX_SIZE,
-                MaxArchiveFiles = InternalSettings.LOG_FILE_MAX_ARCHIVES,
-                FileName = InternalSettings.LOG_FILE_NAME,
-                ArchiveFileName = InternalSettings.LOG_FILE_NAME_ARCHIVE,
+                ArchiveAboveSize = InternalSettings.LogFileMaxSize,
+                MaxArchiveFiles = InternalSettings.LogFileMaxArchives,
+                FileName = InternalSettings.LogFileName,
+                ArchiveFileName = InternalSettings.LogFileNameArchive,
                 ArchiveNumbering = NLog.Targets.ArchiveNumberingMode.Rolling,
                 Layout = "[${longdate}] ${message}"
             };

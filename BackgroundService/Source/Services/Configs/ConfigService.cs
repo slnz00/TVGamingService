@@ -3,6 +3,7 @@ using BackgroundService.Source.Providers;
 using Core.Configs;
 using BackgroundService.Source.Controllers.Environment.Components;
 using Core.Components;
+using Core;
 
 namespace BackgroundService.Source.Services.Configs
 {
@@ -64,9 +65,9 @@ namespace BackgroundService.Source.Services.Configs
         {
             lock (threadLock)
             {
-                Logger.Debug($"Loading config from JSON file: {InternalSettings.PATH_CONFIG}");
+                Logger.Debug($"Loading config from JSON file: {SharedSettings.Paths.Config}");
 
-                config = Config.ReadFromFile(InternalSettings.PATH_CONFIG);
+                config = Config.ReadFromFile(SharedSettings.Paths.Config);
             }
         }
 
@@ -74,15 +75,15 @@ namespace BackgroundService.Source.Services.Configs
         {
             lock (threadLock)
             {
-                Logger.Debug($"Loading jobs config from JSON file: {InternalSettings.PATH_CONFIG_JOBS}");
+                Logger.Debug($"Loading jobs config from JSON file: {SharedSettings.Paths.JobsConfig}");
 
-                jobsConfig = JobsConfig.ReadFromFile(InternalSettings.PATH_CONFIG_JOBS);
+                jobsConfig = JobsConfig.ReadFromFile(SharedSettings.Paths.JobsConfig);
             }
         }
 
         private void SetupWatcher()
         {
-            ConfigWatcher = new FileChangeWatcher(InternalSettings.PATH_CONFIG);
+            ConfigWatcher = new FileChangeWatcher(SharedSettings.Paths.Config);
 
             ConfigWatcher.OnChanged(() =>
             {

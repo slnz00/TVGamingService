@@ -185,7 +185,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Services\OS\AudioService.cs" />
     <Compile Include="Source\Providers\LoggerProvider.cs" />
-    <Content Include="Resources\tv-gaming-empty-cursor.cur">
+    <Content Include="Resources\gameenv-empty-cursor.cur">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Properties\Resources.resx">

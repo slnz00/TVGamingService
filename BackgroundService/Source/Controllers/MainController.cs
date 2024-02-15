@@ -58,7 +58,7 @@ namespace BackgroundService.Source.Controllers
 
         public MainController()
         {
-            ProcessMutex = new Mutex(true, SharedSettings.ProcessGuids.BACKGROUND_SERVICE.ToString());
+            ProcessMutex = new Mutex(true, SharedSettings.ProcessGuids.BackgroundService.ToString());
             MessageLoop = new MessageLoop();
             Logger = new LoggerProvider(GetType().Name);
             Services = new ServiceProvider(MessageLoop);

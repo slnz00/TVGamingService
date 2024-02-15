@@ -1,5 +1,6 @@
 ﻿using BackgroundService.Source.Controllers.Environment.Components;
 using BackgroundService.Source.Providers;
+using Core;
 using Core.Utils;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,7 @@ namespace BackgroundService.Source.Services
         private string GetGameConfigDataPath(string configPath, Environments env)
         {
             var pathHash = GetGameConfigPathHash(configPath);
-            var directory = Path.Combine(InternalSettings.PATH_DATA_GAME_CONFIGS, pathHash);
+            var directory = Path.Combine(SharedSettings.Paths.DataGameConfigs, pathHash);
             var envName = EnumUtils.GetName(env);
 
             return Path.Combine(directory, envName);

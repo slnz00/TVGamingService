@@ -68,7 +68,7 @@ namespace BackgroundService.Source.Services.OS
 
         public void ShowMessageBoxSync(MessageBoxIcon icon, string message)
         {
-            MessageBox.Show(message, InternalSettings.WINDOW_TITLE, MessageBoxButtons.OK, icon);
+            MessageBox.Show(message, InternalSettings.WindowTitle, MessageBoxButtons.OK, icon);
         }
     }
 }

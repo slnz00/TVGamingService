@@ -12,7 +12,7 @@ namespace BackgroundService.Source.Services.OS
 {
     internal class HotkeyService : Service
     {
-        private static readonly uint HOTKEY_ACTION_TIMEOUT = InternalSettings.TIMEOUT_HOTKEY_ACTION;
+        private static readonly uint HOTKEY_ACTION_TIMEOUT = InternalSettings.TimeoutHotkeyAction;
 
         private const int WM_HOTKEY = 0x0312;
 

@@ -1,5 +1,6 @@
 ﻿using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.State.Components;
+using Core;
 using Core.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -159,26 +160,26 @@ namespace BackgroundService.Source.Services.State
 
         private void SaveStorageToFile()
         {
-            FSUtils.EnsureFileDirectory(InternalSettings.PATH_DATA_STATES);
+            FSUtils.EnsureFileDirectory(SharedSettings.Paths.DataStates);
 
             var statesJson = JsonConvert.SerializeObject(storage);
 
-            File.WriteAllText(InternalSettings.PATH_DATA_STATES, statesJson, Encoding.Default);
+            File.WriteAllText(SharedSettings.Paths.DataStates, statesJson, Encoding.Default);
         }
 
         private void LoadStorageFromFile()
         {
-            FSUtils.EnsureFileDirectory(InternalSettings.PATH_DATA_STATES);
+            FSUtils.EnsureFileDirectory(SharedSettings.Paths.DataStates);
 
             storage = new Dictionary<string, object>();
 
-            var statesJsonExists = File.Exists(InternalSettings.PATH_DATA_STATES);
+            var statesJsonExists = File.Exists(SharedSettings.Paths.DataStates);
             if (!statesJsonExists)
             {
                 return;
             }
 
-            string statesJson = File.ReadAllText(InternalSettings.PATH_DATA_STATES, Encoding.Default);
+            string statesJson = File.ReadAllText(SharedSettings.Paths.DataStates, Encoding.Default);
 
             try
             {

@@ -6,6 +6,8 @@ using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.State.Components;
 using BackgroundService.Source.Services.State;
 using System;
+using Core;
+using System.IO;
 
 namespace BackgroundService.Source.Services.OS
 {
@@ -74,7 +76,7 @@ namespace BackgroundService.Source.Services.OS
 
         public static void EnsureCursorIsVisible()
         {
-            Func<List<CursorRegistryValue>> GetRegistryValuesFromState = () =>
+            List<CursorRegistryValue> GetRegistryValuesFromState()
             {
                 try
                 {
@@ -90,7 +92,7 @@ namespace BackgroundService.Source.Services.OS
 
                     return null;
                 }
-            };
+            }
 
             var currentRegistry = GetCurrentRegistry();
             var stateRegistry = GetRegistryValuesFromState();
@@ -186,13 +188,15 @@ namespace BackgroundService.Source.Services.OS
         private static List<CursorRegistryValue> GetHiddenCursorRegistry()
         {
             return CURSOR_REGISTRY_NAMES
-                .Select(name => new CursorRegistryValue(name, InternalSettings.PATH_RESOURCE_EMPTY_CURSOR))
+                .Select(name => new CursorRegistryValue(name, SharedSettings.Paths.ResourceEmptyCursor))
                 .ToList();
         }
 
         private static bool IsHiddenCursorRegistry(IEnumerable<CursorRegistryValue> registryValues)
         {
-            return registryValues.Any(value => value.Path.Contains(InternalSettings.CURSOR_EMPTY_FILE_NAME));
+            var emptyCursorFileName = Path.GetFileName(SharedSettings.Paths.ResourceEmptyCursor);
+
+            return registryValues.Any(value => value.Path.Contains(emptyCursorFileName));
         }
     }
 }

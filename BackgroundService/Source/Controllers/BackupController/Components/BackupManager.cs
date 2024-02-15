@@ -1,4 +1,5 @@
-﻿using Core.Utils;
+﻿using Core;
+using Core.Utils;
 using System;
 
 namespace BackgroundService.Source.Controllers.BackupController.Components
@@ -7,7 +8,7 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
     {
         private const long SCHEDULE_DELAY = 1500;
 
-        private object threadLock = new object();
+        private readonly object threadLock = new object();
 
         public long? RunBackupAt { get; private set; }
 
@@ -28,7 +29,7 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
             BackupName = backupName;
             BackupAmount = backupAmount;
             OriginalPath = originalPath;
-            BackupBasePath = FSUtils.JoinPaths(InternalSettings.PATH_DATA_BACKUPS, backupName);
+            BackupBasePath = FSUtils.JoinPaths(SharedSettings.Paths.DataBackups, backupName);
             Watcher = new BackupWatcher(BackupName, OriginalPath, () => ScheduleBackup());
             Handler = new BackupHandler(BackupName, BackupAmount, BackupBasePath, OriginalPath);
         }

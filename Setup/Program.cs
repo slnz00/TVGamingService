@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Diagnostics;
+using Core;
 
 namespace Setup
 {
@@ -47,10 +48,10 @@ namespace Setup
 
         static void OpenConfigFile()
         {
-            Process.Start("notepad.exe", ""); // TODO: PATH_CONFIG
+            Process.Start("notepad.exe", SharedSettings.Paths.Config);
         }
 
-        static void Main(string[] args)
+        static void Main()
         {
             try
             {

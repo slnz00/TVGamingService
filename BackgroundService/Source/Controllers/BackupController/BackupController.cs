@@ -172,7 +172,7 @@ namespace BackgroundService.Source.Controllers.BackupController
         {
             string backupName = backupConfig.Name;
             string originalPath = Path.GetFullPath(backupConfig.Path);
-            int backupAmount = backupConfig.Amount ?? InternalSettings.BACKUP_DEFAULT_AMOUNT;
+            int backupAmount = backupConfig.Amount ?? InternalSettings.BackupDefaultAmount;
 
             return new BackupManager(backupName, backupAmount, originalPath);
         }
