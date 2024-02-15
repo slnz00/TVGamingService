@@ -589,16 +589,24 @@ namespace Core.WinAPI
                 }
             }
 
+            private EDataFlow? _DataFlow;
+
             public EDataFlow DataFlow
             {
                 get
                 {
-                    EDataFlow Result;
-                    IMMEndpoint ep = _RealDevice as IMMEndpoint;
-                    ep.GetDataFlow(out Result);
-                    return Result;
+                    if (_DataFlow == null)
+                    {
+                        IMMEndpoint ep = _RealDevice as IMMEndpoint;
+                        ep.GetDataFlow(out var result);
+                        _DataFlow = result;
+                    }
+
+                    return (EDataFlow)_DataFlow;
                 }
             }
+
+            private string _FriendlyName;
 
             public string FriendlyName
             {
@@ -606,6 +614,11 @@ namespace Core.WinAPI
                 {
                     try
                     {
+                        if (_FriendlyName != null)
+                        {
+                            return _FriendlyName;
+                        }
+
                         if (_PropertyStore == null)
                         {
                             GetPropertyInformation();
@@ -613,7 +626,9 @@ namespace Core.WinAPI
 
                         if (_PropertyStore.Contains(PKEY.PKEY_DeviceInterface_FriendlyName))
                         {
-                            return (string)_PropertyStore[PKEY.PKEY_DeviceInterface_FriendlyName].Value;
+                            _FriendlyName = (string)_PropertyStore[PKEY.PKEY_DeviceInterface_FriendlyName].Value;
+
+                            return _FriendlyName;
                         }
 
                         return null;

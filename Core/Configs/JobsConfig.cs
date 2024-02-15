@@ -20,7 +20,7 @@ namespace Core.Configs
 
         public static void WriteToFile(JobsConfig config, string filePath)
         {
-            var configJson = JsonConvert.SerializeObject(config);
+            var configJson = JsonConvert.SerializeObject(config, Formatting.Indented);
 
             File.WriteAllText(filePath, configJson, Encoding.Default);
         }

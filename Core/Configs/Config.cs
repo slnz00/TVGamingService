@@ -10,7 +10,7 @@ namespace Core.Configs
         public static Config ReadFromFile(string filePath)
         {
             string configJson = File.ReadAllText(filePath, Encoding.Default);
-            
+
             return JsonConvert.DeserializeObject<Config>(configJson, new JsonSerializerSettings
             {
                 ObjectCreationHandling = ObjectCreationHandling.Replace
@@ -19,7 +19,7 @@ namespace Core.Configs
 
         public static void WriteToFile(Config config, string filePath)
         {
-            var configJson = JsonConvert.SerializeObject(config);
+            var configJson = JsonConvert.SerializeObject(config, Formatting.Indented);
 
             File.WriteAllText(filePath, configJson, Encoding.Default);
         }
@@ -67,8 +67,14 @@ namespace Core.Configs
 
     public class ThirdPartyConfig
     {
-        public AppConfig PlayniteFullscreen = null;
-        public AppConfig PlayniteDesktop = null;
+        public AppConfig PlayniteFullscreen = new AppConfig()
+        {
+            ProcessName = "Playnite.FullscreenApp"
+        };
+        public AppConfig PlayniteDesktop = new AppConfig()
+        {
+            ProcessName = "Playnite.DesktopApp"
+        };
         public AppConfig DS4Windows = null;
         public AppConfig Steam = null;
         public AppConfig EpicGames = null;
@@ -77,7 +83,7 @@ namespace Core.Configs
 
     public class AppConfig
     {
-        public string ProcessName;
-        public string Path;
+        public string ProcessName = "";
+        public string Path = "";
     }
 }

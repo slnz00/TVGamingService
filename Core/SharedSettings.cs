@@ -7,7 +7,7 @@ namespace Core
     {
         public static class Paths
         {
-            public static readonly string StartupScript = FSUtils.GetAbsolutePath("GameEnvironmentService.bat");
+            public static readonly string ServiceStartupScript = FSUtils.GetAbsolutePath("GameEnvironmentService.bat");
             public static readonly string Config = FSUtils.GetAbsolutePath("Configs", "Config.json");
             public static readonly string JobsConfig = FSUtils.GetAbsolutePath("Configs", "Jobs.json");
             public static readonly string ResourceEmptyCursor = FSUtils.GetAbsolutePath("Resources", "gameenv-empty-cursor.cur");
