@@ -20,7 +20,7 @@ namespace BackgroundService.Source.Controllers.BackupController
 
         public bool Initialized { get; private set; } = false;
 
-        public bool Running => eventLoop != null ? eventLoop.IsAlive : false;
+        public bool Running => eventLoop != null && eventLoop.IsAlive;
 
         private ServiceProvider Services { get; set; }
         private LoggerProvider Logger { get; set; }
@@ -151,10 +151,7 @@ namespace BackgroundService.Source.Controllers.BackupController
 
         private void StopEventLoop()
         {
-            if (eventLoop != null)
-            {
-                eventLoop.Cancel();
-            }
+            eventLoop?.Cancel();
         }
 
         private void RunBackups()

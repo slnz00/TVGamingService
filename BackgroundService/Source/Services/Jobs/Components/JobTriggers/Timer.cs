@@ -26,7 +26,8 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobTriggers
             });
         }
 
-        protected override void OnClose() {
+        protected override void OnClose()
+        {
             timerTask.Cancel(false);
         }
     }

@@ -2,7 +2,6 @@
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS;
 using System;
-using System.IO;
 
 namespace BackgroundService.Source
 {

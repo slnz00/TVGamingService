@@ -1,6 +1,6 @@
-﻿using System;
-using BackgroundService.Source.Providers;
+﻿using BackgroundService.Source.Providers;
 using Core.Utils;
+using System;
 
 namespace BackgroundService.Source.Services
 {

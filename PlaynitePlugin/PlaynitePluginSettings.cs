@@ -9,7 +9,7 @@ namespace PlaynitePlugin
     public class PlaynitePluginSettingsViewModel : ObservableObject, ISettings
     {
         private readonly PlaynitePlugin plugin;
-        private PlaynitePluginSettings editingClone { get; set; }
+        private PlaynitePluginSettings editingClone;
 
         private PlaynitePluginSettings settings;
         public PlaynitePluginSettings Settings

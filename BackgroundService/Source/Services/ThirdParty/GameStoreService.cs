@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using BackgroundService.Source.Providers;
+﻿using BackgroundService.Source.Providers;
 using Core.Configs;
 using Core.Utils;
+using System;
+using System.Collections.Generic;
 
 namespace BackgroundService.Source.Services.ThirdParty
 {

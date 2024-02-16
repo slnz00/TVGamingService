@@ -15,7 +15,7 @@ namespace BackgroundService.Source.Services.Jobs
         private const string JOB_TRIGGER_NAMESPACE = "BackgroundService.Source.Services.Jobs.Components.JobTriggers";
         private const string JOB_ACTION_NAMESPACE = "BackgroundService.Source.Services.Jobs.Components.JobActions";
 
-        private Dictionary<string, Job> jobs = new Dictionary<string, Job>();
+        private readonly Dictionary<string, Job> jobs = new Dictionary<string, Job>();
 
         public JobService(ServiceProvider services) : base(services) { }
 
@@ -93,10 +93,11 @@ namespace BackgroundService.Source.Services.Jobs
                 return new List<JobAction>();
             }
 
-            Func<JobActionConfig, JobAction> CreateFromConfig = (config) => {
+            JobAction CreateFromConfig(JobActionConfig config)
+            {
                 var ActionType = Type.GetType($"{JOB_ACTION_NAMESPACE}.{config.Type}");
                 return (JobAction)Activator.CreateInstance(ActionType, config.Options);
-            };
+            }
 
             return actionConfigs
                 .Select(CreateFromConfig)

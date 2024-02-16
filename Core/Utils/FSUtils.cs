@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using Microsoft.VisualBasic.FileIO;
+using System.IO;
 using System.Reflection;
-using Microsoft.VisualBasic.FileIO;
 
 namespace Core.Utils
 {
@@ -15,7 +15,8 @@ namespace Core.Utils
         {
             string joinedPath = JoinPaths(paths);
 
-            if (Path.IsPathRooted(joinedPath)) {
+            if (Path.IsPathRooted(joinedPath))
+            {
                 return joinedPath;
             }
 

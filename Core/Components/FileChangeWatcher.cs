@@ -105,9 +105,7 @@ namespace Core.Components
 
         private void StopEventLoop()
         {
-            if (eventLoop != null) {
-                eventLoop.Cancel();
-            }
+            eventLoop?.Cancel();
         }
 
         private void ScheduleOnChangedEvent()

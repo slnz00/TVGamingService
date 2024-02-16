@@ -1,5 +1,4 @@
 ﻿using Core.Playnite.Communication.Models;
-using Core.Playnite.Communication.Models.Commands;
 using Core.Playnite.Communication.Services;
 using Playnite.SDK;
 using Playnite.SDK.Events;
@@ -8,28 +7,25 @@ using Playnite.SDK.Plugins;
 using PlaynitePlugin.Communication;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Windows.Controls;
 
 namespace PlaynitePlugin
 {
     public class PlaynitePlugin : GenericPlugin
     {
-        private static readonly ILogger logger = LogManager.GetLogger();
-        private static readonly ServiceClient<IPlayniteAppService> tvGamingService = new ServiceClient<IPlayniteAppService>();
+        private static readonly ILogger Logger = LogManager.GetLogger();
+        private static readonly ServiceClient<IPlayniteAppService> GameEnvironmentService = new ServiceClient<IPlayniteAppService>();
 
         // GameId -> Game path
-        private static readonly Dictionary<string, string> gamePaths = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> GamePaths = new Dictionary<string, string>();
 
-        private PlaynitePluginSettingsViewModel settings { get; set; }
-
-        private Timer asyncTaskTimer { get; set; } = null;
+        private PlaynitePluginSettingsViewModel Settings { get; set; }
 
         public override Guid Id { get; } = Guid.Parse("6dc9c7f6-44f0-4e09-b294-52aac097750a");
 
         public PlaynitePlugin(IPlayniteAPI api) : base(api)
         {
-            settings = new PlaynitePluginSettingsViewModel(this);
+            Settings = new PlaynitePluginSettingsViewModel(this);
             Properties = new GenericPluginProperties
             {
                 HasSettings = true
@@ -44,9 +40,9 @@ namespace PlaynitePlugin
         {
             var gameInfo = GetGameInfo(args.Game);
 
-            logger.Info($"TVGamingService: Sending GameStarted event, game: {gameInfo.Name}");
+            Logger.Info($"GameEnvironmentService: Sending GameStarted event, game: {gameInfo.Name}");
 
-            tvGamingService.Service.SendGameStarted(gameInfo);
+            GameEnvironmentService.Service.SendGameStarted(gameInfo);
         }
 
         public override void OnGameStarting(OnGameStartingEventArgs args)
@@ -55,18 +51,18 @@ namespace PlaynitePlugin
 
             var gameInfo = GetGameInfo(args.Game);
 
-            logger.Info($"TVGamingService: Sending GameStarting event, game: {gameInfo.Name}");
+            Logger.Info($"GameEnvironmentService: Sending GameStarting event, game: {gameInfo.Name}");
 
-            tvGamingService.Service.SendGameStarting(gameInfo);
+            GameEnvironmentService.Service.SendGameStarting(gameInfo);
         }
 
         public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
             var gameInfo = GetGameInfo(args.Game);
 
-            logger.Info($"TVGamingService: Sending GameStopped event, game: {gameInfo.Name}");
+            Logger.Info($"GameEnvironmentService: Sending GameStopped event, game: {gameInfo.Name}");
 
-            tvGamingService.Service.SendGameStopped(gameInfo);
+            GameEnvironmentService.Service.SendGameStopped(gameInfo);
         }
 
         public override void OnGameUninstalled(OnGameUninstalledEventArgs args)
@@ -75,7 +71,7 @@ namespace PlaynitePlugin
 
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
-            logger.Info("TVGamingService: Plugin is loaded");
+            Logger.Info("GameEnvironmentService: Plugin is loaded");
         }
 
         public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
@@ -88,7 +84,7 @@ namespace PlaynitePlugin
 
         public override ISettings GetSettings(bool firstRunSettings)
         {
-            return settings;
+            return Settings;
         }
 
         public override UserControl GetSettingsView(bool firstRunSettings)
@@ -126,7 +122,8 @@ namespace PlaynitePlugin
 
         private string GetGamePlatformName(Game game)
         {
-            if (game.Platforms == null || game.Platforms.Count == 0) {
+            if (game.Platforms == null || game.Platforms.Count == 0)
+            {
                 return null;
             }
 
@@ -135,40 +132,19 @@ namespace PlaynitePlugin
 
         private string GetGamePath(Game game)
         {
-            if (!gamePaths.ContainsKey(game.GameId))
+            if (!GamePaths.ContainsKey(game.GameId))
             {
                 return null;
             }
 
-            return gamePaths[game.GameId];
+            return GamePaths[game.GameId];
         }
 
         private void SetGamePath(Game game, string path)
         {
             var gameId = game.GameId;
 
-            gamePaths[gameId] = path;
-        }
-
-        private void StartAsyncTaskProcessor()
-        {
-            var delay = TimeSpan.FromSeconds(0);
-            var sleep = TimeSpan.FromSeconds(1);
-
-            asyncTaskTimer = new Timer((object _) =>
-            {
-                var task = tvGamingService.Service.GetAsyncTask();
-
-                ExecuteAsyncTask(task);
-            }, null, delay, sleep);
-        }
-
-        private void ExecuteAsyncTask(AsyncPlayniteTask task)
-        {
-            if (task == null)
-            {
-                return;
-            }
+            GamePaths[gameId] = path;
         }
     }
 }

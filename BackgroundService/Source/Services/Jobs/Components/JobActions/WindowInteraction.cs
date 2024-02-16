@@ -113,7 +113,8 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
             var currentDesktopName = Services.OS.Desktop.GetCurrentDesktopName();
             var allWindows = Services.OS.Desktop.GetWindowsOnDesktop(currentDesktopName);
 
-            var window = allWindows.Find(win => {
+            var window = allWindows.Find(win =>
+            {
                 var windowNameMatching = Regex.IsMatch(win.Name, Options.WindowName);
                 var processNameMatching = string.IsNullOrEmpty(Options.ProcessName) || Regex.IsMatch(win.Process.ProcessName, Options.ProcessName);
 

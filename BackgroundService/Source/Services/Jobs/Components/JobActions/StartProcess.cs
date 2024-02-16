@@ -1,6 +1,5 @@
 ﻿using BackgroundService.Source.Services.Jobs.Components.Common;
 using Core.Utils;
-using System;
 using System.Diagnostics;
 using System.IO;
 

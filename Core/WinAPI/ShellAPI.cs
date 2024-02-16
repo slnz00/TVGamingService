@@ -1,8 +1,9 @@
-﻿using System.Runtime.InteropServices;
-using System;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Core.WinAPI
 {
+#pragma warning disable IDE1006 // Naming Styles
     public static class ShellAPI
     {
         [ComImport]
@@ -51,7 +52,7 @@ namespace Core.WinAPI
             object Item([MarshalAs(UnmanagedType.Struct)] object index);
 
             [return: MarshalAs(UnmanagedType.IUnknown)]
-            object _NewEnum();
+            object NewEnum();
 
             void Register([MarshalAs(UnmanagedType.IDispatch)] object pid, int hwnd, ShellWindowTypeConstants swClass, out int plCookie);
 
@@ -82,6 +83,7 @@ namespace Core.WinAPI
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         public interface IShellView
         {
+
             void vtableGap_GetWindow();
             void vtableGap_ContextSensitiveHelp();
             void vtableGap_TranslateAcceleratorA();
@@ -170,4 +172,5 @@ namespace Core.WinAPI
         public const uint FWF_NOICONS = 0x1000;
         public const uint CSIDL_DESKTOP = 0U;
     }
+#pragma warning restore IDE1006 // Naming Styles
 }

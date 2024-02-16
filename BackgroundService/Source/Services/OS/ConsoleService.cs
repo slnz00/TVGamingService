@@ -1,6 +1,6 @@
-﻿using System;
+﻿using BackgroundService.Source.Providers;
+using System;
 using System.Runtime.InteropServices;
-using BackgroundService.Source.Providers;
 
 namespace BackgroundService.Source.Services.OS
 {
@@ -17,10 +17,9 @@ namespace BackgroundService.Source.Services.OS
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        private IntPtr consoleWindowHandle;
-        private bool isConsoleVisible;
+        private readonly IntPtr consoleWindowHandle;
 
-        public bool IsConsoleVisible => isConsoleVisible;
+        public bool IsConsoleVisible { get; private set; }
 
         public ConsoleService(ServiceProvider services) : base(services)
         {
@@ -34,13 +33,14 @@ namespace BackgroundService.Source.Services.OS
 
         public void ToggleConsoleVisibility()
         {
-            SetConsoleVisibility(!isConsoleVisible);
+            SetConsoleVisibility(!IsConsoleVisible);
         }
 
         public void SetConsoleVisibility(bool visibility)
         {
             ShowWindow(consoleWindowHandle, visibility ? SW_SHOW : SW_HIDE);
-            isConsoleVisible = visibility;
+
+            IsConsoleVisible = visibility;
 
             Logger.Info($"Console window visibility changed to: {visibility}");
         }

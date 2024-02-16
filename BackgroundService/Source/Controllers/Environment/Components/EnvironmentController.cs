@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using BackgroundService.Source.Providers;
+﻿using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.Jobs.Components;
 using Core.Configs;
 using Core.Utils;
-
+using System.Collections.Generic;
 using static BackgroundService.Source.Services.Jobs.Components.JobOptions;
 
 namespace BackgroundService.Source.Controllers.Environment.Components

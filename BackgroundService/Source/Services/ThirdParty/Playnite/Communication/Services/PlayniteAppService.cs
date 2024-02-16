@@ -10,11 +10,12 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Se
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     internal class PlayniteAppService : IPlayniteAppService
     {
-        private object threadLock = new object();
+        private readonly object threadLock = new object();
 
-        private Queue<AsyncPlayniteTask> asyncTaskQueue = new Queue<AsyncPlayniteTask>();
+        private readonly Queue<AsyncPlayniteTask> asyncTaskQueue = new Queue<AsyncPlayniteTask>();
 
-        public class Events {
+        public class Events
+        {
             public Action<PlayniteGameInfo> OnGameStarting { get; set; }
             public Action<PlayniteGameInfo> OnGameStarted { get; set; }
             public Action<PlayniteGameInfo> OnGameStopped { get; set; }
@@ -55,8 +56,10 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Se
             }
         }
 
-        public void EnqueueAsyncTask(AsyncPlayniteTask task) {
-            lock (threadLock) {
+        public void EnqueueAsyncTask(AsyncPlayniteTask task)
+        {
+            lock (threadLock)
+            {
                 asyncTaskQueue.Enqueue(task);
             }
         }

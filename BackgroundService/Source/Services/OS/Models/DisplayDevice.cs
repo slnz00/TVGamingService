@@ -8,8 +8,10 @@ namespace BackgroundService.Source.Services.OS.Models
         public DISPLAYCONFIG_TARGET_DEVICE_NAME NameInfo;
         public DISPLAYCONFIG_TARGET_PREFERRED_MODE PreferredMode;
 
-        public string FullName {
-            get {
+        public string FullName
+        {
+            get
+            {
                 var baseName = NameInfo.monitorFriendlyDeviceName;
                 var devicePath = NameInfo.monitorDevicePath;
 

@@ -25,11 +25,14 @@ namespace Core.Components
 
         private uint listenerIdCounter = 0;
 
-        private Dictionary<uint, EventListener<TEventID, TEventAction>> listenersById = new Dictionary<uint, EventListener<TEventID, TEventAction>>();
-        private Dictionary<TEventID, List<EventListener<TEventID, TEventAction>>> listenersByEventId = new Dictionary<TEventID, List<EventListener<TEventID, TEventAction>>>();
+        private readonly Dictionary<uint, EventListener<TEventID, TEventAction>> listenersById;
+        private readonly Dictionary<TEventID, List<EventListener<TEventID, TEventAction>>> listenersByEventId;
 
         public EventListenerRegistry()
         {
+            listenersById = new Dictionary<uint, EventListener<TEventID, TEventAction>>();
+            listenersByEventId = new Dictionary<TEventID, List<EventListener<TEventID, TEventAction>>>();
+
             Initialize();
         }
 
@@ -66,7 +69,8 @@ namespace Core.Components
 
         public void RemoveListener(uint id)
         {
-            lock (threadLock) {
+            lock (threadLock)
+            {
                 bool listenerExists = listenersById.TryGetValue(id, out EventListener<TEventID, TEventAction> listener);
                 if (!listenerExists)
                 {

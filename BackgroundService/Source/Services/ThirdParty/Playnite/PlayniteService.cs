@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using BackgroundService.Source.Common;
+﻿using BackgroundService.Source.Common;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.ThirdParty.Playnite.Communication;
 using BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Services;
@@ -10,6 +6,10 @@ using Core.Components;
 using Core.Configs;
 using Core.Playnite.Communication.Models;
 using Core.Utils;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace BackgroundService.Source.Services.ThirdParty.Playnite
 {
@@ -120,7 +120,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             }
             .All(val => !string.IsNullOrWhiteSpace(val));
 
-            if (!validConfigs) {
+            if (!validConfigs)
+            {
                 return false;
             }
 

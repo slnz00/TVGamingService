@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using BackgroundService.Source.Providers;
-using BackgroundService.Source.Controllers.Environment;
+﻿using BackgroundService.Source.Controllers.Environment;
 using BackgroundService.Source.Controllers.Environment.Components;
-using Core.Components.System;
-using System.Reflection;
+using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.OS;
 using BackgroundService.Source.Services.OS.Models;
 using BackgroundService.Source.Services.State.Components;
-using Core.Utils;
-using BackgroundService.Source.Services.OS;
-using System.Threading;
 using Core;
+using Core.Components.System;
+using Core.Utils;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading;
 using System.Windows;
 
 namespace BackgroundService.Source.Controllers
@@ -199,7 +199,8 @@ namespace BackgroundService.Source.Controllers
 
                 var newEnvironment = createEnvironment();
 
-                if (!newEnvironment.Validate()) {
+                if (!newEnvironment.Validate())
+                {
                     Logger.Error($"Failed to change environment: Validation failed");
 
                     return;

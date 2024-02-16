@@ -173,13 +173,13 @@ namespace Core.WinAPI
             public int pid;
         };
 
-        internal struct Blob
+        public struct Blob
         {
             public int Length;
             public IntPtr Data;
 
             // Dummy method for avoiding CS0649 warning.
-            private void FixCS0649()
+            public void Clear()
             {
                 Length = 0;
                 Data = IntPtr.Zero;
@@ -189,26 +189,26 @@ namespace Core.WinAPI
         [StructLayout(LayoutKind.Explicit)]
         public struct PropVariant
         {
-            [FieldOffset(0)] short vt;
-            [FieldOffset(2)] short wReserved1;
-            [FieldOffset(4)] short wReserved2;
-            [FieldOffset(6)] short wReserved3;
-            [FieldOffset(8)] sbyte cVal;
-            [FieldOffset(8)] byte bVal;
-            [FieldOffset(8)] short iVal;
-            [FieldOffset(8)] ushort uiVal;
-            [FieldOffset(8)] int lVal;
-            [FieldOffset(8)] uint ulVal;
-            [FieldOffset(8)] long hVal;
-            [FieldOffset(8)] ulong uhVal;
-            [FieldOffset(8)] float fltVal;
-            [FieldOffset(8)] double dblVal;
-            [FieldOffset(8)] Blob blobVal;
-            [FieldOffset(8)] DateTime date;
-            [FieldOffset(8)] bool boolVal;
-            [FieldOffset(8)] int scode;
-            [FieldOffset(8)] System.Runtime.InteropServices.ComTypes.FILETIME filetime;
-            [FieldOffset(8)] IntPtr everything_else;
+            [FieldOffset(0)] public short vt;
+            [FieldOffset(2)] public short wReserved1;
+            [FieldOffset(4)] public short wReserved2;
+            [FieldOffset(6)] public short wReserved3;
+            [FieldOffset(8)] public sbyte cVal;
+            [FieldOffset(8)] public byte bVal;
+            [FieldOffset(8)] public short iVal;
+            [FieldOffset(8)] public ushort uiVal;
+            [FieldOffset(8)] public int lVal;
+            [FieldOffset(8)] public uint ulVal;
+            [FieldOffset(8)] public long hVal;
+            [FieldOffset(8)] public ulong uhVal;
+            [FieldOffset(8)] public float fltVal;
+            [FieldOffset(8)] public double dblVal;
+            [FieldOffset(8)] public Blob blobVal;
+            [FieldOffset(8)] public DateTime date;
+            [FieldOffset(8)] public bool boolVal;
+            [FieldOffset(8)] public int scode;
+            [FieldOffset(8)] public System.Runtime.InteropServices.ComTypes.FILETIME filetime;
+            [FieldOffset(8)] public IntPtr everything_else;
 
             internal byte[] GetBlob()
             {
@@ -251,7 +251,7 @@ namespace Core.WinAPI
 
         [ComImport]
         [Guid("870af99c-171d-4f9e-af0d-e63df40c2bc9")]
-        internal class _PolicyConfigClient
+        internal class COM_PolicyConfigClient
         {
         }
 
@@ -355,7 +355,7 @@ namespace Core.WinAPI
 
         [ComImport]
         [Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")]
-        internal class _MMDeviceEnumerator
+        internal class COM_MMDeviceEnumerator
         {
         }
 
@@ -414,11 +414,11 @@ namespace Core.WinAPI
 
             public PolicyConfigClient()
             {
-                _PolicyConfig = new _PolicyConfigClient() as IPolicyConfig;
+                _PolicyConfig = new COM_PolicyConfigClient() as IPolicyConfig;
                 if (_PolicyConfig != null)
                     return;
 
-                _PolicyConfig10 = new _PolicyConfigClient() as IPolicyConfig10;
+                _PolicyConfig10 = new COM_PolicyConfigClient() as IPolicyConfig10;
             }
 
             public void SetDefaultEndpoint(string devID, ERole eRole)
@@ -465,14 +465,13 @@ namespace Core.WinAPI
 
         public class PropertyStore
         {
-            private IPropertyStore _Store;
+            private readonly IPropertyStore _Store;
 
             public int Count
             {
                 get
                 {
-                    int Result;
-                    Marshal.ThrowExceptionForHR(_Store.GetCount(out Result));
+                    Marshal.ThrowExceptionForHR(_Store.GetCount(out int Result));
                     return Result;
                 }
             }
@@ -481,9 +480,8 @@ namespace Core.WinAPI
             {
                 get
                 {
-                    PropVariant result;
-                    PropertyKey key = Get(index);
-                    Marshal.ThrowExceptionForHR(_Store.GetValue(ref key, out result));
+                    var key = Get(index);
+                    Marshal.ThrowExceptionForHR(_Store.GetValue(ref key, out PropVariant result));
                     return new PropertyStoreProperty(key, result);
                 }
             }
@@ -503,13 +501,12 @@ namespace Core.WinAPI
             {
                 get
                 {
-                    PropVariant result;
                     for (int i = 0; i < Count; i++)
                     {
                         PropertyKey key = Get(i);
                         if (key.fmtid == guid)
                         {
-                            Marshal.ThrowExceptionForHR(_Store.GetValue(ref key, out result));
+                            Marshal.ThrowExceptionForHR(_Store.GetValue(ref key, out PropVariant result));
                             return new PropertyStoreProperty(key, result);
                         }
                     }
@@ -519,16 +516,14 @@ namespace Core.WinAPI
 
             public PropertyKey Get(int index)
             {
-                PropertyKey key;
-                Marshal.ThrowExceptionForHR(_Store.GetAt(index, out key));
+                Marshal.ThrowExceptionForHR(_Store.GetAt(index, out PropertyKey key));
                 return key;
             }
 
             public PropVariant GetValue(int index)
             {
-                PropVariant result;
                 PropertyKey key = Get(index);
-                Marshal.ThrowExceptionForHR(_Store.GetValue(ref key, out result));
+                Marshal.ThrowExceptionForHR(_Store.GetValue(ref key, out PropVariant result));
                 return result;
             }
 
@@ -547,13 +542,12 @@ namespace Core.WinAPI
             {
                 get
                 {
-                    PropVariant result;
                     for (int i = 0; i < Count; i++)
                     {
                         PropertyKey key = Get(i);
                         if (key.fmtid == queryKey.fmtid && key.pid == queryKey.pid)
                         {
-                            Marshal.ThrowExceptionForHR(_Store.GetValue(ref key, out result));
+                            Marshal.ThrowExceptionForHR(_Store.GetValue(ref key, out PropVariant result));
                             return new PropertyStoreProperty(key, result);
                         }
                     }
@@ -569,13 +563,13 @@ namespace Core.WinAPI
 
         public class MMDevice
         {
-            private IMMDevice _RealDevice;
+            private readonly IMMDevice _RealDevice;
+
             private PropertyStore _PropertyStore;
 
             private void GetPropertyInformation()
             {
-                IPropertyStore propstore;
-                Marshal.ThrowExceptionForHR(_RealDevice.OpenPropertyStore(EStgmAccess.STGM_READ, out propstore));
+                Marshal.ThrowExceptionForHR(_RealDevice.OpenPropertyStore(EStgmAccess.STGM_READ, out IPropertyStore propstore));
                 _PropertyStore = new PropertyStore(propstore);
             }
 
@@ -644,8 +638,7 @@ namespace Core.WinAPI
             {
                 get
                 {
-                    string Result;
-                    Marshal.ThrowExceptionForHR(_RealDevice.GetId(out Result));
+                    Marshal.ThrowExceptionForHR(_RealDevice.GetId(out string Result));
                     return Result;
                 }
             }
@@ -654,8 +647,7 @@ namespace Core.WinAPI
             {
                 get
                 {
-                    EDeviceState Result;
-                    Marshal.ThrowExceptionForHR(_RealDevice.GetState(out Result));
+                    Marshal.ThrowExceptionForHR(_RealDevice.GetState(out EDeviceState Result));
                     return Result;
 
                 }
@@ -670,26 +662,23 @@ namespace Core.WinAPI
 
         public class MMDeviceEnumerator
         {
-            private IMMDeviceEnumerator _realEnumerator = new _MMDeviceEnumerator() as IMMDeviceEnumerator;
+            private readonly IMMDeviceEnumerator _realEnumerator = new COM_MMDeviceEnumerator() as IMMDeviceEnumerator;
 
             public MMDeviceCollection EnumerateAudioEndPoints(EDataFlow dataFlow, EDeviceState dwStateMask)
             {
-                IMMDeviceCollection result;
-                Marshal.ThrowExceptionForHR(_realEnumerator.EnumAudioEndpoints(dataFlow, dwStateMask, out result));
+                Marshal.ThrowExceptionForHR(_realEnumerator.EnumAudioEndpoints(dataFlow, dwStateMask, out IMMDeviceCollection result));
                 return new MMDeviceCollection(result);
             }
 
             public MMDevice GetDefaultAudioEndpoint(EDataFlow dataFlow, ERole role)
             {
-                IMMDevice _Device = null;
-                Marshal.ThrowExceptionForHR((_realEnumerator).GetDefaultAudioEndpoint(dataFlow, role, out _Device));
+                Marshal.ThrowExceptionForHR(_realEnumerator.GetDefaultAudioEndpoint(dataFlow, role, out IMMDevice _Device));
                 return new MMDevice(_Device);
             }
 
             public MMDevice GetDevice(string ID)
             {
-                IMMDevice _Device = null;
-                Marshal.ThrowExceptionForHR((_realEnumerator).GetDevice(ID, out _Device));
+                Marshal.ThrowExceptionForHR(_realEnumerator.GetDevice(ID, out IMMDevice _Device));
                 return new MMDevice(_Device);
             }
 
@@ -704,8 +693,8 @@ namespace Core.WinAPI
 
         public class MMDeviceCollection : IEnumerable<MMDevice>
         {
-            private List<MMDevice> list;
-            private IMMDeviceCollection collection;
+            private readonly List<MMDevice> list;
+            private readonly IMMDeviceCollection collection;
 
             public int Count => list.Count;
 

@@ -1,17 +1,20 @@
 ﻿using IWshRuntimeLibrary;
 using Microsoft.Win32;
 using System.Globalization;
+using System.Linq;
 using System.Management;
 
 namespace Core.Utils
 {
     public static class OSUtils
     {
-        public class WindowsVersion {
+        public class WindowsVersion
+        {
             public readonly string version;
             public readonly double buildNumber;
 
-            public WindowsVersion(string version, double buildNumber) {
+            public WindowsVersion(string version, double buildNumber)
+            {
                 this.version = version;
                 this.buildNumber = buildNumber;
             }
@@ -46,7 +49,7 @@ namespace Core.Utils
                 ManagementObjectCollection information = searcher.Get();
                 if (information != null)
                 {
-                    foreach (ManagementObject obj in information)
+                    foreach (ManagementObject obj in information.Cast<ManagementObject>())
                     {
                         result = obj["Caption"].ToString() + " - " + obj["OSArchitecture"].ToString();
                     }

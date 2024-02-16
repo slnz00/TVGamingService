@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Core.Utils
 {
@@ -10,13 +6,15 @@ namespace Core.Utils
     {
         public static List<T> CloneList<T>(List<T> list)
         {
-            if (list == null) {
+            if (list == null)
+            {
                 return null;
             }
 
             List<T> clonedList = new List<T>(list.Count);
 
-            foreach (T item in list) {
+            foreach (T item in list)
+            {
                 clonedList.Add(item);
             }
 

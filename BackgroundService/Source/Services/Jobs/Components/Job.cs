@@ -27,7 +27,6 @@ namespace BackgroundService.Source.Services.Jobs.Components
         private readonly Context context;
         private ManagedTask jobTask;
 
-        private ServiceProvider Services => context.Services;
         private LoggerProvider Logger => context.Logger;
 
         public Job(ServiceProvider services, JobOptions options)
@@ -186,15 +185,15 @@ namespace BackgroundService.Source.Services.Jobs.Components
         {
             jobTask = ManagedTask.Run(async (ctx) =>
             {
-                Action RunActionsOnce = () =>
+                void RunActionsOnce()
                 {
                     foreach (var action in Options.Actions)
                     {
                         action.Execute();
                     }
-                };
+                }
 
-                Func<Task> RunActionsUntilCancellation = async () =>
+                async Task RunActionsUntilCancellation()
                 {
                     while (!ctx.Cancellation.IsCancellationRequested)
                     {
@@ -202,7 +201,7 @@ namespace BackgroundService.Source.Services.Jobs.Components
 
                         await Task.Delay(Options.TimeBetweenExecutions, ctx.Cancellation.Token);
                     }
-                };
+                }
 
                 try
                 {

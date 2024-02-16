@@ -1,9 +1,9 @@
-﻿using System;
+﻿using BackgroundService.Source.Controllers.Environment.Components;
 using BackgroundService.Source.Providers;
-using Core.Configs;
-using BackgroundService.Source.Controllers.Environment.Components;
-using Core.Components;
 using Core;
+using Core.Components;
+using Core.Configs;
+using System;
 
 namespace BackgroundService.Source.Services.Configs
 {

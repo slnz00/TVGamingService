@@ -29,7 +29,8 @@ namespace Core.Configs
         public EnvironmentJobsConfig GameEnvironment = new EnvironmentJobsConfig();
     }
 
-    public class EnvironmentJobsConfig {
+    public class EnvironmentJobsConfig
+    {
         public List<JobConfig> Setup = new List<JobConfig>();
         public List<JobConfig> Reset = new List<JobConfig>();
         public List<JobConfig> Teardown = new List<JobConfig>();

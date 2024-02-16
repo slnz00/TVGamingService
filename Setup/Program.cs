@@ -1,12 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Diagnostics;
-using System.Linq;
-using Core;
+﻿using Core;
 using Core.Configs;
 using Core.Utils;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
-
 using static Core.WinAPI.AudioAPI;
 using static Core.WinAPI.DisplayAPI;
 

@@ -131,7 +131,7 @@ namespace BackgroundService.Source.Services.State
                 var state = EnumUtils.GetValue<States>(field);
                 var entry = GetStateEntry(state)
                     ?? throw new InvalidOperationException($"{nameof(States)} enum field: '{field}' does not have a {nameof(StateEntry)} attribute");
-               
+
                 if (usedKeys.Contains(entry.Key))
                 {
                     throw new ArgumentException($"{nameof(States)} enum field: '{field}', specified key is already in use: '{entry.Key}'");

@@ -1,7 +1,4 @@
-﻿using BackgroundService.Source.Components;
-using System;
-
-namespace BackgroundService.Source.Services.Jobs.Components
+﻿namespace BackgroundService.Source.Services.Jobs.Components
 {
     internal abstract class JobAction : JobComponent
     {

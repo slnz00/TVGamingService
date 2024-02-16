@@ -26,7 +26,8 @@ namespace BackgroundService.Source.Services
 
                     string savePath = GetGameConfigDataPath(configPath, env);
 
-                    if (!File.Exists(configPath)) {
+                    if (!File.Exists(configPath))
+                    {
                         Logger.Warn($"Game config file does not exist: {configPath}");
                         return;
                     }

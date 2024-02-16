@@ -9,7 +9,6 @@ namespace Core.WinAPI
         public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
 
         [DllImport("user32.dll")]
-        // A signature for ChangeDisplaySettingsEx with a DEVMODE struct as the second parameter won't allow you to pass in IntPtr.Zero, so create an overload
         public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, IntPtr lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
 
         [DllImport("user32.dll")]
@@ -50,39 +49,39 @@ namespace Core.WinAPI
             [FieldOffset(0)]
             public string dmDeviceName;
             [FieldOffset(32)]
-            public Int16 dmSpecVersion;
+            public short dmSpecVersion;
             [FieldOffset(34)]
-            public Int16 dmDriverVersion;
+            public short dmDriverVersion;
             [FieldOffset(36)]
-            public Int16 dmSize;
+            public short dmSize;
             [FieldOffset(38)]
-            public Int16 dmDriverExtra;
+            public short dmDriverExtra;
             [FieldOffset(40)]
             public DEVMODEFlags dmFields;
 
             [FieldOffset(44)]
-            Int16 dmOrientation;
+            public short dmOrientation;
             [FieldOffset(46)]
-            Int16 dmPaperSize;
+            public short dmPaperSize;
             [FieldOffset(48)]
-            Int16 dmPaperLength;
+            public short dmPaperLength;
             [FieldOffset(50)]
-            Int16 dmPaperWidth;
+            public short dmPaperWidth;
             [FieldOffset(52)]
-            Int16 dmScale;
+            public short dmScale;
             [FieldOffset(54)]
-            Int16 dmCopies;
+            public short dmCopies;
             [FieldOffset(56)]
-            Int16 dmDefaultSource;
+            public short dmDefaultSource;
             [FieldOffset(58)]
-            Int16 dmPrintQuality;
+            public short dmPrintQuality;
 
             [FieldOffset(44)]
             public POINTL dmPosition;
             [FieldOffset(52)]
-            public Int32 dmDisplayOrientation;
+            public int dmDisplayOrientation;
             [FieldOffset(56)]
-            public Int32 dmDisplayFixedOutput;
+            public int dmDisplayFixedOutput;
 
             [FieldOffset(60)]
             public short dmColor; // See note below!
@@ -98,19 +97,19 @@ namespace Core.WinAPI
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHFORMNAME)]
             public string dmFormName;
             [FieldOffset(102)]
-            public Int16 dmLogPixels;
+            public short dmLogPixels;
             [FieldOffset(104)]
-            public Int32 dmBitsPerPel;
+            public int dmBitsPerPel;
             [FieldOffset(108)]
-            public Int32 dmPelsWidth;
+            public int dmPelsWidth;
             [FieldOffset(112)]
-            public Int32 dmPelsHeight;
+            public int dmPelsHeight;
             [FieldOffset(116)]
-            public Int32 dmDisplayFlags;
+            public int dmDisplayFlags;
             [FieldOffset(116)]
-            public Int32 dmNup;
+            public int dmNup;
             [FieldOffset(120)]
-            public Int32 dmDisplayFrequency;
+            public int dmDisplayFrequency;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]

@@ -39,7 +39,8 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
             Watcher.Dispose();
         }
 
-        public void RunBackup() {
+        public void RunBackup()
+        {
             lock (threadLock)
             {
                 RunBackupAt = null;
@@ -63,7 +64,8 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
             }
         }
 
-        public void ScheduleBackup(long? time = null) {
+        public void ScheduleBackup(long? time = null)
+        {
             lock (threadLock)
             {
                 long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();

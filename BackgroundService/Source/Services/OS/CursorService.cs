@@ -1,13 +1,13 @@
-﻿using Microsoft.Win32;
+﻿using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.State;
+using BackgroundService.Source.Services.State.Components;
+using Core;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.State.Components;
-using BackgroundService.Source.Services.State;
-using System;
-using Core;
-using System.IO;
 
 namespace BackgroundService.Source.Services.OS
 {

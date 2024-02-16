@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using BackgroundService.Source.Providers;
+﻿using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
 using Core.Utils;
-
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using static Core.WinAPI.VirtualDesktop.VirtualDesktopAPIW11;
 
 namespace BackgroundService.Source.Services.OS

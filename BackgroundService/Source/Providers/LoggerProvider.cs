@@ -8,7 +8,7 @@ namespace BackgroundService.Source.Providers
         private static readonly NLog.Logger NLogger = NLog.LogManager.GetLogger("");
         public readonly static LoggerProvider Global = new LoggerProvider("Global");
 
-        private string name;
+        private readonly string name;
 
         public string Name => name;
 

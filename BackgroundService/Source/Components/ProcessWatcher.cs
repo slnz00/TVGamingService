@@ -87,7 +87,8 @@ namespace BackgroundService.Source.Common
             });
         }
 
-        private bool RequestProcessRunningStatus() {
+        private bool RequestProcessRunningStatus()
+        {
             return Process.GetProcessesByName(ProcessName).Length != 0;
         }
 

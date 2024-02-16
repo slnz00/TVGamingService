@@ -1,9 +1,5 @@
-﻿using NLog.Targets;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Core.WinAPI.DisplayAPI;
 
 namespace BackgroundService.Source.Services.OS.Models

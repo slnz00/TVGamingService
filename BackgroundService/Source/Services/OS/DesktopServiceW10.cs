@@ -1,13 +1,12 @@
-﻿using System;
+﻿using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.OS.Models;
+using BackgroundService.Source.Services.State.Components;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.OS.Models;
-using Microsoft.Win32;
-using BackgroundService.Source.Services.State.Components;
-
-using static Core.WinAPI.VirtualDesktop.VirtualDesktopAPIW10;
 using static Core.WinAPI.DesktopAPI;
+using static Core.WinAPI.VirtualDesktop.VirtualDesktopAPIW10;
 
 namespace BackgroundService.Source.Services.OS
 {

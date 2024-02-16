@@ -74,23 +74,19 @@ namespace Core.Utils
             Action<ProcessStartInfo> customizeStartInfo = null
         )
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = windowStyle == ProcessWindowStyle.Hidden;
-            startInfo.UseShellExecute = true;
-            startInfo.FileName = path;
-            startInfo.WindowStyle = windowStyle;
-            startInfo.Arguments = args;
-
-            if (customizeStartInfo != null)
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
-                customizeStartInfo(startInfo);
-            }
+                CreateNoWindow = windowStyle == ProcessWindowStyle.Hidden,
+                UseShellExecute = true,
+                FileName = path,
+                WindowStyle = windowStyle,
+                Arguments = args
+            };
 
-            Process proc = Process.Start(startInfo);
-            if (proc == null)
-            {
-                throw new NullReferenceException("Failed to start process");
-            }
+            customizeStartInfo?.Invoke(startInfo);
+
+            Process proc = Process.Start(startInfo)
+                ?? throw new NullReferenceException("Failed to start process");
 
             if (waitForExit)
             {

@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using BackgroundService.Source.Common;
+﻿using BackgroundService.Source.Common;
 using BackgroundService.Source.Providers;
 using Core.Configs;
 using Core.Utils;
+using System.Diagnostics;
 
 namespace BackgroundService.Source.Services.ThirdParty
 {

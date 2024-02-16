@@ -1,12 +1,12 @@
-﻿using System;
+﻿using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.OS.Models;
+using Core.Components;
+using Core.Components.System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.OS.Models;
-using Core.Components;
-using Core.Components.System;
 
 namespace BackgroundService.Source.Services.OS
 {
@@ -119,7 +119,8 @@ namespace BackgroundService.Source.Services.OS
             bool isHotkeyMessage = msg.message == WM_HOTKEY;
             if (isHotkeyMessage)
             {
-                if (CurrentAction != null && CurrentAction.IsAlive) {
+                if (CurrentAction != null && CurrentAction.IsAlive)
+                {
                     return;
                 }
 

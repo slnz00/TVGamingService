@@ -1,11 +1,10 @@
-﻿using System;
+﻿using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.OS.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
-using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.OS.Models;
-
 using static Core.WinAPI.WindowAPI;
 
 namespace BackgroundService.Source.Services.OS

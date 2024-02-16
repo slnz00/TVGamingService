@@ -1,10 +1,10 @@
-﻿using System;
+﻿using BackgroundService.Source.Providers;
+using BackgroundService.Source.Services.OS.Models;
+using Core.Utils;
+using Core.WinAPI;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.OS.Models;
-using Core.WinAPI;
-using Core.Utils;
 
 namespace BackgroundService.Source.Services.OS
 {
@@ -46,12 +46,11 @@ namespace BackgroundService.Source.Services.OS
             Logger.Info($"Toggling desktop icons visibility to: {visible}");
 
             var shellWindows = (ShellAPI.IShellWindows)new ShellAPI.ShellWindows();
-
             var serviceProvider = (ShellAPI.IServiceProvider)shellWindows.FindWindowSW(
                 ShellAPI.CSIDL_DESKTOP,
                 new object(),
                 ShellAPI.ShellWindowTypeConstants.SWC_DESKTOP,
-                out int _hwnd,
+                out _,
                 ShellAPI.ShellWindowFindWindowOptions.SWFO_NEEDDISPATCH
             );
 

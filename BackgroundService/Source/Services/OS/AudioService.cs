@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using BackgroundService.Source.Providers;
+﻿using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
 using BackgroundService.Source.Services.State.Components;
 using Core.Components;
 using Core.Utils;
-
+using System;
+using System.Linq;
+using System.Runtime.InteropServices;
 using static Core.WinAPI.AudioAPI;
 
 namespace BackgroundService.Source.Services.OS

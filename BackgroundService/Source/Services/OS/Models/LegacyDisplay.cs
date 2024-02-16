@@ -26,7 +26,8 @@ namespace BackgroundService.Source.Services.OS.Models
         {
             string[] deviceIdParts = MonitorDevice.DeviceID.Split('\\');
 
-            if (deviceIdParts.Length >= 2) {
+            if (deviceIdParts.Length >= 2)
+            {
                 return deviceIdParts[1];
             }
 

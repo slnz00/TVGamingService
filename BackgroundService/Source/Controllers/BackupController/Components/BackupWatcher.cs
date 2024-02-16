@@ -32,13 +32,14 @@ namespace BackgroundService.Source.Controllers.BackupController.Components
         {
             try
             {
-                directoryWatcher = new FileSystemWatcher();
-
-                directoryWatcher.Path = originalPath;
-                directoryWatcher.NotifyFilter = NotifyFilters.LastWrite;
-                directoryWatcher.Filter = "*.*";
-                directoryWatcher.EnableRaisingEvents = true;
-                directoryWatcher.IncludeSubdirectories = true;
+                directoryWatcher = new FileSystemWatcher
+                {
+                    Path = originalPath,
+                    NotifyFilter = NotifyFilters.LastWrite,
+                    Filter = "*.*",
+                    EnableRaisingEvents = true,
+                    IncludeSubdirectories = true
+                };
 
                 directoryWatcher.Changed += new FileSystemEventHandler((object source, FileSystemEventArgs e) =>
                 {

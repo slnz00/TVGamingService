@@ -11,7 +11,8 @@ namespace Core.Utils
         {
             var validName = GetNames<T>().Exists(n => n == name);
 
-            if (!validName) {
+            if (!validName)
+            {
                 throw new ArgumentOutOfRangeException("name", $"Unknown name for {typeof(T).Name}: {name}");
             }
 
