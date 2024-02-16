@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Windows;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
 
@@ -18,12 +18,12 @@ namespace BackgroundService.Source.Services.OS
         {
             var windows = new List<WindowComponent>();
 
-            EnumThreadDelegate addWindow = (handle, lParam) =>
+            bool addWindow(IntPtr handle, IntPtr lParam)
             {
                 windows.Add(new WindowComponent("Window", handle));
 
                 return true;
-            };
+            }
 
             foreach (ProcessThread thread in Process.GetProcessById(processId).Threads)
             {
@@ -48,7 +48,7 @@ namespace BackgroundService.Source.Services.OS
             }
 
             IntPtr curentHandle = IntPtr.Zero;
-            Func<IntPtr> NextComponentHandle = () => FindWindowEx(component.Handle, curentHandle, componentType, null);
+            IntPtr NextComponentHandle() => FindWindowEx(component.Handle, curentHandle, componentType, null);
 
             while ((curentHandle = NextComponentHandle()) != IntPtr.Zero)
             {
@@ -58,7 +58,7 @@ namespace BackgroundService.Source.Services.OS
             return components;
         }
 
-        public Task ShowMessageBoxAsync(MessageBoxIcon icon, string message)
+        public Task ShowMessageBoxAsync(MessageBoxImage icon, string message)
         {
             return Task.Run(() =>
             {
@@ -66,9 +66,9 @@ namespace BackgroundService.Source.Services.OS
             });
         }
 
-        public void ShowMessageBoxSync(MessageBoxIcon icon, string message)
+        public void ShowMessageBoxSync(MessageBoxImage icon, string message)
         {
-            MessageBox.Show(message, InternalSettings.WindowTitle, MessageBoxButtons.OK, icon);
+            MessageBox.Show(message, InternalSettings.WindowTitle, MessageBoxButton.OK, icon);
         }
     }
 }

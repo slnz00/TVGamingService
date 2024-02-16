@@ -1,7 +1,7 @@
 ﻿using BackgroundService.Source.Controllers.Environment.Components;
 using BackgroundService.Source.Providers;
 using Core.Utils;
-using System.Windows.Forms;
+using System.Windows;
 
 namespace BackgroundService.Source.Controllers.Environment
 {
@@ -10,6 +10,11 @@ namespace BackgroundService.Source.Controllers.Environment
         public PCEnvironment(MainController mainController, ServiceProvider services) :
             base(Environments.PC, mainController, services)
         { }
+
+        protected override bool OnValidate()
+        {
+            return true;
+        }
 
         protected override void OnSetup()
         {
@@ -71,7 +76,7 @@ namespace BackgroundService.Source.Controllers.Environment
             if (!result)
             {
                 Services.OS.Window.ShowMessageBoxAsync(
-                    MessageBoxIcon.Error,
+                    MessageBoxImage.Error,
                     "Failed to restore PC environment's display settings. Please set your display settings manually."
                 );
             }
@@ -80,7 +85,7 @@ namespace BackgroundService.Source.Controllers.Environment
             if (!result)
             {
                 Services.OS.Window.ShowMessageBoxAsync(
-                    MessageBoxIcon.Error,
+                    MessageBoxImage.Error,
                     "Failed to restore PC environment's audio settings. Please set your audio settings manually."
                 );
             }

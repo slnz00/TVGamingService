@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using BackgroundService.Source.Common;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.ThirdParty.Playnite.Communication;
@@ -33,8 +34,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
         private AppCommunicationHost playniteCommunication;
         private ProcessWatcher watcherPlayniteFullscreen;
 
-        private AppConfig configPlayniteFullscreen => Services.Config.GetConfig().ThirdParty.PlayniteFullscreen;
-        private AppConfig configPlayniteDesktop => Services.Config.GetConfig().ThirdParty.PlayniteDesktop;
+        private AppConfig ConfigPlayniteFullscreen => Services.Config.GetConfig().ThirdParty?.PlayniteFullscreen;
+        private AppConfig ConfigPlayniteDesktop => Services.Config.GetConfig().ThirdParty?.PlayniteDesktop;
 
         public bool IsPlayniteFullscreenOpen => watcherPlayniteFullscreen != null && watcherPlayniteFullscreen.IsProcessOpen;
 
@@ -59,7 +60,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
             Services.Config.ConfigWatcher.OnChanged(() =>
             {
-                lock (threadLock) {
+                lock (threadLock)
+                {
                     StopServices();
                     StartServices();
                 }
@@ -107,11 +109,36 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             eventListenerRegistry.RemoveListener(listenerId);
         }
 
+        public bool IsPlayniteAvailable()
+        {
+            var validConfigs = new string[]
+            {
+                ConfigPlayniteFullscreen?.Path,
+                ConfigPlayniteFullscreen?.ProcessName,
+                ConfigPlayniteDesktop?.Path,
+                ConfigPlayniteDesktop?.ProcessName
+            }
+            .All(val => !string.IsNullOrWhiteSpace(val));
+
+            if (!validConfigs) {
+                return false;
+            }
+
+            var validPaths = new string[]
+            {
+                ConfigPlayniteFullscreen.Path,
+                ConfigPlayniteDesktop.Path
+            }
+            .All(path => File.Exists(path));
+
+            return validPaths;
+        }
+
         public void OpenFullscreenPlaynite()
         {
             Logger.Info("Opening Playnite fullscreen application");
 
-            var playnitePath = FSUtils.GetAbsolutePath(configPlayniteFullscreen.Path);
+            var playnitePath = FSUtils.GetAbsolutePath(ConfigPlayniteFullscreen.Path);
             var playniteDir = Path.GetDirectoryName(playnitePath);
 
             ProcessUtils.StartProcess(playnitePath, "", ProcessWindowStyle.Normal, false, (startInfo) =>
@@ -126,7 +153,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             {
                 Logger.Info("Closing Playnite fullscreen application");
 
-                ProcessUtils.CloseProcess(configPlayniteFullscreen.ProcessName);
+                ProcessUtils.CloseProcess(ConfigPlayniteFullscreen.ProcessName);
             }
         }
 
@@ -136,7 +163,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             {
                 Logger.Info("Closing Playnite desktop application");
 
-                ProcessUtils.CloseProcess(configPlayniteDesktop.ProcessName);
+                ProcessUtils.CloseProcess(ConfigPlayniteDesktop.ProcessName);
             }
         }
 
@@ -157,12 +184,12 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
         private void StartServices()
         {
-            if (configPlayniteFullscreen == null || configPlayniteDesktop == null)
+            if (ConfigPlayniteFullscreen == null || ConfigPlayniteDesktop == null)
             {
                 throw new NullReferenceException("PlayniteDesktop and PlayniteFullscreen third-party configurations are not defined");
             }
 
-            watcherPlayniteFullscreen = new ProcessWatcher(configPlayniteFullscreen.ProcessName, watcherEvents, 1000);
+            watcherPlayniteFullscreen = new ProcessWatcher(ConfigPlayniteFullscreen.ProcessName, watcherEvents, 1000);
             playniteCommunication = new AppCommunicationHost(playniteAppEvents);
 
             playniteCommunication.Open();

@@ -2,7 +2,7 @@
 using BackgroundService.Source.Providers;
 using Core.Configs;
 using Core.Utils;
-using System.Windows.Forms;
+using System.Windows;
 
 namespace BackgroundService.Source.Controllers.Environment
 {
@@ -15,6 +15,16 @@ namespace BackgroundService.Source.Controllers.Environment
         public GameEnvironment(MainController mainController, ServiceProvider services) :
             base(Environments.Game, mainController, services)
         { }
+
+        protected override bool OnValidate()
+        {
+            if (!ValidatePlaynite())
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         protected override void OnSetup()
         {
@@ -43,6 +53,21 @@ namespace BackgroundService.Source.Controllers.Environment
             CloseThirdPartyApps();
 
             SaveGameConfigs();
+        }
+
+        private bool ValidatePlaynite()
+        {
+            var playniteAvailable = Services.ThirdParty.Playnite.IsPlayniteAvailable();
+
+            if (!playniteAvailable)
+            {
+                Services.OS.Window.ShowMessageBoxAsync(
+                    MessageBoxImage.Error,
+                    "Playnite configuration is invalid. Please use the Configurator app to reconfigure it."
+                );
+            }
+
+            return playniteAvailable;
         }
 
         private void LoadGameConfigs()
@@ -89,8 +114,8 @@ namespace BackgroundService.Source.Controllers.Environment
             if (!result)
             {
                 Services.OS.Window.ShowMessageBoxAsync(
-                    MessageBoxIcon.Error,
-                    "Failed to switch displays. TV environment's display device is unavailable. Please reconfigure it using the Configurator app."
+                    MessageBoxImage.Error,
+                    "Failed to switch displays. TV environment's display device is unavailable. Please use the Configurator app to reconfigure it."
                 );
             }
         }

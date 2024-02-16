@@ -7,8 +7,8 @@ namespace BackgroundService.Source.Services.OS.Models
 {
     internal class HotkeyDefinition
     {
-        private KeyModifiers keyModifier;
-        private Keys key;
+        private readonly KeyModifiers keyModifier;
+        private readonly Keys key;
 
         public KeyModifiers KeyModifier => keyModifier;
 

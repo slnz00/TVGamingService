@@ -34,6 +34,11 @@ namespace BackgroundService.Source.Controllers.Environment.Components
             MainController = mainController;
         }
 
+        public bool Validate()
+        {
+            return OnValidate();
+        }
+
         public void Setup()
         {
             OnSetup();
@@ -56,6 +61,8 @@ namespace BackgroundService.Source.Controllers.Environment.Components
 
             RemoveAllEnvironmentJobs();
         }
+
+        protected abstract bool OnValidate();
 
         protected abstract void OnSetup();
 

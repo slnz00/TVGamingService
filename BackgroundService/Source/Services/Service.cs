@@ -7,18 +7,16 @@ namespace BackgroundService.Source.Services
     internal abstract class Service : IDisposable
     {
         private bool initialized = false;
-        private ServiceProvider services;
-        private LoggerProvider logger;
 
-        protected ServiceProvider Services => services;
-        protected LoggerProvider Logger => logger;
+        protected readonly ServiceProvider Services;
+        protected readonly LoggerProvider Logger;
 
         public bool IsInitialized => initialized;
 
         public Service(ServiceProvider services)
         {
-            this.services = services;
-            logger = new LoggerProvider(GetType().Name);
+            Services = services;
+            Logger = new LoggerProvider(GetType().Name);
         }
 
         public void Initialize()

@@ -11,7 +11,7 @@ using Core.Utils;
 using BackgroundService.Source.Services.OS;
 using System.Threading;
 using Core;
-using System.Windows.Forms;
+using System.Windows;
 
 namespace BackgroundService.Source.Controllers
 {
@@ -115,7 +115,7 @@ namespace BackgroundService.Source.Controllers
 
             if (alreadyRunning)
             {
-                Services.OS.Window.ShowMessageBoxSync(MessageBoxIcon.Error, "A background service instance is already running.");
+                Services.OS.Window.ShowMessageBoxSync(MessageBoxImage.Error, "A background service instance is already running.");
 
                 System.Environment.Exit(-1);
             }
@@ -191,20 +191,25 @@ namespace BackgroundService.Source.Controllers
 
                 LogControllerEvent($"Switching environment to: {environmentName}");
 
-                bool factoryExists = EnvironmentFactory.TryGetValue(environment, out var createEnvironmentController);
+                bool factoryExists = EnvironmentFactory.TryGetValue(environment, out var createEnvironment);
                 if (!factoryExists)
                 {
                     throw new KeyNotFoundException($"Environment does not have a factory method: {environmentName}");
                 }
 
-                var newController = createEnvironmentController();
-                var currentController = CurrentEnvironment;
+                var newEnvironment = createEnvironment();
 
-                currentController?.Teardown();
-                newController.Setup();
+                if (!newEnvironment.Validate()) {
+                    Logger.Error($"Failed to change environment: Validation failed");
 
-                CurrentEnvironment = newController;
-                EnvironmentState = environment;
+                    return;
+                }
+
+                CurrentEnvironment?.Teardown();
+                newEnvironment.Setup();
+
+                CurrentEnvironment = newEnvironment;
+                EnvironmentState = newEnvironment.EnvironmentType;
             }
         }
 

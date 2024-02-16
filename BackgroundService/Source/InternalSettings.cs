@@ -1,10 +1,8 @@
-﻿using Core.Utils;
-
-namespace BackgroundService.Source
+﻿namespace BackgroundService.Source
 {
     internal static class InternalSettings
     {
-        public static readonly string WindowTitle = "GamingService";
+        public static readonly string WindowTitle = "GameEnvironmentService";
 
         public static readonly string DesktopNameGameEnvironment = "GameEnvironment";
 
