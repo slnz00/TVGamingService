@@ -11,7 +11,12 @@ namespace Core.Components
         {
             private readonly TimeSpan LOCK_TIMEOUT = TimeSpan.FromMilliseconds(10);
 
-            public CancellationTokenSource Cancellation { get; set; }
+            public readonly CancellationTokenSource Cancellation;
+
+            public Context(CancellationTokenSource cancellation)
+            {
+                Cancellation = cancellation;
+            }
 
             public async Task Delay(int millisecondsDelay)
             {
@@ -76,49 +81,67 @@ namespace Core.Components
             }
         }
 
-        public Task Task => task;
-        public bool IsAlive => AsyncUtils.IsTaskAlive(task);
+        public bool IsAlive => task != null && AsyncUtils.IsTaskAlive(task);
+        public bool Started => task != null;
 
-        private readonly Func<Context, Task> action;
+        private readonly Func<Context, Task> actionAsync;
+        private readonly Action<Context> actionSync;
         private readonly Context context;
         private readonly CancellationTokenSource cancellation;
-        private readonly Task task;
+        private Task task;
 
-        public static ManagedTask Run(Action<Context> action, TaskCreationOptions options = TaskCreationOptions.None)
+        public static ManagedTask Run(Action<Context> action)
         {
-            return Run(async (ctx) => await Task.Run(() => action(ctx)), options);
-        }
-
-        public static ManagedTask Run(Func<Context, Task> action, TaskCreationOptions options = TaskCreationOptions.None)
-        {
-            var managedTask = new ManagedTask(action, options);
+            var managedTask = new ManagedTask(action);
 
             managedTask.Start();
 
             return managedTask;
         }
 
-        public ManagedTask(Action<Context> action, TaskCreationOptions options = TaskCreationOptions.None)
-            : this(async (ctx) => await Task.Run(() => action(ctx)), options)
-        { }
-
-        public ManagedTask(Func<Context, Task> action, TaskCreationOptions options = TaskCreationOptions.None)
+        public static ManagedTask Run(Func<Context, Task> action)
         {
-            cancellation = new CancellationTokenSource();
+            var managedTask = new ManagedTask(action);
 
-            context = new Context
-            {
-                Cancellation = cancellation
-            };
+            managedTask.Start();
 
-            this.action = action;
-
-            task = new Task(() => RunAction().Wait(), cancellation.Token, options);
+            return managedTask;
         }
 
-        public void Start()
+        public ManagedTask(Action<Context> action) : this()
         {
-            task.Start();
+            actionSync = action;
+        }
+
+        public ManagedTask(Func<Context, Task> action) : this()
+        {
+            actionAsync = action;
+        }
+
+        private ManagedTask()
+        {
+            cancellation = new CancellationTokenSource();
+            context = new Context(cancellation);
+        }
+
+        public ManagedTask Start()
+        {
+            if (Started)
+            {
+                return this;
+            }
+
+            if (actionSync != null)
+            {
+                task = new Task(() => RunSyncAction(), cancellation.Token, TaskCreationOptions.LongRunning);
+                task.Start();
+            }
+            else
+            {
+                task = Task.Run(RunAsyncAction, cancellation.Token);
+            }
+
+            return this;
         }
 
         public void Wait()
@@ -148,11 +171,20 @@ namespace Core.Components
             }
         }
 
-        private async Task RunAction()
+        private void RunSyncAction()
         {
             try
             {
-                await action(context);
+                actionSync(context);
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        private async Task RunAsyncAction()
+        {
+            try
+            {
+                await actionAsync(context);
             }
             catch (TaskCanceledException) { }
         }

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace BackgroundService.Source.Services.OS
 {
@@ -131,10 +130,7 @@ namespace BackgroundService.Source.Services.OS
                 {
                     Logger.Debug($"Hotkey triggered: {hotkey.Name} -> {hotkey.KeyModifierName} + {hotkey.KeyName}");
 
-                    CurrentAction = ManagedTask.Run(
-                        (ctx) => hotkey.TriggerAction(),
-                        TaskCreationOptions.LongRunning
-                    );
+                    CurrentAction = ManagedTask.Run((ctx) => hotkey.TriggerAction());
                 }
             }
         }
