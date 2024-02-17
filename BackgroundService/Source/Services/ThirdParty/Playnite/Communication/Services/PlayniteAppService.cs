@@ -35,7 +35,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Se
 
         public void SendGameStarted(PlayniteGameInfo gameInfo)
         {
-            events.OnGameStarting(gameInfo);
+            events.OnGameStarted(gameInfo);
         }
 
         public void SendGameStopped(PlayniteGameInfo gameInfo)

@@ -1,7 +1,7 @@
 ﻿Id: PlaynitePlugin_6dc9c7f6-44f0-4e09-b294-52aac097750a
-Name: GameEnvironmentService Plugin
+Name: Game Environment Service
 Author: slnz00
 Version: 1.1
-Module: GameEnvironmentServicePlugin.dll
+Module: Playnite.GameEnvironmentService.dll
 Type: GenericPlugin
 Icon: icon.png
