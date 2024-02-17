@@ -102,7 +102,6 @@ namespace BackgroundService.Source.Services.ThirdParty
                 return;
             }
 
-            // Should only start watcher when DS4Windows is already running:
             bool alreadyRunning = Process.GetProcessesByName(DS4WindowsConfig.ProcessName).Length != 0;
             if (!alreadyRunning)
             {

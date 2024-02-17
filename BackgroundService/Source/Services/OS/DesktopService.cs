@@ -31,6 +31,8 @@ namespace BackgroundService.Source.Services.OS
 
         public abstract string GetCurrentDesktopName();
 
+        public abstract Guid GetCurrentDesktopId();
+
         public abstract void ChangeWallpaper(string wallpaperPath);
 
         public abstract void ChangeWallpaperOnCurrentDesktop(string wallpaperPath);
@@ -39,7 +41,7 @@ namespace BackgroundService.Source.Services.OS
 
         public abstract bool RestoreWallpaperSettings();
 
-        public abstract List<WindowComponent> GetWindowsOnDesktop(string desktopName);
+        public abstract List<WindowComponent> GetWindowsOnDesktop(Guid desktopId);
 
         public void ToggleIconsVisiblity(bool visible)
         {

@@ -2,6 +2,8 @@
 using BackgroundService.Source.Providers;
 using Core.Configs;
 using Core.Utils;
+using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace BackgroundService.Source.Controllers.Environment
@@ -10,7 +12,7 @@ namespace BackgroundService.Source.Controllers.Environment
     {
         private GameEnvironmentConfig Config => Services.Config.GetConfig().GameEnvironment;
 
-        private uint? playniteClosedListenerId = null;
+        private readonly List<uint> playniteListenerIds = new List<uint>();
 
         public GameEnvironment(MainController mainController, ServiceProvider services) :
             base(Environments.Game, mainController, services)
@@ -43,7 +45,7 @@ namespace BackgroundService.Source.Controllers.Environment
         protected override void OnReset()
         {
             CloseThirdPartyApps();
-            ForceCloseAppsOnTVDesktop();
+            ForceCloseAppsOnGameDesktop();
 
             OpenThirdPartyApps();
         }
@@ -122,15 +124,31 @@ namespace BackgroundService.Source.Controllers.Environment
 
         private void OpenThirdPartyApps()
         {
-            if (playniteClosedListenerId != null)
-            {
-                Services.ThirdParty.Playnite.RemoveEventListener((uint)playniteClosedListenerId);
-            }
+            ClearPlayniteListeners();
 
-            playniteClosedListenerId = Services.ThirdParty.Playnite.OnPlayniteClosed(() =>
-            {
-                MainController.ChangeEnvironmentTo(Environments.PC);
-            });
+            playniteListenerIds.Add
+            (
+                Services.ThirdParty.Playnite.OnPlayniteClosed(() =>
+                {
+                    MainController.ChangeEnvironmentTo(Environments.PC);
+                })
+            );
+            playniteListenerIds.Add
+            (
+                Services.ThirdParty.Playnite.OnPlayniteOpened(() =>
+                {
+                    Services.ThirdParty.Playnite.FocusFullscreenPlaynite();
+                    Console.WriteLine("OnPlayniteOpened -> Focused");
+                })
+            );
+            playniteListenerIds.Add
+            (
+                Services.ThirdParty.Playnite.OnGameStopped((_) =>
+                {
+                    Services.ThirdParty.Playnite.FocusFullscreenPlaynite();
+                    Console.WriteLine("OnGameStopped -> Focused");
+                })
+            );
 
             Services.ThirdParty.DS4Windows.OpenDS4Windows();
             Services.ThirdParty.Playnite.OpenFullscreenPlaynite();
@@ -138,19 +156,30 @@ namespace BackgroundService.Source.Controllers.Environment
 
         private void CloseThirdPartyApps()
         {
-            if (playniteClosedListenerId != null)
-            {
-                Services.ThirdParty.Playnite.RemoveEventListener((uint)playniteClosedListenerId);
-            }
+            ClearPlayniteListeners();
 
             Services.ThirdParty.DS4Windows.CloseDS4Windows();
             Services.ThirdParty.Playnite.CloseFullscreenPlaynite();
             Services.ThirdParty.GameStore.CloseAllGameStores();
         }
 
-        private void ForceCloseAppsOnTVDesktop()
+        private void ClearPlayniteListeners()
         {
-            var windows = Services.OS.Desktop.GetWindowsOnDesktop(InternalSettings.DesktopNameGameEnvironment);
+            playniteListenerIds.ForEach(Services.ThirdParty.Playnite.RemoveEventListener);
+            playniteListenerIds.Clear();
+        }
+
+        private void ForceCloseAppsOnGameDesktop()
+        {
+            var currentDesktopName = Services.OS.Desktop.GetCurrentDesktopName();
+            var currentDesktopId = Services.OS.Desktop.GetCurrentDesktopId();
+
+            if (currentDesktopName != InternalSettings.DesktopNameGameEnvironment)
+            {
+                return;
+            }
+
+            var windows = Services.OS.Desktop.GetWindowsOnDesktop(currentDesktopId);
 
             windows.ForEach(win => ProcessUtils.CloseProcess(win.ProcessID, true));
         }

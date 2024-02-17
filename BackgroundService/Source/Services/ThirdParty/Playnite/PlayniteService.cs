@@ -104,7 +104,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             return listener.Id;
         }
 
-        public void RemoveEventListener(UInt32 listenerId)
+        public void RemoveEventListener(uint listenerId)
         {
             eventListenerRegistry.RemoveListener(listenerId);
         }
@@ -148,13 +148,28 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             });
         }
 
+        public void FocusFullscreenPlaynite()
+        {
+            var currentDesktopId = Services.OS.Desktop.GetCurrentDesktopId();
+            var allWindows = Services.OS.Desktop.GetWindowsOnDesktop(currentDesktopId);
+
+            var playniteFullscreenWindow = allWindows
+                .FirstOrDefault(win => win.Process.ProcessName == ConfigPlayniteFullscreen.ProcessName);
+
+            if (playniteFullscreenWindow == null) {
+                return;
+            }
+
+            playniteFullscreenWindow.Focus();
+        }
+
         public void CloseFullscreenPlaynite()
         {
             lock (threadLock)
             {
                 Logger.Info("Closing Playnite fullscreen application");
 
-                ProcessUtils.CloseProcess(ConfigPlayniteFullscreen.ProcessName);
+                ProcessUtils.CloseProcess(ConfigPlayniteFullscreen.ProcessName, false, TimeSpan.FromSeconds(3));
             }
         }
 
@@ -164,7 +179,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             {
                 Logger.Info("Closing Playnite desktop application");
 
-                ProcessUtils.CloseProcess(ConfigPlayniteDesktop.ProcessName);
+                ProcessUtils.CloseProcess(ConfigPlayniteDesktop.ProcessName, false, TimeSpan.FromSeconds(3));
             }
         }
 

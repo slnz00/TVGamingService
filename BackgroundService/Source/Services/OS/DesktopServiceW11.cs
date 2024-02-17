@@ -4,6 +4,7 @@ using Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+
 using static Core.WinAPI.VirtualDesktop.VirtualDesktopAPIW11;
 
 namespace BackgroundService.Source.Services.OS
@@ -147,22 +148,29 @@ namespace BackgroundService.Source.Services.OS
             return VirtualDesktopManagerInternal.GetCurrentDesktop().GetName();
         }
 
-        public override List<WindowComponent> GetWindowsOnDesktop(string desktopName)
+        public override Guid GetCurrentDesktopId()
+        {
+            if (OutdatedVersion)
+            {
+                return VirtualDesktopManagerInternal_Old.GetCurrentDesktop().GetId();
+            }
+
+            return VirtualDesktopManagerInternal.GetCurrentDesktop().GetId();
+        }
+
+        public override List<WindowComponent> GetWindowsOnDesktop(Guid desktopId)
         {
             try
             {
                 var views = GetAllApplicationViews();
-                var desktops = GetAllDesktops();
                 var windows = new List<WindowComponent>();
 
                 views.ForEach(view =>
                 {
                     view.GetThumbnailWindow(out var windowHandle);
-                    view.GetVirtualDesktopId(out var desktopId);
+                    view.GetVirtualDesktopId(out var viewDesktopId);
 
-                    var desktop = desktops.Find(d => d.GetId().CompareTo(desktopId) == 0);
-
-                    var isOnDesktop = desktop != null && desktop.GetName() == desktopName;
+                    var isOnDesktop = desktopId.CompareTo(viewDesktopId) == 0;
                     var isVisible = IsViewVisible(view);
 
                     if (isVisible && isOnDesktop)
@@ -175,7 +183,7 @@ namespace BackgroundService.Source.Services.OS
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to get windows on desktop (name: {desktopName}): {ex}");
+                Logger.Error($"Failed to get windows on desktop (id: {desktopId}): {ex}");
             }
 
             return new List<WindowComponent>();

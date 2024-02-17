@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Components;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -44,15 +45,41 @@ namespace Core.Utils
             return processIds;
         }
 
-        public static void CloseProcess(string processName, bool forceKill = false)
+        public static void CloseProcess(string processName, bool forceKill = false, TimeSpan? timeout = null)
         {
             InteractWithProcess(processName, (process) =>
             {
                 if (!process.CloseMainWindow() || forceKill)
                 {
                     process.Kill();
+
+                    return;
                 }
             });
+
+            if (timeout != null && !forceKill)
+            {
+                var waitUntilClosedTask = ManagedTask.Run(async (ctx) =>
+                {
+                    while (!ctx.Cancelled)
+                    {
+                        if (Process.GetProcessesByName(processName).Count() == 0)
+                        {
+                            return;
+                        }
+
+                        await ctx.Delay(25);
+                    }
+                });
+
+                var processClosed = waitUntilClosedTask.Wait((TimeSpan)timeout);
+                if (!processClosed)
+                {
+                    CloseProcess(processName, true);
+
+                    waitUntilClosedTask.Cancel();
+                }
+            }
         }
 
         public static void CloseProcess(int processId, bool forceKill = false)

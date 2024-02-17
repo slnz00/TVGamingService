@@ -12,6 +12,7 @@ namespace Core.Components
             private readonly TimeSpan LOCK_TIMEOUT = TimeSpan.FromMilliseconds(10);
 
             public readonly CancellationTokenSource Cancellation;
+            public bool Cancelled => Cancellation.IsCancellationRequested;
 
             public Context(CancellationTokenSource cancellation)
             {
@@ -92,20 +93,12 @@ namespace Core.Components
 
         public static ManagedTask Run(Action<Context> action)
         {
-            var managedTask = new ManagedTask(action);
-
-            managedTask.Start();
-
-            return managedTask;
+            return new ManagedTask(action).Start();
         }
 
         public static ManagedTask Run(Func<Context, Task> action)
         {
-            var managedTask = new ManagedTask(action);
-
-            managedTask.Start();
-
-            return managedTask;
+            return new ManagedTask(action).Start();
         }
 
         public ManagedTask(Action<Context> action) : this()

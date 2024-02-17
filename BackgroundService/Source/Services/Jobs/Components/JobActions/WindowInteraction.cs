@@ -110,8 +110,8 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
 
         protected WindowComponent GetWindow()
         {
-            var currentDesktopName = Services.OS.Desktop.GetCurrentDesktopName();
-            var allWindows = Services.OS.Desktop.GetWindowsOnDesktop(currentDesktopName);
+            var currentDesktopId = Services.OS.Desktop.GetCurrentDesktopId();
+            var allWindows = Services.OS.Desktop.GetWindowsOnDesktop(currentDesktopId);
 
             var window = allWindows.Find(win =>
             {
