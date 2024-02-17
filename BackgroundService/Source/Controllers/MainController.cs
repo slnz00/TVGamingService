@@ -140,6 +140,8 @@ namespace BackgroundService.Source.Controllers
             {
                 ChangeEnvironmentTo(Environments.PC);
             }
+
+            CurrentEnvironment.EnsureSetupJobsAreCreated();
         }
 
         private void SetupHotkeys()

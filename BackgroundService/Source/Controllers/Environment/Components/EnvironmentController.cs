@@ -19,6 +19,7 @@ namespace BackgroundService.Source.Controllers.Environment.Components
         public Environments EnvironmentType { get; private set; }
         public string EnvironmentName => EnumUtils.GetName(EnvironmentType);
 
+        private readonly Dictionary<string, bool> jobsCreated = new Dictionary<string, bool>();
         private readonly List<string> environmentJobIds = new List<string>();
 
         public EnvironmentController(
@@ -31,6 +32,16 @@ namespace BackgroundService.Source.Controllers.Environment.Components
             EnvironmentType = environment;
             Logger = new LoggerProvider(GetType().Name);
             MainController = mainController;
+        }
+
+        public void EnsureSetupJobsAreCreated()
+        {
+            if (AreJobsCreatedForEvent("Setup"))
+            {
+                return;
+            }
+
+            CreateEnvironmentJobsForEvent("Setup");
         }
 
         public bool Validate()
@@ -96,6 +107,8 @@ namespace BackgroundService.Source.Controllers.Environment.Components
 
         private void CreateEnvironmentJobsForEvent(string eventName, List<JobMode> allowedJobModes = null)
         {
+            jobsCreated[eventName] = true;
+
             var configs = (List<JobConfig>)JobsConfig.GetType().GetField(eventName).GetValue(JobsConfig);
 
             configs.ForEach(config =>
@@ -114,6 +127,17 @@ namespace BackgroundService.Source.Controllers.Environment.Components
 
                 CreateEnvironmentJob(options);
             });
+        }
+
+        private bool AreJobsCreatedForEvent(string eventName)
+        {
+            var exists = jobsCreated.TryGetValue(eventName, out var created);
+
+            if (!exists)
+            {
+                return false;
+            }
+            return created;
         }
     }
 }
