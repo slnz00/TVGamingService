@@ -1,0 +1,47 @@
+name: Release
+on:
+  workflow_dispatch:
+  push:
+    tags: [ 'v[0-9]+\.[0-9]+' ]
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.5
+        
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+      
+      - name: Restore Packages
+        run: nuget restore TVGamingService.sln
+      
+      - name: Build solution
+        run: msbuild TVGamingService.sln -t:rebuild -property:Configuration=Release
+
+      - name: Get artifact info
+        id: artifact_info
+        run: echo "ARTIFACT_PATH=TVGamingService_${GITHUB_REF/refs\/tags\//}.zip" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Archive artifact
+        run: Compress-Archive -Path bin/Release/* -Destination ${{ steps.artifact_info.outputs.ARTIFACT_PATH }}
+
+      - name: Initialize Release
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+      
+      - name: Create Release    
+        uses: csexton/release-asset-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ steps.artifact_info.outputs.ARTIFACT_PATH }}
+          release-url: ${{ steps.create_release.outputs.upload_url }}

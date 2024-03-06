@@ -200,12 +200,8 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="Configs\Config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Configs\Jobs.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Configs\Config.json" />
+    <None Include="Configs\Jobs.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -241,4 +237,9 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions />
+  <PropertyGroup>
+    <PostBuildEvent>if not exist "$(TargetDir)Configs" mkdir "$(TargetDir)Configs"
+if exist "$(ProjectDir)Configs\Config.json" copy /Y "$(ProjectDir)Configs\Config.json" "$(TargetDir)Configs\Config.json"
+if exist "$(ProjectDir)Configs\Jobs.json" copy /Y "$(ProjectDir)Configs\Jobs.json" "$(TargetDir)Configs\Jobs.json"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
