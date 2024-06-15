@@ -1,8 +1,7 @@
-﻿using Core.Playnite.Communication.Models;
-using Core.Playnite.Communication.Models.Commands;
+﻿using Core.Models.Playnite;
 using System.ServiceModel;
 
-namespace Core.Playnite.Communication.Services
+namespace Core.Interfaces.ServiceContracts
 {
     [ServiceContract]
     public interface IPlayniteAppService

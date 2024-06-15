@@ -1,4 +1,4 @@
-﻿using Core.Models;
+﻿using Core.Interfaces;
 using System;
 
 namespace BackgroundService.Source.Providers

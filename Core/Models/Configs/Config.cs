@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Core.Configs
+namespace Core.Models.Configs
 {
     public class Config
     {

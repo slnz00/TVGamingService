@@ -1,6 +1,5 @@
-﻿using Core.Playnite.Communication.Models;
-using Core.Playnite.Communication.Models.Commands;
-using Core.Playnite.Communication.Services;
+﻿using Core.Models.Playnite;
+using Core.Interfaces.ServiceContracts;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;

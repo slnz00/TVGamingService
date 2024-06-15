@@ -1,6 +1,6 @@
 ﻿using BackgroundService.Source.Controllers.Environment.Components;
 using BackgroundService.Source.Providers;
-using Core.Configs;
+using Core.Models.Configs;
 using Core.Utils;
 using System;
 using System.Collections.Generic;

@@ -1,5 +1,5 @@
-﻿using Core.Playnite.Communication.Models;
-using Core.Playnite.Communication.Services;
+﻿using Core.Models.Playnite;
+using Core.Interfaces.ServiceContracts;
 using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;

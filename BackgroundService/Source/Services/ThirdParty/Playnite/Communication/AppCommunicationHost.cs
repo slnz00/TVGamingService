@@ -1,6 +1,6 @@
 ﻿using BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Services;
 using Core;
-using Core.Playnite.Communication.Services;
+using Core.Interfaces.ServiceContracts;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;

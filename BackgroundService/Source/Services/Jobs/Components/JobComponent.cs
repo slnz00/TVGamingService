@@ -1,5 +1,5 @@
-﻿using BackgroundService.Source.Components;
-using BackgroundService.Source.Providers;
+﻿using BackgroundService.Source.Providers;
+using Core.Components;
 using System;
 
 namespace BackgroundService.Source.Services.Jobs.Components

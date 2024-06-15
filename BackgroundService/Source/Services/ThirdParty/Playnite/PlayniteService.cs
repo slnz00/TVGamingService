@@ -1,10 +1,10 @@
-﻿using BackgroundService.Source.Common;
-using BackgroundService.Source.Providers;
+﻿using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.ThirdParty.Playnite.Communication;
 using BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Services;
 using Core.Components;
-using Core.Configs;
-using Core.Playnite.Communication.Models;
+using Core.Components.Watchers;
+using Core.Models.Configs;
+using Core.Models.Playnite;
 using Core.Utils;
 using System;
 using System.Diagnostics;
@@ -205,7 +205,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
                 throw new NullReferenceException("PlayniteDesktop and PlayniteFullscreen third-party configurations are not defined");
             }
 
-            watcherPlayniteFullscreen = new ProcessWatcher(ConfigPlayniteFullscreen.ProcessName, watcherEvents, 1000);
+            watcherPlayniteFullscreen = new ProcessWatcher(ConfigPlayniteFullscreen.ProcessName, Logger, watcherEvents, 1000);
             playniteCommunication = new AppCommunicationHost(playniteAppEvents);
 
             playniteCommunication.Open();

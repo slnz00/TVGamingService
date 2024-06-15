@@ -1,8 +1,8 @@
 ﻿using BackgroundService.Source.Controllers.Environment.Components;
 using BackgroundService.Source.Providers;
 using Core;
-using Core.Components;
-using Core.Configs;
+using Core.Components.Watchers;
+using Core.Models.Configs;
 using System;
 
 namespace BackgroundService.Source.Services.Configs

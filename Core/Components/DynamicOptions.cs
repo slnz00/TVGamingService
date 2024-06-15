@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace BackgroundService.Source.Components
+namespace Core.Components
 {
-    internal abstract class DynamicOptions
+    public abstract class DynamicOptions
     {
         private readonly object options;
         private readonly Dictionary<Type, object> jsonOptionsCache = new Dictionary<Type, object>();

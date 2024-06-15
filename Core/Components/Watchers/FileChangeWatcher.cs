@@ -1,9 +1,9 @@
-﻿using Core.Models;
+﻿using Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Core.Components
+namespace Core.Components.Watchers
 {
     public class FileChangeWatcher
     {

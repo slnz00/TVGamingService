@@ -1,4 +1,4 @@
-﻿namespace Core.Playnite.Communication.Models
+﻿namespace Core.Models.Playnite
 {
     public class PlayniteGameInfo
     {

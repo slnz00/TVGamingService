@@ -1,6 +1,6 @@
-﻿using BackgroundService.Source.Common;
-using BackgroundService.Source.Providers;
-using Core.Configs;
+﻿using BackgroundService.Source.Providers;
+using Core.Components.Watchers;
+using Core.Models.Configs;
 using Core.Utils;
 using System.Diagnostics;
 
@@ -75,7 +75,7 @@ namespace BackgroundService.Source.Services.ThirdParty
             {
                 if (Enabled && Watcher == null)
                 {
-                    Watcher = new ProcessWatcher(DS4WindowsConfig.ProcessName, new ProcessWatcher.Events
+                    Watcher = new ProcessWatcher(DS4WindowsConfig.ProcessName, Logger, new ProcessWatcher.Events
                     {
                         OnProcessClosed = () => ReopenOnUnexpectedExit()
                     });

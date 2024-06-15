@@ -123,12 +123,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Components\DynamicOptions.cs" />
-    <Compile Include="Source\Components\ProcessWatcher.cs" />
-    <Compile Include="Source\Controllers\BackupController\BackupController.cs" />
-    <Compile Include="Source\Controllers\BackupController\Components\BackupHandler.cs" />
-    <Compile Include="Source\Controllers\BackupController\Components\BackupManager.cs" />
-    <Compile Include="Source\Controllers\BackupController\Components\BackupWatcher.cs" />
+    <Compile Include="Source\Controllers\Backup\BackupController.cs" />
+    <Compile Include="Source\Controllers\Backup\Components\BackupHandler.cs" />
+    <Compile Include="Source\Controllers\Backup\Components\BackupManager.cs" />
+    <Compile Include="Source\Controllers\Backup\Components\BackupWatcher.cs" />
     <Compile Include="Source\Controllers\Environment\Components\EnvironmentController.cs" />
     <Compile Include="Source\Controllers\Environment\PCEnvironment.cs" />
     <Compile Include="Source\Controllers\Environment\GameEnvironment.cs" />

@@ -1,4 +1,4 @@
-﻿namespace Core.Playnite.Communication.Models.Commands
+﻿namespace Core.Models.Playnite
 {
     public abstract class AsyncPlayniteTask
     {

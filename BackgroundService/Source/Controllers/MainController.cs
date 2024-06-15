@@ -1,5 +1,6 @@
 ﻿using BackgroundService.Source.Controllers.Environment;
 using BackgroundService.Source.Controllers.Environment.Components;
+using BackgroundService.Source.Controllers.Backup;
 using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS;
 using BackgroundService.Source.Services.OS.Models;
@@ -49,7 +50,7 @@ namespace BackgroundService.Source.Controllers
         private readonly ServiceProvider Services;
         private readonly LoggerProvider Logger;
 
-        private readonly BackupController.BackupController BackupController;
+        private readonly BackupController BackupController;
         private readonly Dictionary<Environments, Func<EnvironmentController>> EnvironmentFactory;
 
         private EnvironmentController CurrentEnvironment;
@@ -63,7 +64,7 @@ namespace BackgroundService.Source.Controllers
             Logger = new LoggerProvider(GetType().Name);
             Services = new ServiceProvider(MessageLoop);
 
-            BackupController = new BackupController.BackupController(Services);
+            BackupController = new BackupController(Services);
 
             EnvironmentFactory = new Dictionary<Environments, Func<EnvironmentController>>
             {

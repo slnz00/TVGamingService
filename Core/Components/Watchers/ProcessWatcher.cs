@@ -1,12 +1,11 @@
-﻿using BackgroundService.Source.Providers;
-using Core.Components;
+﻿using Core.Interfaces;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace BackgroundService.Source.Common
+namespace Core.Components.Watchers
 {
-    internal class ProcessWatcher
+    public class ProcessWatcher
     {
         public class Events
         {
@@ -19,7 +18,7 @@ namespace BackgroundService.Source.Common
         public bool IsWatcherRunning => watcherTask != null && watcherTask.IsAlive;
         public bool IsProcessOpen { get; private set; }
 
-        private readonly LoggerProvider Logger;
+        private readonly ILogger Logger;
 
         private readonly object threadLock = new object();
         private readonly int timeBetweenChecks;
@@ -27,14 +26,13 @@ namespace BackgroundService.Source.Common
 
         private ManagedTask watcherTask = null;
 
-        public ProcessWatcher(string processName, Events events, int timeBetweenChecks = 500)
+        public ProcessWatcher(string processName, ILogger logger, Events events, int timeBetweenChecks = 500)
         {
             ProcessName = processName;
+            Logger = logger;
 
             this.timeBetweenChecks = timeBetweenChecks;
             this.events = events;
-
-            Logger = new LoggerProvider($"{GetType().Name}:{ProcessName}");
         }
 
         public void Start()
