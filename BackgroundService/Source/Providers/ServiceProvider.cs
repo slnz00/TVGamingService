@@ -5,6 +5,7 @@ using BackgroundService.Source.Services.OS;
 using BackgroundService.Source.Services.State;
 using BackgroundService.Source.Services.ThirdParty;
 using BackgroundService.Source.Services.ThirdParty.Playnite;
+using BackgroundService.Source.Services.Communication;
 using Core.Components.System;
 using Core.Utils;
 using System.Collections.Generic;
@@ -41,6 +42,7 @@ namespace BackgroundService.Source.Providers
         public readonly GameConfigService GameConfig;
         public readonly JobService Jobs;
         public readonly StateService State;
+        public readonly CommunicationService Communication;
 
         public readonly MessageLoop MessageLoop;
 
@@ -54,6 +56,7 @@ namespace BackgroundService.Source.Providers
             GameConfig = RegisterService(new GameConfigService(this));
             Jobs = RegisterService(new JobService(this));
             State = RegisterService(new StateService(this));
+            Communication = RegisterService(new CommunicationService(this));
 
             OS = new OSServices
             {

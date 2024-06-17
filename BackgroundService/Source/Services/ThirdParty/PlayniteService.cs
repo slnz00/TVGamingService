@@ -1,8 +1,8 @@
 ﻿using BackgroundService.Source.Providers;
-using BackgroundService.Source.Services.ThirdParty.Playnite.Communication;
-using BackgroundService.Source.Services.ThirdParty.Playnite.Communication.Services;
+using BackgroundService.Source.Services.Communication.ServiceHosts;
 using Core.Components;
 using Core.Components.Watchers;
+using Core.Interfaces.ServiceContracts;
 using Core.Models.Configs;
 using Core.Models.Playnite;
 using Core.Utils;
@@ -24,14 +24,14 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             GameStopped,
         }
 
+        private PlayniteAppService PlayniteApp => Services.Communication.Playnite;
+
         private readonly object threadLock = new object();
 
         private readonly EventListenerRegistry<PlayniteEventID, Action<object>> eventListenerRegistry = new EventListenerRegistry<PlayniteEventID, Action<object>>();
 
         private ProcessWatcher.Events watcherEvents;
-        private PlayniteAppService.Events playniteAppEvents;
 
-        private AppCommunicationHost playniteCommunication;
         private ProcessWatcher watcherPlayniteFullscreen;
 
         private AppConfig ConfigPlayniteFullscreen => Services.Config.GetConfig().ThirdParty?.PlayniteFullscreen;
@@ -49,28 +49,27 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
                 OnProcessClosed = () => RunEventListeners(PlayniteEventID.PlayniteClosed, null)
             };
 
-            playniteAppEvents = new PlayniteAppService.Events
+            PlayniteApp.SetEventHandlers(new PlayniteAppService.Events
             {
                 OnGameStarting = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStarting, gameInfo),
                 OnGameStarted = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStarted, gameInfo),
                 OnGameStopped = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStopped, gameInfo),
-            };
+            });
 
-            StartServices();
+            StartWatcher();
 
             Services.Config.ConfigWatcher.OnChanged(() =>
             {
                 lock (threadLock)
                 {
-                    StopServices();
-                    StartServices();
+                    StopWatcher();
+                    StartWatcher();
                 }
             });
         }
 
         protected override void OnDispose()
         {
-            playniteCommunication.Close();
             watcherPlayniteFullscreen.Stop();
         }
 
@@ -156,7 +155,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             var playniteFullscreenWindow = allWindows
                 .FirstOrDefault(win => win.Process.ProcessName == ConfigPlayniteFullscreen.ProcessName);
 
-            if (playniteFullscreenWindow == null) {
+            if (playniteFullscreenWindow == null)
+            {
                 return;
             }
 
@@ -183,14 +183,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             }
         }
 
-        private void StopServices()
+        private void StopWatcher()
         {
-            if (playniteCommunication != null)
-            {
-                playniteCommunication.Close();
-                playniteCommunication = null;
-            }
-
             if (watcherPlayniteFullscreen != null)
             {
                 watcherPlayniteFullscreen.Stop();
@@ -198,7 +192,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             }
         }
 
-        private void StartServices()
+        private void StartWatcher()
         {
             if (ConfigPlayniteFullscreen == null || ConfigPlayniteDesktop == null)
             {
@@ -206,9 +200,6 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             }
 
             watcherPlayniteFullscreen = new ProcessWatcher(ConfigPlayniteFullscreen.ProcessName, Logger, watcherEvents, 1000);
-            playniteCommunication = new AppCommunicationHost(playniteAppEvents);
-
-            playniteCommunication.Open();
             watcherPlayniteFullscreen.Start();
         }
 

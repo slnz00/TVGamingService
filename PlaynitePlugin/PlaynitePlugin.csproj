@@ -48,7 +48,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Communication\ServiceClient.cs" />
     <Compile Include="PlaynitePlugin.cs" />
     <Compile Include="PlaynitePluginSettings.cs" />
     <Compile Include="PlaynitePluginSettingsView.xaml.cs">

@@ -21,14 +21,20 @@ namespace Core
             public static readonly Guid BackgroundService = new Guid("929f0e08-977a-4c90-b825-6823e4f75d5a");
         }
 
-        public static class Playnite
+        public static class Communication
         {
             public static readonly Guid PIPE_GUID = new Guid("4dbc9aba-f0c2-4ba0-a637-5ca12f3a621a");
-            public static readonly string PIPE_BASE_URL = $"net.pipe://localhost/TVGamingService-Playnite-{PIPE_GUID}";
+            public static readonly string PIPE_BASE_URL = $"net.pipe://localhost/GameEnvironment_{PIPE_GUID}";
+            public static readonly string SERVICE_ENDPOINT = $"Service";
 
             public static string GetServiceAddress<TService>() where TService : class
             {
-                return $"{PIPE_BASE_URL}/{typeof(TService).Name}";
+                return $"{PIPE_BASE_URL}_{typeof(TService).Name}";
+            }
+
+            public static string GetServiceURL<TService>() where TService : class
+            {
+                return $"{GetServiceAddress<TService>()}/{SERVICE_ENDPOINT}";
             }
         }
     }

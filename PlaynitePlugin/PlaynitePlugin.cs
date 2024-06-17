@@ -4,17 +4,17 @@ using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
-using PlaynitePlugin.Communication;
 using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using Core.Components.Communication;
 
 namespace PlaynitePlugin
 {
     public class PlaynitePlugin : GenericPlugin
     {
         private static readonly ILogger Logger = LogManager.GetLogger();
-        private static readonly ServiceClient<IPlayniteAppService> GameEnvironmentService = new ServiceClient<IPlayniteAppService>();
+        private static readonly ServiceClient<IPlayniteAppService> GameEnvironmentClient = new ServiceClient<IPlayniteAppService>();
 
         // GameId -> Game path
         private static readonly Dictionary<string, string> GamePaths = new Dictionary<string, string>();
@@ -42,7 +42,7 @@ namespace PlaynitePlugin
 
             Logger.Info($"GameEnvironmentService: Sending GameStarted event, game: {gameInfo.Name}");
 
-            GameEnvironmentService.Service.SendGameStarted(gameInfo);
+            GameEnvironmentClient.Service.SendGameStarted(gameInfo);
         }
 
         public override void OnGameStarting(OnGameStartingEventArgs args)
@@ -53,7 +53,7 @@ namespace PlaynitePlugin
 
             Logger.Info($"GameEnvironmentService: Sending GameStarting event, game: {gameInfo.Name}");
 
-            GameEnvironmentService.Service.SendGameStarting(gameInfo);
+            GameEnvironmentClient.Service.SendGameStarting(gameInfo);
         }
 
         public override void OnGameStopped(OnGameStoppedEventArgs args)
@@ -62,7 +62,7 @@ namespace PlaynitePlugin
 
             Logger.Info($"GameEnvironmentService: Sending GameStopped event, game: {gameInfo.Name}");
 
-            GameEnvironmentService.Service.SendGameStopped(gameInfo);
+            GameEnvironmentClient.Service.SendGameStopped(gameInfo);
         }
 
         public override void OnGameUninstalled(OnGameUninstalledEventArgs args)

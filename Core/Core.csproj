@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Communication\ServiceClient.cs" />
     <Compile Include="Components\DynamicOptions.cs" />
     <Compile Include="Components\EventListenerRegistry.cs" />
     <Compile Include="Components\Watchers\FileChangeWatcher.cs" />

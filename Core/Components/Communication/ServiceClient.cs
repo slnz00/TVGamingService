@@ -1,10 +1,9 @@
-﻿using Core;
-using System.ServiceModel;
+﻿using System.ServiceModel;
 using System.ServiceModel.Description;
 
-namespace PlaynitePlugin.Communication
+namespace Core.Components.Communication
 {
-    internal class ServiceClient<TService> : ClientBase<TService> where TService : class
+    public class ServiceClient<TService> : ClientBase<TService> where TService : class
     {
         public TService Service => Channel;
 
@@ -14,7 +13,7 @@ namespace PlaynitePlugin.Communication
             (
                 ContractDescription.GetContract(typeof(TService)),
                 new NetNamedPipeBinding(),
-                new EndpointAddress(SharedSettings.Playnite.GetServiceAddress<TService>()))
+                new EndpointAddress(SharedSettings.Communication.GetServiceURL<TService>()))
             )
         { }
     }

@@ -19,14 +19,20 @@ namespace BackgroundService.Source.Services.Jobs.Components
 
         protected abstract void OnClose();
 
-        protected void ExecuteTrigger()
+        protected void ExecuteTrigger(bool async = true)
         {
             EnsureOwned();
 
             switch (Action)
             {
                 case JobTriggerAction.StartJob:
-                    OwnerJob.StartTaskAsync();
+                    if (async)
+                    {
+                        OwnerJob.StartTaskAsync();
+                    }
+                    else {
+                        OwnerJob.StartTask();
+                    }
                     break;
                 case JobTriggerAction.StopJob:
                     OwnerJob.StopTask();

@@ -8,6 +8,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobTriggers
         public class GameStartingOptions
         {
             public PlayniteGameInfo Filter { get; set; }
+            public bool WaitUntilFinished = false;
         }
 
         private GameStartingOptions Options => GetOptions<GameStartingOptions>();
@@ -25,7 +26,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobTriggers
                     return;
                 }
 
-                ExecuteTrigger();
+                ExecuteTrigger(!Options.WaitUntilFinished);
             });
         }
 

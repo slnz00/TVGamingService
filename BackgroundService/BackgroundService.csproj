@@ -163,9 +163,9 @@
     <Compile Include="Source\Services\State\StateService.cs" />
     <Compile Include="Source\Services\State\Components\States.cs" />
     <Compile Include="Source\Services\ThirdParty\DS4WindowsService.cs" />
-    <Compile Include="Source\Services\ThirdParty\Playnite\Communication\AppCommunicationHost.cs" />
-    <Compile Include="Source\Services\ThirdParty\Playnite\Communication\Services\PlayniteAppService.cs" />
-    <Compile Include="Source\Services\ThirdParty\Playnite\PlayniteService.cs" />
+    <Compile Include="Source\Services\Communication\CommunicationService.cs" />
+    <Compile Include="Source\Services\Communication\ServiceHosts\PlayniteAppService.cs" />
+    <Compile Include="Source\Services\ThirdParty\PlayniteService.cs" />
     <Compile Include="Source\Services\ThirdParty\GameStoreService.cs" />
     <Compile Include="Source\Services\OS\CursorService.cs" />
     <Compile Include="Source\Services\Jobs\JobService.cs" />

@@ -1,5 +1,5 @@
 ﻿using Core;
-using Core.Configs;
+using Core.Models.Configs;
 using Core.Utils;
 using System;
 using System.Diagnostics;
