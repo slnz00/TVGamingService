@@ -54,6 +54,7 @@
     <AllowedReferenceRelatedFileExtensions>.pdb</AllowedReferenceRelatedFileExtensions>
   </PropertyGroup>
   <PropertyGroup>
+	<UseCommonOutputDirectory>true</UseCommonOutputDirectory>
     <StartupObject>BackgroundService.Source.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
