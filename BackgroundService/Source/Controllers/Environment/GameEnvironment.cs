@@ -2,7 +2,6 @@
 using BackgroundService.Source.Providers;
 using Core.Models.Configs;
 using Core.Utils;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -138,15 +137,6 @@ namespace BackgroundService.Source.Controllers.Environment
                 Services.ThirdParty.Playnite.OnPlayniteOpened(() =>
                 {
                     Services.ThirdParty.Playnite.FocusFullscreenPlaynite();
-                    Console.WriteLine("OnPlayniteOpened -> Focused");
-                })
-            );
-            playniteListenerIds.Add
-            (
-                Services.ThirdParty.Playnite.OnGameStopped((_) =>
-                {
-                    Services.ThirdParty.Playnite.FocusFullscreenPlaynite();
-                    Console.WriteLine("OnGameStopped -> Focused");
                 })
             );
 
