@@ -38,7 +38,7 @@ namespace BackgroundService.Source.Services.OS
             return new WindowComponent("Window", handle);
         }
 
-        public List<WindowComponent> GetChildComponent(WindowComponent component, string componentType)
+        public List<WindowComponent> GetChildComponents(WindowComponent component, string componentType)
         {
             List<WindowComponent> components = new List<WindowComponent>();
             if (component.Handle == null)

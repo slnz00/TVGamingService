@@ -2,7 +2,6 @@
 using BackgroundService.Source.Services.Communication.ServiceHosts;
 using Core.Components;
 using Core.Components.Watchers;
-using Core.Interfaces.ServiceContracts;
 using Core.Models.Configs;
 using Core.Models.Playnite;
 using Core.Utils;
@@ -145,6 +144,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             {
                 startInfo.WorkingDirectory = playniteDir;
             });
+
+            CloseSafeModeWindow();
         }
 
         public void FocusFullscreenPlaynite()
@@ -181,6 +182,55 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
                 ProcessUtils.CloseProcess(ConfigPlayniteDesktop.ProcessName, false, TimeSpan.FromSeconds(3));
             }
+        }
+
+        public void CloseSafeModeWindow()
+        {
+            Func<bool> tryToCloseWindow = () =>
+            {
+                try
+                {
+                    var safeModeWindow = Services.OS.Window.FindWindowByName("Startup Error");
+                    if (!safeModeWindow.IsValid)
+                    {
+                        return false;
+                    }
+
+                    var isPlayniteWindow = safeModeWindow.Process.ProcessName.ToLower().Contains("playnite");
+                    if (!isPlayniteWindow)
+                    {
+                        return false;
+                    }
+
+                    var buttons = Services.OS.Window.GetChildComponents(safeModeWindow, "Button");
+                    var noButton = buttons.Count == 2 ? buttons[1] : null;
+                    if (noButton == null)
+                    {
+                        return false;
+                    }
+
+                    noButton.Click();
+
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            };
+
+            ManagedTask.Run(async (ctx) =>
+            {
+                for (int tries = 0; tries < 10; tries++)
+                {
+                    if (tryToCloseWindow())
+                    {
+                        return;
+                    }
+
+                    await ctx.Delay(500);
+                }
+            });
         }
 
         private void StopWatcher()

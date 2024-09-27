@@ -30,8 +30,8 @@ namespace BackgroundService.Source.Controllers.Environment
         protected override void OnSetup()
         {
             HideCursor();
-
             SetupDisplay();
+
             SetupAudio();
             SetupDesktop();
 

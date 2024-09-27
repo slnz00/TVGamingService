@@ -94,7 +94,7 @@ namespace BackgroundService.Source.Services.Jobs.Components.JobActions
                 return window;
             }
 
-            var components = Services.OS.Window.GetChildComponent(window, Options.ComponentType);
+            var components = Services.OS.Window.GetChildComponents(window, Options.ComponentType);
             if (components.Count == 0)
             {
                 return null;
