@@ -62,8 +62,7 @@ namespace BackgroundService.Source.Controllers.Environment
 
             if (!playniteAvailable)
             {
-                Services.OS.Window.ShowMessageBoxAsync(
-                    MessageBoxImage.Error,
+                ShowErrorNotification(
                     "Playnite configuration is invalid. Please use the Configurator app to reconfigure it."
                 );
             }
@@ -79,6 +78,11 @@ namespace BackgroundService.Source.Controllers.Environment
         private void SaveGameConfigs()
         {
             Services.GameConfig.SaveGameConfigsForEnvironment(EnvironmentType);
+        }
+
+        private void ShowCursor()
+        {
+            Services.OS.Cursor.SetCursorVisibility(true);
         }
 
         private void HideCursor()
@@ -114,8 +118,7 @@ namespace BackgroundService.Source.Controllers.Environment
 
             if (!result)
             {
-                Services.OS.Window.ShowMessageBoxAsync(
-                    MessageBoxImage.Error,
+                ShowErrorNotification(
                     "Failed to switch displays. TV environment's display device is unavailable. Please use the Configurator app to reconfigure it."
                 );
             }
@@ -135,6 +138,13 @@ namespace BackgroundService.Source.Controllers.Environment
             playniteListenerIds.Add
             (
                 Services.ThirdParty.Playnite.OnPlayniteOpened(() =>
+                {
+                    Services.ThirdParty.Playnite.FocusFullscreenPlaynite();
+                })
+            );
+            playniteListenerIds.Add
+            (
+                Services.ThirdParty.Playnite.OnGameStopped((gameInfo) =>
                 {
                     Services.ThirdParty.Playnite.FocusFullscreenPlaynite();
                 })
@@ -172,6 +182,13 @@ namespace BackgroundService.Source.Controllers.Environment
             var windows = Services.OS.Desktop.GetWindowsOnDesktop(currentDesktopId);
 
             windows.ForEach(win => ProcessUtils.CloseProcess(win.ProcessID, true));
+        }
+
+        private void ShowErrorNotification(string message)
+        {
+            ShowCursor();
+
+            Services.OS.Window.ShowMessageBoxAsync(MessageBoxImage.Error, message);
         }
     }
 }
