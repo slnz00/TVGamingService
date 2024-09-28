@@ -26,6 +26,7 @@ namespace BackgroundService.Source.Services.OS
                 Logger.Info($"Switching to display: {fullName}");
 
                 var settings = GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ALL_PATHS);
+                var defaultSettings = settings.Clone();
                 var availableDisplays = GetAvailableDisplays(settings);
 
                 var displayByPath = GetDisplayByDevicePath(availableDisplays, devicePath);
@@ -40,12 +41,21 @@ namespace BackgroundService.Source.Services.OS
                 }
 
                 var source = GetAvailableSourceForDisplay(settings, display);
-
-                settings.ResetPaths();
+                
+                settings.Reset();
                 settings.ActivatePath(source.id, display.TargetInfo.id);
 
-                SaveDisplaySettings(settings);
+                defaultSettings.ResetPaths();
+                defaultSettings.ActivatePath(source.id, display.TargetInfo.id);
 
+                try
+                {
+                    SaveDisplaySettings(settings);
+                }
+                catch {
+                    SaveDisplaySettings(defaultSettings);
+                }
+                
                 return true;
             }
             catch (Exception ex)
@@ -102,7 +112,7 @@ namespace BackgroundService.Source.Services.OS
                     return false;
                 }
 
-                settings.ResetPaths();
+                settings.Reset();
 
                 foreach (var snapshotPath in snapshot.Settings.Paths)
                 {
@@ -110,7 +120,15 @@ namespace BackgroundService.Source.Services.OS
                     var sourceId = snapshotPath.sourceInfo.id;
                     var targetId = snapshotPath.targetInfo.id;
 
+                    snapshot.Settings.GetModesForPath(
+                        sourceId,
+                        targetId,
+                        out var snapshotSourceMode,
+                        out var snapshotTargetMode
+                    );
+
                     settings.ActivatePath(sourceId, targetId);
+                    settings.SetModesForPath(sourceId, targetId, snapshotSourceMode, snapshotTargetMode);
                 }
 
                 SaveDisplaySettings(settings);
@@ -157,8 +175,12 @@ namespace BackgroundService.Source.Services.OS
             var paths = settings.Paths.ToArray();
             var modes = settings.Modes.ToArray();
 
+            var baseFlags = modes.Length == 0 ?
+                SET_DISPLAY_CONFIG_FLAGS.SDC_TOPOLOGY_SUPPLIED | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_PATH_ORDER_CHANGES :
+                SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_SAVE_TO_DATABASE | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES;
+
             SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
-                SET_DISPLAY_CONFIG_FLAGS.SDC_APPLY | SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES
+                baseFlags | SET_DISPLAY_CONFIG_FLAGS.SDC_APPLY
             ));
         }
 
