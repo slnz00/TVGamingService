@@ -4,7 +4,6 @@ using BackgroundService.Source.Services.State.Components;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-
 using static Core.WinAPI.DisplayAPI;
 
 namespace BackgroundService.Source.Services.OS
@@ -40,8 +39,10 @@ namespace BackgroundService.Source.Services.OS
                     return false;
                 }
 
-                settings.Reset();
-                settings.ActivatePath(0, display.TargetInfo.id);
+                var source = GetAvailableSourceForDisplay(settings, display);
+
+                settings.ResetPaths();
+                settings.ActivatePath(source.id, display.TargetInfo.id);
 
                 SaveDisplaySettings(settings);
 
@@ -101,7 +102,7 @@ namespace BackgroundService.Source.Services.OS
                     return false;
                 }
 
-                settings.Reset();
+                settings.ResetPaths();
 
                 foreach (var snapshotPath in snapshot.Settings.Paths)
                 {
@@ -109,15 +110,7 @@ namespace BackgroundService.Source.Services.OS
                     var sourceId = snapshotPath.sourceInfo.id;
                     var targetId = snapshotPath.targetInfo.id;
 
-                    snapshot.Settings.GetModesForPath(
-                        sourceId,
-                        targetId,
-                        out var snapshotSourceMode,
-                        out var snapshotTargetMode
-                    );
-
                     settings.ActivatePath(sourceId, targetId);
-                    settings.SetModesForPath(sourceId, targetId, snapshotSourceMode, snapshotTargetMode);
                 }
 
                 SaveDisplaySettings(settings);
@@ -131,7 +124,6 @@ namespace BackgroundService.Source.Services.OS
                 return false;
             }
         }
-
 
         private bool ValidateSnapshot(DisplaySettingsSnapshot snapshot, DisplayDevice[] availableDisplays)
         {
@@ -164,18 +156,47 @@ namespace BackgroundService.Source.Services.OS
         {
             var paths = settings.Paths.ToArray();
             var modes = settings.Modes.ToArray();
-            var baseFlags = modes.Length == 0 ?
-                SET_DISPLAY_CONFIG_FLAGS.SDC_TOPOLOGY_SUPPLIED | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_PATH_ORDER_CHANGES :
-                SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_SAVE_TO_DATABASE;
 
             SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
-                baseFlags | SET_DISPLAY_CONFIG_FLAGS.SDC_VALIDATE
-            ));
-            SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
-                baseFlags | SET_DISPLAY_CONFIG_FLAGS.SDC_APPLY
+                SET_DISPLAY_CONFIG_FLAGS.SDC_APPLY | SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES
             ));
         }
 
+        private void ValidateDisplaySettings(DisplaySettings settings)
+        {
+            var paths = settings.Paths.ToArray();
+            var modes = settings.Modes.ToArray();
+
+            SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
+                SET_DISPLAY_CONFIG_FLAGS.SDC_VALIDATE | SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES
+            ));
+        }
+
+        private DISPLAYCONFIG_PATH_SOURCE_INFO GetAvailableSourceForDisplay(DisplaySettings settings, DisplayDevice display)
+        {
+            for (int pathIndex = 0; pathIndex < settings.Paths.Count; pathIndex++)
+            {
+                var currentPath = settings.Paths[pathIndex];
+
+                if (currentPath.targetInfo.id != display.TargetInfo.id)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var currentSettings = settings.Clone();
+                    currentSettings.ActivatePath(currentPath.sourceInfo.id, currentPath.targetInfo.id);
+
+                    ValidateDisplaySettings(currentSettings);
+
+                    return currentPath.sourceInfo;
+                }
+                catch { }
+            }
+
+            throw new InvalidOperationException("Display does not have a valid source");
+        }
         private DisplayDevice GetDisplayByDevicePath(DisplayDevice[] displays, string devicePath)
         {
             return displays

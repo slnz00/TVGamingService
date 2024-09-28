@@ -11,8 +11,8 @@ namespace BackgroundService.Source.Services.OS.Models
     {
         public delegate void ModifyPathAction(ref DISPLAYCONFIG_PATH_INFO path);
 
-        public List<DISPLAYCONFIG_PATH_INFO> Paths;
-        public List<DISPLAYCONFIG_MODE_INFO> Modes;
+        public List<DISPLAYCONFIG_PATH_INFO> Paths = new List<DISPLAYCONFIG_PATH_INFO>();
+        public List<DISPLAYCONFIG_MODE_INFO> Modes = new List<DISPLAYCONFIG_MODE_INFO>();
 
         public DisplaySettings() { }
 
@@ -30,6 +30,16 @@ namespace BackgroundService.Source.Services.OS.Models
             Modes = modes
                 .Take(Convert.ToInt32(modesCount))
                 .ToList();
+        }
+
+        public DisplaySettings Clone()
+        {
+            var clone = new DisplaySettings();
+
+            clone.Paths = new List<DISPLAYCONFIG_PATH_INFO>(Paths);
+            clone.Modes = new List<DISPLAYCONFIG_MODE_INFO>(Modes);
+
+            return clone;
         }
 
         public void Reset()
