@@ -21,6 +21,11 @@ namespace BackgroundService.Source.Services.OS
 
         public AudioService(ServiceProvider services) : base(services) { }
 
+        public void CancelPendingTask()
+        {
+            setDevicesTask?.Cancel();
+        }
+
         public bool BackupAudioSettings()
         {
             try

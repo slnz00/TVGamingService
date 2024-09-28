@@ -54,6 +54,13 @@ namespace BackgroundService.Source.Controllers.Environment
             CloseThirdPartyApps();
 
             SaveGameConfigs();
+
+            CleanupServices();
+        }
+
+        private void CleanupServices()
+        {
+            Services.OS.Audio.CancelPendingTask();
         }
 
         private bool ValidatePlaynite()
