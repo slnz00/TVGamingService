@@ -14,7 +14,7 @@ namespace BackgroundService.Source.Services.OS
     {
         private class MonitorStatus
         {
-            private object threadLock = new object();
+            private readonly object threadLock = new object();
             private long? turnedOnAt = null;
 
             public volatile bool IsTurnedOn = true;
