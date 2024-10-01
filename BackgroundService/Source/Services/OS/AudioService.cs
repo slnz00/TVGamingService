@@ -5,7 +5,6 @@ using Core.Components;
 using Core.Utils;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using static Core.WinAPI.AudioAPI;
 
 namespace BackgroundService.Source.Services.OS
@@ -173,25 +172,7 @@ namespace BackgroundService.Source.Services.OS
         {
             ushort VK_MEDIA_STOP = 0xB2;
 
-            var inputs = new Input[] {
-                new Input()
-                {
-                    type = InputType.Keyboard,
-                    union = new InputUnion()
-                    {
-                        keyboard = new KeyboardInput()
-                        {
-                            wVk = VK_MEDIA_STOP,
-                            wScan = 0,
-                            dwFlags = KeyEventF.KeyDown,
-                            time = 0,
-                            dwExtraInfo = GetMessageExtraInfo()
-                        }
-                    }
-                }
-            };
-
-            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
+            Services.OS.Input.PressKey(VK_MEDIA_STOP);
         }
 
         private MMDevice GetAudioDeviceByName(string deviceName, EDataFlow dataFlow)

@@ -103,7 +103,7 @@ namespace Setup
               out var pathArray,
               out var numModes,
               out var modeArray,
-              IntPtr.Zero
+              out var currentTopologyId
             );
 
             var availableTargets = pathArray

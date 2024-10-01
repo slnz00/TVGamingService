@@ -432,17 +432,6 @@ namespace Core.WinAPI
 
             [DllImport("USER32.dll", ExactSpelling = true)]
             [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-            public static extern unsafe StatusCode QueryDisplayConfig(
-                QUERY_DISPLAY_CONFIG_FLAGS flags,
-                ref uint numPathArrayElements,
-                DISPLAYCONFIG_PATH_INFO* pathArray,
-                ref uint numModeInfoArrayElements,
-                DISPLAYCONFIG_MODE_INFO* modeInfoArray,
-                out DISPLAYCONFIG_TOPOLOGY_ID currentTopologyId
-            );
-
-            [DllImport("USER32.dll", ExactSpelling = true)]
-            [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
             public static extern unsafe StatusCode SetDisplayConfig(
                 uint numPathArrayElements,
                 DISPLAYCONFIG_PATH_INFO* pathArray,
@@ -482,7 +471,7 @@ namespace Core.WinAPI
             out DISPLAYCONFIG_PATH_INFO[] pathArray,
             out uint numModeInfoArrayElements,
             out DISPLAYCONFIG_MODE_INFO[] modeInfoArray,
-            IntPtr currentTopologyId
+            out DISPLAYCONFIG_TOPOLOGY_ID currentTopologyId
         )
         {
             pathArray = null; modeInfoArray = null;
@@ -491,6 +480,7 @@ namespace Core.WinAPI
 
             pathArray = new DISPLAYCONFIG_PATH_INFO[numPathArrayElements];
             modeInfoArray = new DISPLAYCONFIG_MODE_INFO[numModeInfoArrayElements];
+            currentTopologyId = DISPLAYCONFIG_TOPOLOGY_ID.DISPLAYCONFIG_TOPOLOGY_UNKNOWN;
 
             unsafe
             {
@@ -498,11 +488,23 @@ namespace Core.WinAPI
                 {
                     fixed (DISPLAYCONFIG_MODE_INFO* pModeArray = modeInfoArray)
                     {
-                        var result = PInvoke.QueryDisplayConfig(flags, ref numPathArrayElements, pPathArray, ref numModeInfoArrayElements, pModeArray, currentTopologyId);
-
-                        if (result != StatusCode.SUCCESS)
+                        fixed (DISPLAYCONFIG_TOPOLOGY_ID* pCurrentTopologyId = &currentTopologyId)
                         {
-                            throw new DisplayAPIException(nameof(PInvoke.QueryDisplayConfig), result);
+                            var isDatabaseQuery = flags.HasFlag(QUERY_DISPLAY_CONFIG_FLAGS.QDC_DATABASE_CURRENT);
+
+                            var result = PInvoke.QueryDisplayConfig(
+                                flags,
+                                ref numPathArrayElements,
+                                pPathArray,
+                                ref numModeInfoArrayElements,
+                                pModeArray,
+                                isDatabaseQuery ? (IntPtr)pCurrentTopologyId : IntPtr.Zero
+                            );
+
+                            if (result != StatusCode.SUCCESS)
+                            {
+                                throw new DisplayAPIException(nameof(PInvoke.QueryDisplayConfig), result);
+                            }
                         }
                     }
                 }

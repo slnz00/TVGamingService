@@ -54,7 +54,6 @@
     <AllowedReferenceRelatedFileExtensions>.pdb</AllowedReferenceRelatedFileExtensions>
   </PropertyGroup>
   <PropertyGroup>
-	<UseCommonOutputDirectory>true</UseCommonOutputDirectory>
     <StartupObject>BackgroundService.Source.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -83,6 +82,10 @@
     </Reference>
     <Reference Include="Microsoft.Windows.SDK.Win32Docs, Version=0.1.42.13748, Culture=neutral, PublicKeyToken=7c40c7c34b1fcfe1, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Windows.SDK.Win32Docs.0.1.42-alpha\lib\netstandard2.0\Microsoft.Windows.SDK.Win32Docs.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -149,6 +152,7 @@
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStarting.cs" />
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\GameStopped.cs" />
     <Compile Include="Source\Services\Jobs\Components\JobTriggers\Timer.cs" />
+    <Compile Include="Source\Services\OS\InputService.cs" />
     <Compile Include="Source\Services\OS\Models\AudioSettingsSnapshot.cs" />
     <Compile Include="Source\Services\OS\DesktopServiceW10.cs" />
     <Compile Include="Source\Services\OS\DesktopServiceW11.cs" />

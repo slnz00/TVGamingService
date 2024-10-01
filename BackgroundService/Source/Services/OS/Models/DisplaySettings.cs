@@ -13,6 +13,7 @@ namespace BackgroundService.Source.Services.OS.Models
 
         public List<DISPLAYCONFIG_PATH_INFO> Paths = new List<DISPLAYCONFIG_PATH_INFO>();
         public List<DISPLAYCONFIG_MODE_INFO> Modes = new List<DISPLAYCONFIG_MODE_INFO>();
+        public DISPLAYCONFIG_TOPOLOGY_ID CurrentTopologyId = DISPLAYCONFIG_TOPOLOGY_ID.DISPLAYCONFIG_TOPOLOGY_UNKNOWN;
 
         public DisplaySettings() { }
 
@@ -20,7 +21,8 @@ namespace BackgroundService.Source.Services.OS.Models
             DISPLAYCONFIG_PATH_INFO[] paths,
             uint pathsCount,
             DISPLAYCONFIG_MODE_INFO[] modes,
-            uint modesCount
+            uint modesCount,
+            DISPLAYCONFIG_TOPOLOGY_ID currentTopologyId
         )
         {
             Paths = paths
@@ -30,16 +32,18 @@ namespace BackgroundService.Source.Services.OS.Models
             Modes = modes
                 .Take(Convert.ToInt32(modesCount))
                 .ToList();
+
+            CurrentTopologyId = currentTopologyId;
         }
 
         public DisplaySettings Clone()
         {
-            var clone = new DisplaySettings();
-
-            clone.Paths = new List<DISPLAYCONFIG_PATH_INFO>(Paths);
-            clone.Modes = new List<DISPLAYCONFIG_MODE_INFO>(Modes);
-
-            return clone;
+            return new DisplaySettings
+            {
+                Paths = new List<DISPLAYCONFIG_PATH_INFO>(Paths),
+                Modes = new List<DISPLAYCONFIG_MODE_INFO>(Modes),
+                CurrentTopologyId = CurrentTopologyId
+            };
         }
 
         public void Reset()

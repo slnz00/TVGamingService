@@ -1,16 +1,73 @@
 ﻿using BackgroundService.Source.Providers;
 using BackgroundService.Source.Services.OS.Models;
 using BackgroundService.Source.Services.State.Components;
+using Microsoft.WindowsAPICodePack.ApplicationServices;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using static Core.WinAPI.DisplayAPI;
 
 namespace BackgroundService.Source.Services.OS
 {
     internal class DisplayService : Service
     {
+        private class MonitorStatus
+        {
+            private object threadLock = new object();
+            private long? turnedOnAt = null;
+
+            public volatile bool IsTurnedOn = true;
+            public long? TurnedOnAt
+            {
+                get { lock (threadLock) return turnedOnAt; }
+                set { lock (threadLock) turnedOnAt = value; }
+            }
+
+            public void Update()
+            {
+                lock (threadLock)
+                {
+                    bool newStatus = PowerManager.IsMonitorOn;
+                    bool isMonitorTurnedOn = !IsTurnedOn && newStatus;
+
+                    if (isMonitorTurnedOn)
+                    {
+                        TurnedOnAt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    }
+                    IsTurnedOn = newStatus;
+                }
+            }
+
+            public long GetTimeUntilMonitorTurnsOn()
+            {
+                lock (threadLock)
+                {
+                    if (TurnedOnAt == null) {
+                        return 0;
+                    }
+
+                    long monitorTurnOnTime = 6000;
+
+                    long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    long turnOnTime = (long)TurnedOnAt + monitorTurnOnTime - now;
+
+                    return turnOnTime > 0 ? turnOnTime : 0;
+                }
+            }
+        }
+
+        private readonly MonitorStatus monitorStatus = new MonitorStatus();
+
         public DisplayService(ServiceProvider services) : base(services) { }
+
+        protected override void OnInitialize()
+        {
+            PowerManager.IsMonitorOnChanged += new EventHandler((object sender, EventArgs e) =>
+            {
+                monitorStatus.Update();
+            });
+        }
 
         public bool SwitchToDisplay(string devicePath, string fullName)
         {
@@ -41,7 +98,9 @@ namespace BackgroundService.Source.Services.OS
                 }
 
                 var source = GetAvailableSourceForDisplay(settings, display);
-                
+
+                Logger.Debug($"Assigning source for display: {source.id}");
+
                 settings.Reset();
                 settings.ActivatePath(source.id, display.TargetInfo.id);
 
@@ -52,10 +111,11 @@ namespace BackgroundService.Source.Services.OS
                 {
                     SaveDisplaySettings(settings);
                 }
-                catch {
+                catch
+                {
                     SaveDisplaySettings(defaultSettings);
                 }
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -170,6 +230,22 @@ namespace BackgroundService.Source.Services.OS
             return true;
         }
 
+        private DisplaySettings GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS flags)
+        {
+            EnsureDisplaysAreTurnedOn();
+
+            QueryDisplayConfig(
+              flags,
+              out var pathsCount,
+              out var paths,
+              out var modesCount,
+              out var modes,
+              out var currentTopologyId
+            );
+
+            return new DisplaySettings(paths, pathsCount, modes, modesCount, currentTopologyId);
+        }
+
         private void SaveDisplaySettings(DisplaySettings settings)
         {
             var paths = settings.Paths.ToArray();
@@ -178,6 +254,8 @@ namespace BackgroundService.Source.Services.OS
             var baseFlags = modes.Length == 0 ?
                 SET_DISPLAY_CONFIG_FLAGS.SDC_TOPOLOGY_SUPPLIED | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_PATH_ORDER_CHANGES :
                 SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_SAVE_TO_DATABASE | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES;
+
+            EnsureDisplaysAreTurnedOn();
 
             SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
                 baseFlags | SET_DISPLAY_CONFIG_FLAGS.SDC_APPLY
@@ -188,6 +266,8 @@ namespace BackgroundService.Source.Services.OS
         {
             var paths = settings.Paths.ToArray();
             var modes = settings.Modes.ToArray();
+
+            EnsureDisplaysAreTurnedOn();
 
             SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
                 SET_DISPLAY_CONFIG_FLAGS.SDC_VALIDATE | SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES
@@ -260,20 +340,6 @@ namespace BackgroundService.Source.Services.OS
                 .ToArray();
         }
 
-        private DisplaySettings GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS flags)
-        {
-            QueryDisplayConfig(
-              flags,
-              out var pathsCount,
-              out var paths,
-              out var modesCount,
-              out var modes,
-              IntPtr.Zero
-            );
-
-            return new DisplaySettings(paths, pathsCount, modes, modesCount);
-        }
-
         private DisplayDevice GetDisplayDeviceFromTargetInfo(DISPLAYCONFIG_PATH_TARGET_INFO targetInfo)
         {
             var preferredMode = new DISPLAYCONFIG_TARGET_PREFERRED_MODE
@@ -302,6 +368,23 @@ namespace BackgroundService.Source.Services.OS
             DisplayConfigGetDeviceInfo(ref preferredMode);
 
             return new DisplayDevice(targetInfo, nameInfo, preferredMode);
+        }
+
+        private void EnsureDisplaysAreTurnedOn()
+        {
+            if (!monitorStatus.IsTurnedOn)
+            {
+                ushort VK_LEFT_ALT = 0xA4;
+
+                Services.OS.Input.PressKey(VK_LEFT_ALT);
+                Thread.Sleep(50);
+            }
+
+            var waitAmount = monitorStatus.GetTimeUntilMonitorTurnsOn();
+
+            if (waitAmount != 0) {
+                Thread.Sleep((int)waitAmount);
+            }
         }
     }
 }

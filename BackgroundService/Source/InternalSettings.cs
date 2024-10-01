@@ -9,7 +9,7 @@
         public static readonly int BackupDefaultAmount = 5;
 
         public static readonly uint TimeoutHotkeyAction = 500;
-        public static readonly uint TimeoutSetDefaultAudio = 10_000;
+        public static readonly uint TimeoutSetDefaultAudio = 20_000;
 
         public static readonly bool ConsoleDefaultVisibility = false;
 

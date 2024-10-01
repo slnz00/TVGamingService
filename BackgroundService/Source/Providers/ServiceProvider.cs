@@ -33,6 +33,7 @@ namespace BackgroundService.Source.Providers
             public AudioService Audio;
             public CursorService Cursor;
             public WindowService Window;
+            public InputService Input;
         }
 
         public readonly ThirdPartyServices ThirdParty;
@@ -67,6 +68,7 @@ namespace BackgroundService.Source.Providers
                 Audio = RegisterService(new AudioService(this)),
                 Cursor = RegisterService(new CursorService(this)),
                 Window = RegisterService(new WindowService(this)),
+                Input = RegisterService(new InputService(this)),
             };
 
             ThirdParty = new ThirdPartyServices
