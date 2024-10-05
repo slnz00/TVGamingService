@@ -106,7 +106,6 @@ namespace BackgroundService.Source.Controllers
             lock (threadLock)
             {
                 CursorService.EnsureCursorIsVisible();
-                ProcessMutex.ReleaseMutex();
             }
         }
 

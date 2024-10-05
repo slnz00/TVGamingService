@@ -12,52 +12,7 @@ namespace BackgroundService.Source.Services.OS
 {
     internal class DisplayService : Service
     {
-        private class MonitorStatus
-        {
-            private readonly object threadLock = new object();
-            private long? turnedOnAt = null;
-
-            public volatile bool IsTurnedOn = true;
-            public long? TurnedOnAt
-            {
-                get { lock (threadLock) return turnedOnAt; }
-                set { lock (threadLock) turnedOnAt = value; }
-            }
-
-            public void Update()
-            {
-                lock (threadLock)
-                {
-                    bool newStatus = PowerManager.IsMonitorOn;
-                    bool isMonitorTurnedOn = !IsTurnedOn && newStatus;
-
-                    if (isMonitorTurnedOn)
-                    {
-                        TurnedOnAt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                    }
-                    IsTurnedOn = newStatus;
-                }
-            }
-
-            public long GetTimeUntilMonitorTurnsOn()
-            {
-                lock (threadLock)
-                {
-                    if (TurnedOnAt == null) {
-                        return 0;
-                    }
-
-                    long monitorTurnOnTime = 6000;
-
-                    long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                    long turnOnTime = (long)TurnedOnAt + monitorTurnOnTime - now;
-
-                    return turnOnTime > 0 ? turnOnTime : 0;
-                }
-            }
-        }
-
-        private readonly MonitorStatus monitorStatus = new MonitorStatus();
+        private readonly DisplaysStatus displaysStatus = new DisplaysStatus();
 
         public DisplayService(ServiceProvider services) : base(services) { }
 
@@ -65,7 +20,16 @@ namespace BackgroundService.Source.Services.OS
         {
             PowerManager.IsMonitorOnChanged += new EventHandler((object sender, EventArgs e) =>
             {
-                monitorStatus.Update();
+                try
+                {
+                    displaysStatus.Update(
+                        () => GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ONLY_ACTIVE_PATHS)
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to update displays status: {ex}");
+                }
             });
         }
 
@@ -81,6 +45,8 @@ namespace BackgroundService.Source.Services.OS
                 }
 
                 Logger.Info($"Switching to display: {fullName}");
+
+                EnsureDisplaysAreTurnedOn();
 
                 var settings = GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ALL_PATHS);
                 var defaultSettings = settings.Clone();
@@ -132,6 +98,8 @@ namespace BackgroundService.Source.Services.OS
             {
                 Logger.Info("Creating backup snapshot from current display settings");
 
+                EnsureDisplaysAreTurnedOn();
+
                 var settings = GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ONLY_ACTIVE_PATHS);
                 var displays = settings.Paths
                     .Select(p => GetDisplayDeviceFromTargetInfo(p.targetInfo))
@@ -160,6 +128,8 @@ namespace BackgroundService.Source.Services.OS
             try
             {
                 Logger.Info("Restoring display settings from snapshot");
+
+                EnsureDisplaysAreTurnedOn();
 
                 var snapshot = Services.State.Get<DisplaySettingsSnapshot>(States.DisplaySettingsSnapshot);
                 var settings = GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ALL_PATHS);
@@ -232,8 +202,6 @@ namespace BackgroundService.Source.Services.OS
 
         private DisplaySettings GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS flags)
         {
-            EnsureDisplaysAreTurnedOn();
-
             QueryDisplayConfig(
               flags,
               out var pathsCount,
@@ -255,8 +223,6 @@ namespace BackgroundService.Source.Services.OS
                 SET_DISPLAY_CONFIG_FLAGS.SDC_TOPOLOGY_SUPPLIED | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_PATH_ORDER_CHANGES :
                 SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_SAVE_TO_DATABASE | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES;
 
-            EnsureDisplaysAreTurnedOn();
-
             SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
                 baseFlags | SET_DISPLAY_CONFIG_FLAGS.SDC_APPLY
             ));
@@ -266,8 +232,6 @@ namespace BackgroundService.Source.Services.OS
         {
             var paths = settings.Paths.ToArray();
             var modes = settings.Modes.ToArray();
-
-            EnsureDisplaysAreTurnedOn();
 
             SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
                 SET_DISPLAY_CONFIG_FLAGS.SDC_VALIDATE | SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES
@@ -372,7 +336,9 @@ namespace BackgroundService.Source.Services.OS
 
         private void EnsureDisplaysAreTurnedOn()
         {
-            if (!monitorStatus.IsTurnedOn)
+            var state = displaysStatus.GetState();
+
+            if (!state.TurnedOn)
             {
                 ushort VK_LEFT_ALT = 0xA4;
 
@@ -380,10 +346,27 @@ namespace BackgroundService.Source.Services.OS
                 Thread.Sleep(50);
             }
 
-            var waitAmount = monitorStatus.GetTimeUntilMonitorTurnsOn();
+            state = displaysStatus.GetState();
 
-            if (waitAmount != 0) {
-                Thread.Sleep((int)waitAmount);
+            if (state.ReadyAt == null)
+            {
+                return;
+            }
+
+            Func<long> now = () => DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+            while (now() < state.ReadyAt)
+            {
+                var turnOnPaths = state.SettingWhenTurnedOn.GetPathMap();
+                var currentPaths = GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ONLY_ACTIVE_PATHS).GetPathMap();
+                var arePathsChanged = turnOnPaths.Count != currentPaths.Count || turnOnPaths.Except(currentPaths).Any();
+
+                if (arePathsChanged)
+                {
+                    break;
+                }
+
+                Thread.Sleep(250);
             }
         }
     }

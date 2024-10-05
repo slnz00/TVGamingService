@@ -160,6 +160,7 @@
     <Compile Include="Source\Services\OS\Models\DisplayDevice.cs" />
     <Compile Include="Source\Services\OS\Models\DisplaySettings.cs" />
     <Compile Include="Source\Services\OS\Models\DisplaySettingsSnapshot.cs" />
+    <Compile Include="Source\Services\OS\Models\DisplaysStatus.cs" />
     <Compile Include="Source\Services\OS\Models\LegacyDisplay.cs" />
     <Compile Include="Source\Providers\ServiceProvider.cs" />
     <Compile Include="Source\Services\OS\Models\WallpaperSettingsSnapshot.cs" />

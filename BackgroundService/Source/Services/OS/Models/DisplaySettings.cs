@@ -52,6 +52,16 @@ namespace BackgroundService.Source.Services.OS.Models
             ResetModes();
         }
 
+        public Dictionary<uint, uint> GetPathMap() {
+            var pathMap = new Dictionary<uint, uint>();
+
+            foreach (var path in Paths) {
+                pathMap.Add(path.sourceInfo.id, path.targetInfo.id);
+            }
+
+            return pathMap;
+        }
+
         public void ResetPaths()
         {
             for (int i = 0; i < Paths.Count; i++)
