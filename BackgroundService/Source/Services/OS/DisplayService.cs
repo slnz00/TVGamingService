@@ -348,21 +348,22 @@ namespace BackgroundService.Source.Services.OS
 
             state = displaysStatus.GetState();
 
-            if (state.ReadyAt == null)
+            Func<long> now = () => DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+            if (state.ReadyAt == null || now() >= state.ReadyAt)
             {
                 return;
             }
 
-            Func<long> now = () => DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            Thread.Sleep(2500);
 
             while (now() < state.ReadyAt)
             {
                 var turnOnPaths = state.SettingWhenTurnedOn.GetPathMap();
                 var currentPaths = GetDisplaySettings(QUERY_DISPLAY_CONFIG_FLAGS.QDC_ONLY_ACTIVE_PATHS).GetPathMap();
-                var arePathsChanged = turnOnPaths.Count != currentPaths.Count || turnOnPaths.Except(currentPaths).Any();
+                var pathsChanged = turnOnPaths.Count != currentPaths.Count || turnOnPaths.Except(currentPaths).Any();
 
-                if (arePathsChanged)
-                {
+                if (!pathsChanged) {
                     break;
                 }
 

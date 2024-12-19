@@ -10,7 +10,7 @@
 
         public static readonly uint TimeoutHotkeyAction = 500;
         public static readonly uint TimeoutSetDefaultAudio = 20_000;
-        public static readonly uint TimeoutDisplayTurnOn = 6_000;
+        public static readonly uint TimeoutDisplayTurnOn = 8_000;
 
         public static readonly bool ConsoleDefaultVisibility = false;
 
