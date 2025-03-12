@@ -187,8 +187,8 @@ namespace BackgroundService.Source.Controllers
 
         public void ChangeEnvironmentTo(Environments environment)
         {
-            lock (threadLock)
-            {
+            lock (threadLock) { 
+                var currentEnvironmentName = CurrentEnvironment.EnvironmentName;
                 var environmentName = EnumUtils.GetName(environment);
 
                 LogControllerEvent($"Switching environment to: {environmentName}");
@@ -208,8 +208,24 @@ namespace BackgroundService.Source.Controllers
                     return;
                 }
 
-                CurrentEnvironment?.Teardown();
-                newEnvironment.Setup();
+                try {
+                    CurrentEnvironment?.Teardown();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to teardown current environment {currentEnvironmentName}: {ex}");
+                    return;
+                }
+
+                try
+                {
+                    newEnvironment.Setup();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to setup environment {environmentName}: {ex}");
+                    return;
+                }
 
                 CurrentEnvironment = newEnvironment;
                 EnvironmentState = newEnvironment.EnvironmentType;

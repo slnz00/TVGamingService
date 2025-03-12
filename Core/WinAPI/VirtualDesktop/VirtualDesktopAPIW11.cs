@@ -167,6 +167,7 @@ namespace Core.WinAPI.VirtualDesktop
             [PreserveSig]
             int GetAdjacentDesktop(IVirtualDesktop from, int direction, out IVirtualDesktop desktop);
             void SwitchDesktop(IVirtualDesktop desktop);
+            void SwitchDesktopAndMoveForegroundView(IVirtualDesktop desktop);
             IVirtualDesktop CreateDesktop();
             void MoveDesktop(IVirtualDesktop desktop, int nIndex);
             void RemoveDesktop(IVirtualDesktop desktop, IVirtualDesktop fallback);
