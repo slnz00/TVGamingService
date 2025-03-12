@@ -19,14 +19,14 @@ namespace BackgroundService.Source.Controllers.Environment
         protected override void OnSetup()
         {
             RestoreSettings();
-            ResetDesktop();
             ResetCursor();
+            ResetDesktop();
         }
 
         protected override void OnReset()
         {
-            ResetDesktop();
             ResetCursor();
+            ResetDesktop();
         }
 
         protected override void OnTeardown()
