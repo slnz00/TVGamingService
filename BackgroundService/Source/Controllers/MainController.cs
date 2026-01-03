@@ -166,6 +166,7 @@ namespace BackgroundService.Source.Controllers
                 Services.OS.Hotkey.RegisterAction("ResetEnvironment", new HotkeyDefinition(Hotkeys.ResetEnvironment), ResetEnvironment);
                 Services.OS.Hotkey.RegisterAction("ToggleConsoleVisibility", new HotkeyDefinition(Hotkeys.ToggleConsoleVisibility), ToggleConsoleVisibility);
                 Services.OS.Hotkey.RegisterAction("ToggleCursorVisibility", new HotkeyDefinition(Hotkeys.ToggleCursorVisibility), ToggleCursorVisibility);
+                Services.OS.Hotkey.RegisterAction("ResetDS4Windows", new HotkeyDefinition(Hotkeys.ResetDS4Windows), ResetDS4Windows);
             }
         }
 
@@ -187,7 +188,8 @@ namespace BackgroundService.Source.Controllers
 
         public void ChangeEnvironmentTo(Environments environment)
         {
-            lock (threadLock) { 
+            lock (threadLock)
+            {
                 var currentEnvironmentName = CurrentEnvironment.EnvironmentName;
                 var environmentName = EnumUtils.GetName(environment);
 
@@ -208,7 +210,8 @@ namespace BackgroundService.Source.Controllers
                     return;
                 }
 
-                try {
+                try
+                {
                     CurrentEnvironment?.Teardown();
                 }
                 catch (Exception ex)
@@ -260,6 +263,23 @@ namespace BackgroundService.Source.Controllers
 
                 var currentVisibility = Services.OS.Cursor.GetCursorVisibility();
                 Services.OS.Cursor.SetCursorVisibility(!currentVisibility);
+            }
+        }
+
+        private void ResetDS4Windows()
+        {
+            lock (threadLock)
+            {
+                if (CurrentEnvironment.EnvironmentType != Environments.Game)
+                {
+                    LogControllerEvent("Reset DS4Windows hotkey is only available in Game environment");
+                    return;
+                }
+
+                LogControllerEvent("Resetting DS4Windows...");
+
+                Services.ThirdParty.DS4Windows.CloseDS4Windows();
+                Services.ThirdParty.DS4Windows.OpenDS4Windows();
             }
         }
 

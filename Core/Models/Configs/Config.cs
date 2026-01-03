@@ -42,6 +42,7 @@ namespace Core.Models.Configs
     {
         public List<string> SwitchEnvironment = new List<string> { "Alt", "NumPad0" };
         public List<string> ResetEnvironment = new List<string> { "Alt", "NumPad1" };
+        public List<string> ResetDS4Windows = new List<string> { "Alt", "NumPad2" };
         public List<string> ToggleCursorVisibility = new List<string> { "Alt", "NumPad8" };
         public List<string> ToggleConsoleVisibility = new List<string> { "Alt", "NumPad9" };
     }
