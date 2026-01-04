@@ -17,11 +17,12 @@ namespace BackgroundService.Source.Services.OS.Models
 
         public string Type { get; private set; }
         public IntPtr Handle { get; private set; }
+        public String ID => $"{ProcessID}:{Name}";
         public int ProcessID => GetProcessID();
         public Process Process => GetProcess();
         public string Name => GetName();
         public WindowComponentState State => GetState();
-        public bool IsValid => Handle != IntPtr.Zero;
+        public bool IsValid => Handle != null && IsWindow(Handle);
 
         public WindowComponent(string type, IntPtr handle)
         {

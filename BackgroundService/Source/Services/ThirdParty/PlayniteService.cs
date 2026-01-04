@@ -26,6 +26,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
         private PlayniteAppService PlayniteApp => Services.Communication.Playnite;
 
         private readonly object threadLock = new object();
+        private ManagedTask focusGameTask = null;
 
         private readonly EventListenerRegistry<PlayniteEventID, Action<object>> eventListenerRegistry = new EventListenerRegistry<PlayniteEventID, Action<object>>();
 
@@ -54,6 +55,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
                 OnGameStarted = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStarted, gameInfo),
                 OnGameStopped = (PlayniteGameInfo gameInfo) => RunEventListeners(PlayniteEventID.GameStopped, gameInfo),
             });
+
+            OnGameStarting((info) => FocusOnGameStart());
 
             StartWatcher();
 
@@ -182,6 +185,49 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
                 ProcessUtils.CloseProcess(ConfigPlayniteDesktop.ProcessName, false, TimeSpan.FromSeconds(3));
             }
+        }
+
+        public void FocusOnGameStart()
+        {
+            if (focusGameTask?.IsAlive == true) {
+                focusGameTask.Cancel();
+            }
+
+            focusGameTask = ManagedTask.Run(async (ctx) =>
+            {
+                var currentDesktopId = Services.OS.Desktop.GetCurrentDesktopId();
+                var focusedWindowIds = Services.OS.Desktop
+                    .GetWindowsOnDesktop(currentDesktopId)
+                    .Select(win => win.ID)
+                    .ToList();
+
+                var tries = 0;
+
+                while (tries < 15)
+                {
+                    try
+                    {
+                        var newWindows = Services.OS.Desktop
+                            .GetWindowsOnDesktop(currentDesktopId)
+                            .Where(win => !focusedWindowIds.Contains(win.ID))
+                            .ToList();
+
+                        newWindows.ForEach(win =>
+                        {
+                            win.Focus();
+                        });
+
+                        focusedWindowIds.AddRange(newWindows.Select(win => win.ID));
+                    }
+                    catch (Exception ex) {
+                        Logger.Error($"Failed to focus game window: {ex}");
+                        break;
+                    }
+
+                    tries++;
+                    await ctx.Delay(1000);
+                }
+            });
         }
 
         public void CloseSafeModeWindow()
