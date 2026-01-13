@@ -11,6 +11,15 @@ namespace Core.WinAPI
         [DllImport("user32.dll")]
         public static extern IntPtr GetMessageExtraInfo();
 
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
+
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
+
         [StructLayout(LayoutKind.Sequential)]
         public struct KeyboardInput
         {

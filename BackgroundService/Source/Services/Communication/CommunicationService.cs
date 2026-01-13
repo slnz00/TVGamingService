@@ -30,6 +30,7 @@ namespace BackgroundService.Source.Services.Communication
 
         private void CloseServiceHosts()
         {
+            Console.WriteLine($"CloseServiceHosts {new Exception().StackTrace}");
             serviceHosts.ForEach(serviceHost => serviceHost.Close());
         }
 

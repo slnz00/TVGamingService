@@ -1,7 +1,10 @@
-﻿using System;
+﻿using MS.WindowsAPICodePack.Internal;
+using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
-
+using System.Threading.Tasks;
+using static Core.WinAPI.InputAPI;
 using static Core.WinAPI.WindowAPI;
 
 namespace BackgroundService.Source.Services.OS.Models
@@ -66,9 +69,40 @@ namespace BackgroundService.Source.Services.OS.Models
             ShowWindow(Handle, (int)ShowWindowCommands.SW_MAXIMIZE);
         }
 
+        public static void UnlockForegroundLock()
+        {
+            const byte VK_SHIFT = 0x10;
+            const uint KEYEVENTF_KEYUP = 0x0002;
+
+            keybd_event(VK_SHIFT, 0, 0, 0);
+            keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
+        }
+
         public void Focus()
         {
-            SetForegroundWindow(Handle);
+            var currentThreadId = GetCurrentThreadId();
+            var foregroundThreadId = GetWindowThreadProcessId(GetForegroundWindow(), out var _);
+
+            UnlockForegroundLock();
+
+            bool attached = AttachThreadInput(currentThreadId, foregroundThreadId, true);
+
+            Console.WriteLine($"attached: {attached}");
+
+            try
+            {
+                ShowWindow(Handle, (int)ShowWindowCommands.SW_RESTORE);
+                SetForegroundWindow(Handle);
+                BringWindowToTop(Handle);
+                SwitchToThisWindow(Handle, true);
+            }
+            finally
+            {
+                if (attached)
+                {
+                    AttachThreadInput(currentThreadId, foregroundThreadId, false);
+                }
+            }
         }
 
         private string GetName()

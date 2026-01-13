@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BackgroundService.Source.Services.ThirdParty.Playnite
 {
@@ -57,6 +58,12 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             });
 
             OnGameStarting((info) => FocusOnGameStart());
+            OnGameStopped((info) => {
+                if (focusGameTask?.IsAlive == true)
+                {
+                    focusGameTask.Cancel();
+                }
+            });
 
             StartWatcher();
 
@@ -189,6 +196,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
         public void FocusOnGameStart()
         {
+            Console.WriteLine("FocusOnGameStart");
+
             if (focusGameTask?.IsAlive == true) {
                 focusGameTask.Cancel();
             }
@@ -196,6 +205,7 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
             focusGameTask = ManagedTask.Run(async (ctx) =>
             {
                 var currentDesktopId = Services.OS.Desktop.GetCurrentDesktopId();
+                Console.WriteLine($"FocusOnGameStart - DesktopId: {currentDesktopId}");
                 var focusedWindowIds = Services.OS.Desktop
                     .GetWindowsOnDesktop(currentDesktopId)
                     .Select(win => win.ID)
@@ -203,7 +213,13 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
 
                 var tries = 0;
 
-                while (tries < 15)
+                Services.OS.Desktop
+                    .GetWindowsOnDesktop(currentDesktopId)
+                    .Select(win => win.Name)
+                    .ToList()
+                    .ForEach(Console.WriteLine);
+
+                while (tries < 20)
                 {
                     try
                     {
@@ -212,10 +228,11 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
                             .Where(win => !focusedWindowIds.Contains(win.ID))
                             .ToList();
 
-                        newWindows.ForEach(win =>
+                        foreach (var win in newWindows)
                         {
+                            Console.WriteLine($"Focus new window: {win.Name}");
                             win.Focus();
-                        });
+                        }
 
                         focusedWindowIds.AddRange(newWindows.Select(win => win.ID));
                     }
@@ -302,6 +319,8 @@ namespace BackgroundService.Source.Services.ThirdParty.Playnite
         private void RunEventListeners(PlayniteEventID eventId, object args)
         {
             var listeners = eventListenerRegistry.GetListenersByEventId(eventId);
+
+            Console.WriteLine($"Playnite event: {EnumUtils.GetName(eventId)}");
 
             listeners.ForEach(listener =>
             {
