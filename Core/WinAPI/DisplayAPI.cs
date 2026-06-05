@@ -513,9 +513,9 @@ namespace Core.WinAPI
 
         public static void SetDisplayConfig(
             uint numPathArrayElements,
-            ref DISPLAYCONFIG_PATH_INFO[] pathArray,
+            DISPLAYCONFIG_PATH_INFO[] pathArray,
             uint numModeInfoArrayElements,
-            ref DISPLAYCONFIG_MODE_INFO[] modeInfoArray,
+            DISPLAYCONFIG_MODE_INFO[] modeInfoArray,
             SET_DISPLAY_CONFIG_FLAGS flags
         )
         {

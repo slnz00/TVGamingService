@@ -67,12 +67,13 @@ namespace BackgroundService.Source.Services.OS
 
                 Logger.Debug($"Assigning source for display: {source.id}");
 
-                settings.Reset();
-                settings.ActivatePath(source.id, display.TargetInfo.id);
+                settings.ResetPaths();
+                settings.ActivatePath(source.id, display.TargetInfo.id, display.TargetInfo.adapterId);
 
-                defaultSettings.ResetPaths();
-                defaultSettings.ActivatePath(source.id, display.TargetInfo.id);
-
+                defaultSettings.Reset();
+                defaultSettings.ActivatePath(source.id, display.TargetInfo.id, display.TargetInfo.adapterId);
+                defaultSettings.KeepOnlyActivePaths();
+                
                 try
                 {
                     SaveDisplaySettings(settings);
@@ -149,16 +150,18 @@ namespace BackgroundService.Source.Services.OS
                     var snapshotDisplay = snapshot.GetDisplayForPath(snapshotPath);
                     var sourceId = snapshotPath.sourceInfo.id;
                     var targetId = snapshotPath.targetInfo.id;
+                    var adapterId = snapshotPath.targetInfo.adapterId;
 
                     snapshot.Settings.GetModesForPath(
                         sourceId,
                         targetId,
+                        adapterId,
                         out var snapshotSourceMode,
                         out var snapshotTargetMode
                     );
 
-                    settings.ActivatePath(sourceId, targetId);
-                    settings.SetModesForPath(sourceId, targetId, snapshotSourceMode, snapshotTargetMode);
+                    settings.ActivatePath(sourceId, targetId, adapterId);
+                    settings.SetModesForPath(sourceId, targetId, adapterId, snapshotSourceMode, snapshotTargetMode);
                 }
 
                 SaveDisplaySettings(settings);
@@ -223,7 +226,7 @@ namespace BackgroundService.Source.Services.OS
                 SET_DISPLAY_CONFIG_FLAGS.SDC_TOPOLOGY_SUPPLIED | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_PATH_ORDER_CHANGES :
                 SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_SAVE_TO_DATABASE | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES;
 
-            SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
+            SetDisplayConfig((uint)paths.Length, paths, (uint)modes.Length, modes.Length > 0 ? modes : null, (
                 baseFlags | SET_DISPLAY_CONFIG_FLAGS.SDC_APPLY
             ));
         }
@@ -233,7 +236,7 @@ namespace BackgroundService.Source.Services.OS
             var paths = settings.Paths.ToArray();
             var modes = settings.Modes.ToArray();
 
-            SetDisplayConfig((uint)paths.Length, ref paths, (uint)modes.Length, ref modes, (
+            SetDisplayConfig((uint)paths.Length, paths, (uint)modes.Length, modes.Length > 0 ? modes : null, (
                 SET_DISPLAY_CONFIG_FLAGS.SDC_VALIDATE | SET_DISPLAY_CONFIG_FLAGS.SDC_USE_SUPPLIED_DISPLAY_CONFIG | SET_DISPLAY_CONFIG_FLAGS.SDC_ALLOW_CHANGES
             ));
         }
@@ -244,7 +247,12 @@ namespace BackgroundService.Source.Services.OS
             {
                 var currentPath = settings.Paths[pathIndex];
 
-                if (currentPath.targetInfo.id != display.TargetInfo.id)
+                var isSameTarget =
+                   currentPath.targetInfo.id == display.TargetInfo.id &&
+                   currentPath.targetInfo.adapterId.LowPart == display.TargetInfo.adapterId.LowPart &&
+                   currentPath.targetInfo.adapterId.HighPart == display.TargetInfo.adapterId.HighPart;
+
+                if (!isSameTarget || currentPath.targetInfo.targetAvailable == 0)
                 {
                     continue;
                 }
@@ -252,7 +260,7 @@ namespace BackgroundService.Source.Services.OS
                 try
                 {
                     var currentSettings = settings.Clone();
-                    currentSettings.ActivatePath(currentPath.sourceInfo.id, currentPath.targetInfo.id);
+                    currentSettings.ActivatePath(currentPath.sourceInfo.id, currentPath.targetInfo.id, currentPath.targetInfo.adapterId);
 
                     ValidateDisplaySettings(currentSettings);
 
@@ -263,11 +271,20 @@ namespace BackgroundService.Source.Services.OS
 
             throw new InvalidOperationException("Display does not have a valid source");
         }
+
         private DisplayDevice GetDisplayByDevicePath(DisplayDevice[] displays, string devicePath)
         {
+            if (string.IsNullOrWhiteSpace(devicePath))
+            {
+                return null;
+            }
+
             return displays
-                    .Where(dp => dp.NameInfo.monitorDevicePath == devicePath)
-                    .FirstOrDefault();
+                .Where(dp => string.Equals(
+                    dp.NameInfo.monitorDevicePath,
+                    devicePath,
+                    StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault();
         }
 
         private DisplayDevice GetDisplayByFullName(DisplayDevice[] displays, string fullName)
@@ -296,9 +313,14 @@ namespace BackgroundService.Source.Services.OS
         private DisplayDevice[] GetAvailableDisplays(DisplaySettings settings)
         {
             return settings.Paths
+                .Where(path => path.targetInfo.targetAvailable == 1)
                 .Select(path => path.targetInfo)
-                .Where(targetInfo => targetInfo.targetAvailable == 1)
-                .GroupBy(targetInfo => targetInfo.id)
+                .GroupBy(targetInfo => new
+                {
+                    targetInfo.adapterId.LowPart,
+                    targetInfo.adapterId.HighPart,
+                    targetInfo.id
+                })
                 .Select(group => group.First())
                 .Select(GetDisplayDeviceFromTargetInfo)
                 .ToArray();

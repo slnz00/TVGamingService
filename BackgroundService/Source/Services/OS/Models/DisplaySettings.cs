@@ -73,9 +73,6 @@ namespace BackgroundService.Source.Services.OS.Models
                         (uint)DISPLAYCONFIG_PATH_FLAGS.DISPLAYCONFIG_PATH_ACTIVE,
                         false
                     );
-
-                    path.sourceInfo.statusFlags = 0;
-                    path.targetInfo.statusFlags = 0;
                 });
             }
         }
@@ -94,24 +91,29 @@ namespace BackgroundService.Source.Services.OS.Models
             }
         }
 
-        public void ActivatePath(uint sourceId, uint targetId)
+        public void ActivatePath(uint sourceId, uint targetId, LUID adapterId)
         {
-            ModifyPath(sourceId, targetId, (ref DISPLAYCONFIG_PATH_INFO path) =>
+            ModifyPath(sourceId, targetId, adapterId, (ref DISPLAYCONFIG_PATH_INFO path) =>
             {
                 BitUtils.SetBit(
                     ref path.flags,
                     (uint)DISPLAYCONFIG_PATH_FLAGS.DISPLAYCONFIG_PATH_ACTIVE,
                     true
                 );
-
-                path.sourceInfo.statusFlags = 1;
-                path.targetInfo.statusFlags = 1;
             });
         }
 
-        public void InactivatePath(uint sourceId, uint targetId)
+        public void KeepOnlyActivePaths()
         {
-            ModifyPath(sourceId, targetId, (ref DISPLAYCONFIG_PATH_INFO path) =>
+            Paths = Paths
+                .Where(p =>
+                    (p.flags & (uint)DISPLAYCONFIG_PATH_FLAGS.DISPLAYCONFIG_PATH_ACTIVE) != 0)
+                .ToList();
+        }
+
+        public void InactivatePath(uint sourceId, uint targetId, LUID adapterId)
+        {
+            ModifyPath(sourceId, targetId, adapterId, (ref DISPLAYCONFIG_PATH_INFO path) =>
             {
                 BitUtils.SetBit(
                     ref path.flags,
@@ -124,9 +126,9 @@ namespace BackgroundService.Source.Services.OS.Models
             });
         }
 
-        public void ModifyPath(uint sourceId, uint targetId, ModifyPathAction action)
+        public void ModifyPath(uint sourceId, uint targetId, LUID adapterId, ModifyPathAction action)
         {
-            var pathIndex = FindPathIndex(sourceId, targetId);
+            var pathIndex = FindPathIndex(sourceId, targetId, adapterId);
             var path = Paths[pathIndex];
 
             action(ref path);
@@ -143,9 +145,9 @@ namespace BackgroundService.Source.Services.OS.Models
             Paths[pathIndex] = path;
         }
 
-        public void GetModesForPath(uint sourceId, uint targetId, out DISPLAYCONFIG_MODE_INFO? sourceMode, out DISPLAYCONFIG_MODE_INFO? targetMode)
+        public void GetModesForPath(uint sourceId, uint targetId, LUID adapterId, out DISPLAYCONFIG_MODE_INFO? sourceMode, out DISPLAYCONFIG_MODE_INFO? targetMode)
         {
-            var pathIndex = FindPathIndex(sourceId, targetId);
+            var pathIndex = FindPathIndex(sourceId, targetId, adapterId);
             var sourceModeIdx = Paths[pathIndex].sourceInfo.idx.modeInfoIdx;
             var targetModeIdx = Paths[pathIndex].targetInfo.idx.modeInfoIdx;
 
@@ -168,10 +170,10 @@ namespace BackgroundService.Source.Services.OS.Models
             }
         }
 
-        public void RemoveModesForPath(uint sourceId, uint targetId)
+        public void RemoveModesForPath(uint sourceId, uint targetId, LUID adapterId)
         {
             var modeIndexesToRemove = new List<int>();
-            var pathIndex = FindPathIndex(sourceId, targetId);
+            var pathIndex = FindPathIndex(sourceId, targetId, adapterId);
             var sourceModeIdx = Paths[pathIndex].sourceInfo.idx.modeInfoIdx;
             var targetModeIdx = Paths[pathIndex].targetInfo.idx.modeInfoIdx;
 
@@ -190,11 +192,11 @@ namespace BackgroundService.Source.Services.OS.Models
             }
         }
 
-        public void SetModesForPath(uint sourceId, uint targetId, DISPLAYCONFIG_MODE_INFO? sourceMode, DISPLAYCONFIG_MODE_INFO? targetMode)
+        public void SetModesForPath(uint sourceId, uint targetId, LUID adapterId, DISPLAYCONFIG_MODE_INFO? sourceMode, DISPLAYCONFIG_MODE_INFO? targetMode)
         {
-            RemoveModesForPath(sourceId, targetId);
+            RemoveModesForPath(sourceId, targetId, adapterId);
 
-            ModifyPath(sourceId, targetId, (ref DISPLAYCONFIG_PATH_INFO path) =>
+            ModifyPath(sourceId, targetId, adapterId, (ref DISPLAYCONFIG_PATH_INFO path) =>
             {
                 if (sourceMode != null)
                 {
@@ -220,15 +222,21 @@ namespace BackgroundService.Source.Services.OS.Models
             });
         }
 
-        public int FindPathIndex(uint sourceId, uint targetId)
+        public int FindPathIndex(uint sourceId, uint targetId, LUID adapterId)
         {
             for (int i = 0; i < Paths.Count; i++)
             {
                 var source = Paths[i].sourceInfo;
                 var target = Paths[i].targetInfo;
-                var isSelectedPath = source.id == sourceId && target.id == targetId;
 
-                if (isSelectedPath)
+                var isSelectedPath = source.id == sourceId && target.id == targetId;
+                var isSelectedAdapter =
+                    source.adapterId.LowPart == adapterId.LowPart &&
+                    source.adapterId.HighPart == adapterId.HighPart &&
+                    target.adapterId.LowPart == adapterId.LowPart &&
+                    target.adapterId.HighPart == adapterId.HighPart;
+
+                if (isSelectedPath && isSelectedAdapter && target.targetAvailable == 1)
                 {
                     return i;
                 }
